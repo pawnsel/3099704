@@ -1,0 +1,2188 @@
+<!doctype html>
+<html lang="th" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ชีตอ่าน AI2 — Vibe Coding ในงานวิจัย AI/ML</title>
+<style>
+:root{
+  color-scheme: light;
+  --bg:#f9f9f7; --surface:#fcfcfb; --surface2:#f2f1ed;
+  --ink:#0b0b0b; --ink2:#52514e; --muted:#898781;
+  --grid:#e1e0d9; --axis:#c3c2b7; --border:rgba(11,11,11,.10);
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#4a3aa7;
+  --seq1:#86b6ef; --seq2:#5598e7; --seq3:#2a78d6; --seq4:#1c5cab; --seq5:#104281;
+  --good:#0ca30c; --warn:#fab219; --serious:#ec835a; --crit:#d03b3b;
+  --star:#b07900; --starbg:#fff8e6; --warnbg:#fdf0ee; --tipbg:#eef4fc;
+  --shadow:0 1px 2px rgba(11,11,11,.05), 0 8px 24px -16px rgba(11,11,11,.18);
+}
+@media (prefers-color-scheme: dark){
+  :root:where(:not([data-theme="light"])){
+    color-scheme: dark;
+    --bg:#0d0d0d; --surface:#1a1a19; --surface2:#222221;
+    --ink:#ffffff; --ink2:#c3c2b7; --muted:#898781;
+    --grid:#2c2c2a; --axis:#383835; --border:rgba(255,255,255,.10);
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#9085e9;
+    --seq1:#184f95; --seq2:#256abf; --seq3:#2a78d6; --seq4:#5598e7; --seq5:#9ec5f4;
+    --star:#fab219; --starbg:#2a2412; --warnbg:#2a1a18; --tipbg:#15202e;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --bg:#0d0d0d; --surface:#1a1a19; --surface2:#222221;
+  --ink:#ffffff; --ink2:#c3c2b7; --muted:#898781;
+  --grid:#2c2c2a; --axis:#383835; --border:rgba(255,255,255,.10);
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#9085e9;
+  --seq1:#184f95; --seq2:#256abf; --seq3:#2a78d6; --seq4:#5598e7; --seq5:#9ec5f4;
+  --star:#fab219; --starbg:#2a2412; --warnbg:#2a1a18; --tipbg:#15202e;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.7);
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth; scroll-padding-top:16px}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"IBM Plex Sans Thai","Noto Sans Thai","Sukhumvit Set",-apple-system,"Thonburi",system-ui,"Segoe UI",sans-serif;
+  font-size:16.5px; line-height:1.78; -webkit-text-size-adjust:100%;
+}
+.wrap{display:flex; gap:0; align-items:flex-start}
+
+/* ---------- sidebar ---------- */
+#side{
+  position:sticky; top:0; height:100vh; flex:0 0 298px; width:298px;
+  background:var(--surface); border-right:1px solid var(--border);
+  display:flex; flex-direction:column; z-index:40;
+}
+#side .sbhead{padding:16px 18px 10px; border-bottom:1px solid var(--border)}
+#side .sbtitle{font-weight:700; font-size:15px; letter-spacing:.01em}
+#side .sbsub{font-size:12.5px; color:var(--muted); margin-top:2px}
+.searchbox{position:relative; margin-top:12px}
+.searchbox input{
+  width:100%; padding:8px 30px 8px 11px; font:inherit; font-size:14px;
+  border:1px solid var(--border); border-radius:9px; background:var(--surface2); color:var(--ink);
+}
+.searchbox input:focus{outline:2px solid var(--s1); outline-offset:1px}
+.searchbox .clr{
+  position:absolute; right:6px; top:50%; transform:translateY(-50%);
+  border:0; background:none; color:var(--muted); cursor:pointer; font-size:16px; line-height:1; padding:4px;
+  display:none;
+}
+#searchmeta{font-size:12px; color:var(--muted); margin-top:6px; min-height:1.2em}
+#toc{overflow-y:auto; padding:10px 10px 40px; flex:1}
+#toc .sechead{
+  font-size:11.5px; font-weight:700; letter-spacing:.06em; color:var(--muted);
+  text-transform:none; padding:12px 8px 4px;
+}
+#toc a{
+  display:flex; gap:8px; align-items:baseline; text-decoration:none; color:var(--ink2);
+  font-size:13.5px; line-height:1.45; padding:5px 8px; border-radius:7px; border-left:2px solid transparent;
+}
+#toc a:hover{background:var(--surface2); color:var(--ink)}
+#toc a.on{background:var(--tipbg); color:var(--ink); border-left-color:var(--s1); font-weight:600}
+#toc a.hit{box-shadow:inset 0 0 0 1px var(--warn)}
+#toc a.dim{display:none}
+#toc a .n{flex:0 0 1.6em; color:var(--muted); font-variant-numeric:tabular-nums; font-size:12.5px}
+#toc a .st{color:var(--star); font-size:11px}
+.sbfoot{padding:10px 14px; border-top:1px solid var(--border); display:flex; gap:6px; flex-wrap:wrap}
+.btn{
+  font:inherit; font-size:12.5px; padding:5px 10px; border-radius:8px; cursor:pointer;
+  border:1px solid var(--border); background:var(--surface2); color:var(--ink2);
+}
+.btn:hover{color:var(--ink); border-color:var(--axis)}
+.btn[aria-pressed="true"]{background:var(--tipbg); border-color:var(--s1); color:var(--ink)}
+
+#menubtn{display:none}
+.scrim{display:none}
+
+/* ---------- main ---------- */
+main{flex:1 1 auto; min-width:0; padding:0 clamp(16px,3.5vw,44px) 120px; max-width:1000px}
+header.pg{padding:40px 0 10px; border-bottom:1px solid var(--border); margin-bottom:26px}
+h1{font-size:clamp(23px,3.1vw,33px); line-height:1.3; margin:0 0 10px; letter-spacing:-.01em}
+.meta{color:var(--ink2); font-size:14px; line-height:1.7}
+.meta em{font-style:normal; color:var(--muted)}
+
+h2.sec{
+  font-size:clamp(19px,2.3vw,24px); margin:58px 0 6px; padding-top:10px; line-height:1.35;
+  border-top:2px solid var(--ink); display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;
+}
+h2.sec .pill{
+  font-size:12px; font-weight:600; color:var(--surface); background:var(--ink);
+  padding:2px 9px; border-radius:20px; letter-spacing:.02em;
+}
+.secintro{color:var(--ink2); font-size:14.5px; margin:0 0 4px}
+
+section.ch{margin:30px 0 0; scroll-margin-top:14px}
+section.ch h3{
+  font-size:clamp(17px,1.9vw,20px); line-height:1.4; margin:0 0 12px; letter-spacing:-.005em;
+}
+.chfold>summary{list-style:none; cursor:pointer; display:flex; gap:10px; align-items:baseline; flex-wrap:wrap}
+.chfold>summary::-webkit-details-marker{display:none}
+.chfold>summary::before{
+  content:"▸"; color:var(--muted); font-size:13px; transform:translateY(-1px);
+}
+.chfold[open]>summary::before{content:"▾"}
+.chfold>summary h3{margin:0}
+.chfold>summary:hover h3{color:var(--s1)}
+.chip{
+  font-size:11.5px; font-weight:600; padding:1px 8px; border-radius:20px; white-space:nowrap;
+  border:1px solid var(--border); color:var(--muted); background:var(--surface2);
+}
+.chbody{padding-top:4px}
+.chfold .chbody{padding-top:10px}
+
+p{margin:0 0 13px}
+b,strong{font-weight:700; color:var(--ink)}
+code{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:.87em;
+  background:var(--surface2); padding:1px 5px; border-radius:5px; border:1px solid var(--border);
+}
+pre{
+  background:var(--surface); border:1px solid var(--border); border-radius:11px;
+  padding:14px 16px; overflow-x:auto; margin:0 0 15px; box-shadow:var(--shadow);
+}
+pre code{background:none; border:0; padding:0; font-size:13px; line-height:1.6; white-space:pre}
+
+/* callouts */
+.key,.warnbox,.tip{
+  margin:0 0 15px; padding:13px 16px; border-radius:11px; font-size:15.5px;
+  border:1px solid var(--border); border-left-width:4px;
+}
+.key{background:var(--starbg); border-left-color:var(--star)}
+.warnbox{background:var(--warnbg); border-left-color:var(--crit)}
+.tip{background:var(--tipbg); border-left-color:var(--s1)}
+.key .lb,.warnbox .lb,.tip .lb{display:block; font-size:12px; font-weight:700; letter-spacing:.05em; margin-bottom:3px}
+.key .lb{color:var(--star)} .warnbox .lb{color:var(--crit)} .tip .lb{color:var(--s1)}
+
+ul,ol{margin:0 0 14px; padding-left:1.35em}
+li{margin:0 0 6px}
+.bul{list-style:none; padding:0}
+.bul>li{position:relative; padding-left:1.25em}
+.bul>li::before{content:"·"; position:absolute; left:.35em; color:var(--muted); font-weight:700}
+
+/* tables */
+.tw{overflow-x:auto; margin:0 0 17px; border:1px solid var(--border); border-radius:11px; background:var(--surface); box-shadow:var(--shadow)}
+table{border-collapse:collapse; width:100%; font-size:14.5px}
+th,td{padding:9px 13px; text-align:left; vertical-align:top; border-bottom:1px solid var(--grid)}
+thead th{background:var(--surface2); font-size:13px; font-weight:700; color:var(--ink2); white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
+td.num,th.num{text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap}
+td .hi{font-weight:700}
+
+/* figures */
+figure{
+  margin:0 0 20px; padding:16px 16px 12px; background:var(--surface);
+  border:1px solid var(--border); border-radius:13px; box-shadow:var(--shadow);
+}
+figure svg{display:block; width:100%; height:auto; overflow:visible}
+figcaption{font-size:12.8px; color:var(--muted); margin-top:9px; line-height:1.6}
+.figtitle{font-size:14.5px; font-weight:700; margin:0 0 3px}
+.figsub{font-size:13px; color:var(--ink2); margin:0 0 12px}
+.legend{display:flex; gap:14px; flex-wrap:wrap; font-size:12.8px; color:var(--ink2); margin:0 0 10px}
+.legend span{display:inline-flex; align-items:center; gap:6px}
+.sw{width:11px; height:11px; border-radius:3px; display:inline-block; flex:0 0 auto}
+.svgtxt{font-size:12px; fill:var(--ink2)}
+.svgtxt.sm{font-size:11px; fill:var(--muted)}
+.svgtxt.b{font-weight:700; fill:var(--ink)}
+.svgval{font-size:12.5px; font-weight:700; fill:var(--ink); font-variant-numeric:tabular-nums}
+
+/* stat tiles */
+.tiles{display:grid; gap:12px; grid-template-columns:repeat(auto-fit,minmax(232px,1fr)); margin:0 0 18px}
+.tile{
+  background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:13px 15px; box-shadow:var(--shadow);
+}
+.tile .v{font-size:27px; font-weight:700; line-height:1.15; letter-spacing:-.02em}
+.tile .k{font-size:12.5px; color:var(--ink2); margin-top:4px; line-height:1.5}
+.tile.acc{border-left:4px solid var(--s1)}
+.tile.bad{border-left:4px solid var(--crit)}
+.tile.ok{border-left:4px solid var(--good)}
+.tile.gold{border-left:4px solid var(--star)}
+
+/* cards */
+.cards{display:grid; gap:12px; grid-template-columns:repeat(auto-fit,minmax(215px,1fr)); margin:0 0 18px}
+.card{background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:13px 15px; box-shadow:var(--shadow)}
+.card h4{margin:0 0 5px; font-size:14.5px}
+.card p{margin:0; font-size:13.5px; color:var(--ink2); line-height:1.65}
+
+/* quiz */
+.quiz{margin:0 0 20px}
+.qhead{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:0 0 11px}
+.qhead .qt{font-size:15.5px; font-weight:700}
+.qitem{
+  background:var(--surface); border:1px solid var(--border); border-radius:12px;
+  padding:13px 15px; margin:0 0 10px; box-shadow:var(--shadow);
+}
+.qitem .qn{
+  display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px;
+  border-radius:50%; background:var(--surface2); border:1px solid var(--border);
+  font-size:12.5px; font-weight:700; color:var(--ink2); margin-right:8px; flex:0 0 auto;
+}
+.qq{display:flex; align-items:flex-start; font-size:15px; line-height:1.68}
+.qa{
+  margin-top:11px; padding-top:11px; border-top:1px dashed var(--axis); font-size:14.5px;
+  animation:fade .18s ease;
+}
+@keyframes fade{from{opacity:0; transform:translateY(-3px)}to{opacity:1; transform:none}}
+.qa[hidden]{display:none}
+.qa .ans{font-weight:700; color:var(--good)}
+.qreveal{
+  margin-top:10px; font:inherit; font-size:13px; font-weight:600; padding:5px 12px; cursor:pointer;
+  border-radius:8px; border:1px solid var(--s1); background:none; color:var(--s1);
+}
+.qreveal:hover{background:var(--tipbg)}
+.qreveal.open{border-color:var(--border); color:var(--muted)}
+
+/* misc */
+mark{background:var(--warn); color:#0b0b0b; border-radius:3px; padding:0 2px}
+.flow{
+  display:flex; gap:8px; align-items:center; flex-wrap:wrap; font-size:13.5px;
+  margin:0 0 15px; color:var(--ink2);
+}
+.flow .nd{background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:5px 11px; color:var(--ink)}
+.flow .ar{color:var(--muted)}
+.topnote{
+  background:var(--surface); border:1px solid var(--border); border-left:4px solid var(--s4);
+  border-radius:11px; padding:13px 16px; margin:0 0 20px; font-size:15px;
+}
+.marks{display:flex; gap:16px; flex-wrap:wrap; font-size:13.5px; color:var(--ink2); margin:14px 0 0}
+hr.soft{border:0; border-top:1px solid var(--grid); margin:26px 0}
+.backtop{
+  position:fixed; right:18px; bottom:18px; z-index:50; border-radius:50%; width:42px; height:42px;
+  border:1px solid var(--border); background:var(--surface); color:var(--ink2); cursor:pointer;
+  box-shadow:var(--shadow); font-size:17px; display:none;
+}
+.sheetfoot{margin-top:50px; padding-top:18px; border-top:1px solid var(--border); font-size:13px; color:var(--muted)}
+
+/* interactive: pipeline swap + bug hunt */
+.seg{display:flex; gap:6px; margin:0 0 12px; flex-wrap:wrap}
+.segbtn{font:inherit; font-size:13px; font-weight:600; padding:6px 14px; border-radius:9px; cursor:pointer;
+  border:1px solid var(--border); background:var(--surface2); color:var(--ink2)}
+.segbtn:hover{color:var(--ink); border-color:var(--axis)}
+.segbtn.on{background:var(--tipbg); border-color:var(--s1); color:var(--ink)}
+.swap .pane{display:none}
+.swap[data-mode="leak"] .pane.leak{display:block}
+.swap[data-mode="ok"] .pane.ok{display:block}
+.hunt .huntbar{font-size:13.5px; color:var(--ink2); margin:0 0 10px; font-weight:600}
+.huntcode{border:1px solid var(--border); border-radius:11px; overflow:hidden; background:var(--surface2); margin:0 0 12px}
+.hunt .ln{display:flex; gap:10px; align-items:baseline; width:100%; text-align:left; font:inherit;
+  background:none; border:0; border-left:3px solid transparent; padding:7px 12px; cursor:pointer; color:var(--ink)}
+.hunt .ln+.ln{border-top:1px solid var(--grid)}
+.hunt .ln:hover{background:var(--surface)}
+.hunt .ln.found{border-left-color:var(--crit); background:var(--warnbg)}
+.hunt .lnno{flex:0 0 1.3em; color:var(--muted); font-size:12px; font-variant-numeric:tabular-nums}
+.hunt .lncode{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:12.5px; line-height:1.6; overflow-wrap:anywhere}
+.hunt .note{background:var(--warnbg); border:1px solid var(--border); border-left:3px solid var(--crit);
+  border-radius:9px; padding:9px 13px; margin:0 0 8px; font-size:14px; animation:fade .18s ease}
+.hunt .note[hidden]{display:none}
+@media print{ .swap .pane{display:block!important} .hunt .note{display:block!important} .segbtn,#huntAll{display:none!important} }
+
+@media (max-width:880px){
+  #side{
+    position:fixed; left:0; top:0; height:100vh; transform:translateX(-100%);
+    transition:transform .22s ease; box-shadow:var(--shadow);
+  }
+  body.navopen #side{transform:none}
+  body.navopen .scrim{display:block; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:35}
+  #menubtn{
+    display:block; position:fixed; left:14px; bottom:18px; z-index:45; width:46px; height:46px;
+    border-radius:50%; border:1px solid var(--border); background:var(--surface); color:var(--ink);
+    font-size:19px; cursor:pointer; box-shadow:var(--shadow);
+  }
+  main{padding-left:16px; padding-right:16px; padding-bottom:150px}
+  header.pg{padding-top:26px}
+  section.ch{scroll-margin-top:10px}
+  .tiles{grid-template-columns:1fr 1fr; gap:10px}
+  .tile .v{font-size:23px}
+}
+@media print{
+  #side,#menubtn,.backtop,.qreveal,.scrim{display:none!important}
+  .qa{display:block!important}
+  body{background:#fff; font-size:11pt}
+  figure,.tw,.tile,.card,.qitem{box-shadow:none; break-inside:avoid}
+  section.ch{break-inside:avoid-page}
+  .chfold>summary::before{content:""}
+}
+</style>
+</head>
+<body>
+<button id="menubtn" aria-label="เปิดสารบัญ">☰</button>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+
+<nav id="side" aria-label="สารบัญ">
+  <div class="sbhead">
+    <div class="sbtitle">ชีตอ่าน AI2</div>
+    <div class="sbsub">Vibe Coding ในงานวิจัย AI/ML · 37 บท</div>
+    <div class="searchbox">
+      <input id="q" type="search" placeholder="ค้นหาในชีต…" autocomplete="off" aria-label="ค้นหา">
+      <button class="clr" id="qclr" aria-label="ล้างคำค้น">×</button>
+    </div>
+    <div id="searchmeta"></div>
+  </div>
+  <div id="toc"></div>
+  <div class="sbfoot">
+    <button class="btn" id="themebtn">◐ ธีม: อัตโนมัติ</button>
+    <button class="btn" id="expandbtn">เปิดบททั้งหมด</button>
+    <button class="btn" id="allansbtn">เฉลยทั้งหมด</button>
+  </div>
+</nav>
+
+<main>
+<header class="pg">
+  <h1>เรื่องเล่า AI for Digital Health ภาค 2 — Vibe Coding ในงานวิจัย AI/ML</h1>
+  <div class="meta">
+    Week 2 — ผู้ช่วยเขียนโค้ดด้วย AI · การตรวจสอบโค้ดที่ถูกสร้างขึ้น · และการทำซ้ำได้<br>
+    <em>อ.ดิษยา วรรณวิไล · 3099704 AI for Digital Health · จุฬาลงกรณ์มหาวิทยาลัย · 2 ตุลาคม 2026</em><br>
+    <em>สรุปจากสไลด์ 63 แผ่น — ⚠️ ไม่มีไฟล์เสียงบรรยาย เนื้อหามาจากสไลด์ล้วน ๆ</em>
+  </div>
+  <div class="marks">
+    <span>⭐ เน้นหนัก มีโอกาสออกสอบสูง</span>
+    <span>⚠️ กับดักที่คนพลาดบ่อย</span>
+    <span>💡 ข้อสังเกตที่ช่วยให้เห็นภาพ</span>
+  </div>
+</header>
+
+<div class="topnote">
+  <b>โจทย์ที่ลากยาวทั้งภาค</b><br>
+  พยาบาลนักวิจัยคนหนึ่งขอให้ AI ช่วย <i>“ทำนายเบาหวานจากไฟล์ของคลินิกนี้”</i> แล้วใน 20 วินาที โค้ดก็รายงาน accuracy 0.78 ออกมา ⭐ คำถามคือ <b>ตัวเลขนั้นดีหรือไม่ดี</b> และคำตอบคือเรายังบอกไม่ได้เลย จนกว่าจะรู้ว่า <b>ข้อมูลถูกแบ่งอย่างไร ใช้ตัววัดอะไร และเลขศูนย์ในคอลัมน์อินซูลินหมายถึงอะไร</b>
+</div>
+
+<h2 class="sec" id="s1"><span class="pill">ส่วนที่ 1</span> Vibe Coding คืออะไร</h2>
+<p class="secintro">บทที่ 1–5 · ความเร็วเอาไว้ได้ แต่ความรับผิดชอบโยนทิ้งไม่ได้</p>
+
+<section class="ch" id="ch1" data-ch="1">
+  <h3>บทที่ 1 — จากการเขียนโค้ด สู่การสั่งและตรวจโค้ด</h3>
+  <div class="chbody">
+  <p>ในเดือนกุมภาพันธ์ 2025 นักวิจัย AI ชื่อ Andrej Karpathy บรรยายนิสัยใหม่แบบหนึ่งว่า เรา <i>“ยอมจำนนให้กับความรู้สึกไปเลย”</i> คือบรรยายสิ่งที่ต้องการเป็นภาษาคนธรรมดา รับโค้ดที่ AI เขียนมา แล้วทำต่อไปเรื่อย ๆ จนกว่ามันจะดูเหมือนว่าใช้งานได้ ⭐ <b>เขาเรียกมันว่า vibe coding</b></p>
+
+  <figure>
+    <div class="figtitle">เวลาไม่ได้หายไป — มันย้ายที่</div>
+    <div class="figsub">⭐ นี่คือประโยคที่ต้องจำ เวลาส่วนใหญ่ <i>ควร</i> หมดไปกับการระบุและการตรวจ</div>
+    <svg viewBox="0 0 700 170" role="img" aria-label="แผนภาพเทียบการแบ่งเวลาระหว่างการเขียนโค้ดแบบดั้งเดิมกับ vibe coding">
+      <text class="svgtxt b" x="0" y="18">การเขียนโค้ดแบบดั้งเดิม</text>
+      <rect x="0"   y="28" width="110" height="34" rx="6" fill="var(--s4)" fill-opacity=".25" stroke="var(--s4)"/>
+      <rect x="114" y="28" width="420" height="34" rx="6" fill="var(--s2)" fill-opacity=".45" stroke="var(--s2)"/>
+      <rect x="538" y="28" width="158" height="34" rx="6" fill="var(--s3)" fill-opacity=".30" stroke="var(--s3)"/>
+      <text class="svgtxt sm" x="55"  y="50" text-anchor="middle">ระบุ</text>
+      <text class="svgtxt b"  x="324" y="50" text-anchor="middle">เขียนทุกบรรทัดเอง</text>
+      <text class="svgtxt sm" x="617" y="50" text-anchor="middle">ตรวจ</text>
+
+      <text class="svgtxt b" x="0" y="100">Vibe coding</text>
+      <rect x="0"   y="110" width="258" height="34" rx="6" fill="var(--s4)" fill-opacity=".30" stroke="var(--s4)" stroke-width="2"/>
+      <rect x="262" y="110" width="76"  height="34" rx="6" fill="var(--s2)" fill-opacity=".45" stroke="var(--s2)"/>
+      <rect x="342" y="110" width="354" height="34" rx="6" fill="var(--s3)" fill-opacity=".35" stroke="var(--s3)" stroke-width="2"/>
+      <text class="svgtxt b"  x="129" y="132" text-anchor="middle">ระบุ (บรรยายเป้าหมาย)</text>
+      <text class="svgtxt sm" x="300" y="132" text-anchor="middle">สร้าง</text>
+      <text class="svgtxt b"  x="519" y="132" text-anchor="middle">ตรวจ (ขั้นที่คนข้ามกัน)</text>
+      <text class="svgtxt sm" x="0" y="164" fill="var(--crit)">⚠️ ถ้าเวลาที่ประหยัดจากการเขียนไม่ถูกย้ายไปที่การตรวจ เราก็แค่ผลิตบั๊กเงียบได้เร็วขึ้น</text>
+    </svg>
+  </figure>
+
+  <div class="tw"><table>
+    <thead><tr><th>การเขียนโค้ดแบบดั้งเดิม</th><th>Vibe coding</th></tr></thead>
+    <tbody>
+      <tr><td>เราเรียนภาษาและไลบรารี</td><td><b>เราบรรยายเป้าหมายเป็นคำพูด</b></td></tr>
+      <tr><td>เราพิมพ์ทุกบรรทัดเอง</td><td><b>ผู้ช่วยร่างโค้ดให้</b></td></tr>
+      <tr><td><b>เวลาส่วนใหญ่หมดไปกับการเขียน</b></td><td><b>เวลาส่วนใหญ่ <i>ควร</i> หมดไปกับการระบุและการตรวจ</b></td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="key"><span class="lb">⭐ ความคิดหลัก</span>
+    Karpathy หมายถึงโปรเจกต์เล็ก ๆ ที่ทำแล้วทิ้ง ⚠️ <b>แต่ในงานวิจัย เราเก็บความเร็วไว้ แล้วตัดส่วนที่ว่า “ลืมไปเลยว่าโค้ดมีอยู่” ออก เพราะเรายังเป็นผู้เขียนของทุกบรรทัดที่เรารัน</b>
+  </div>
+  <p>⭐ ประโยคสุดท้ายนั้นคือเส้นแบ่งของทั้งคาบ — <b>ความเร็วเอาไว้ได้ แต่ความรับผิดชอบโยนทิ้งไม่ได้</b></p>
+  </div>
+</section>
+
+<section class="ch" id="ch2" data-ch="2" data-lite="1">
+  <details class="chfold">
+    <summary><h3>บทที่ 2 — ทำไมเรื่องนี้สำคัญกับงานวิจัยสุขภาพ</h3><span class="chip">ไม่เน้นสอบ</span></summary>
+    <div class="chbody">
+    <div class="cards">
+      <div class="card" style="border-left:4px solid var(--good)"><h4>โอกาสที่ได้</h4><p>แพทย์และพยาบาล <b>สร้างการวิเคราะห์ได้โดยไม่ต้องเรียนเขียนโปรแกรมเป็นปี ๆ</b> · ได้ <b>โมเดลเส้นฐานตัวแรกในไม่กี่นาที ไม่ใช่หลายวัน</b> · ⭐ และ <b>มีเวลามากขึ้นสำหรับสิ่งที่ AI ทำแทนไม่ได้ คือคำถามทางคลินิก การออกแบบการศึกษา และการตัดสินว่าผลลัพธ์หมายความว่าอะไร</b></p></div>
+      <div class="card" style="border-left:4px solid var(--crit)"><h4>ความเสี่ยงที่มาด้วย</h4><p>⚠️ <b>โค้ดที่รันได้และพิมพ์ตัวเลขออกมา <i>ดูเหมือนเสร็จแล้ว</i></b> · ⚠️ <b>ความผิดพลาดแบบเงียบให้ผลลัพธ์ที่ดูน่าเชื่อ</b> · ⚠️ และในงานวิจัยทางคลินิก <b>บั๊กที่เงียบสามารถกลายเป็นข้อสรุปที่ผิดซึ่งได้รับการตีพิมพ์ และถูกอ้างอิงต่อไปอีก</b></p></div>
+    </div>
+    <div class="key"><span class="lb">⭐ เคสจริงที่ใช้เป็นตัวตั้งของคาบ</span>
+      พยาบาลนักวิจัยขอให้ผู้ช่วย <i>“ทำนายเบาหวานจากสเปรดชีตของคลินิกนี้”</i> แล้วโค้ดรายงาน <b>accuracy 0.78 ใน 20 วินาที</b> ⚠️ <b>มันดีไหม</b> — <b>ถ้าไม่รู้ว่าข้อมูลถูกแบ่งอย่างไร ใช้ตัววัดอะไร และเลขศูนย์ในคอลัมน์อินซูลินหมายถึงอะไร ก็ไม่มีใครบอกได้</b>
+    </div>
+    </div>
+  </details>
+</section>
+
+<section class="ch" id="ch3" data-ch="3">
+  <h3>บทที่ 3 — ผู้ช่วยเขียนโค้ดทำงานยังไง</h3>
+  <div class="chbody">
+  <p>ผู้ช่วยเขียนโค้ดคือ <b>large language model</b> ซึ่งเป็นเครือข่ายแบบ <b>Transformer</b> ที่ถูกเทรนบนข้อความและโค้ดสาธารณะปริมาณมหาศาล ⭐ <b>และมันเขียนโค้ดด้วยการทำนายชิ้นข้อความถัดไปที่น่าจะเป็นมากที่สุด ซ้ำไปเรื่อย ๆ</b> โดยชิ้นข้อความนั้นเรียกว่า token</p>
+
+  <figure>
+    <div class="figtitle">มันไม่ได้ “คิด” ว่าโค้ดควรเป็นอะไร — มันเดาคำถัดไป</div>
+    <svg viewBox="0 0 700 192" role="img" aria-label="แผนภาพการทำนาย token ถัดไป โดย split ได้ความน่าจะเป็น 0.93">
+      <rect x="0" y="40" width="186" height="76" rx="11" fill="var(--surface2)" stroke="var(--axis)"/>
+      <text class="svgtxt b" x="93" y="62" text-anchor="middle">prompt + บริบทของเรา</text>
+      <text class="svgtxt sm" x="93" y="84" text-anchor="middle" font-family="ui-monospace,monospace">X_tr, X_te, y_tr, y_te =</text>
+      <text class="svgtxt sm" x="93" y="102" text-anchor="middle" font-family="ui-monospace,monospace">train_test_</text>
+
+      <path d="M192 78 L 238 78" stroke="var(--axis)" stroke-width="2"/><path d="M238 78 l -8 -4.5 v 9 z" fill="var(--axis)"/>
+      <rect x="242" y="40" width="130" height="76" rx="11" fill="var(--tipbg)" stroke="var(--s1)" stroke-width="2"/>
+      <text class="svgtxt b" x="307" y="68" text-anchor="middle">LLM ให้คะแนน</text>
+      <text class="svgtxt sm" x="307" y="88" text-anchor="middle">token ถัดไป</text>
+      <text class="svgtxt sm" x="307" y="104" text-anchor="middle">ทุกตัวที่เป็นไปได้</text>
+
+      <path d="M378 78 L 414 78" stroke="var(--axis)" stroke-width="2"/><path d="M414 78 l -8 -4.5 v 9 z" fill="var(--axis)"/>
+      <g>
+        <rect x="418" y="30" width="150" height="22" rx="5" fill="var(--s1)" fill-opacity=".35" stroke="var(--s1)"/>
+        <text class="svgtxt b" x="426" y="46" font-family="ui-monospace,monospace">split</text>
+        <text class="svgval" x="560" y="46" text-anchor="end">0.93</text>
+        <rect x="418" y="58" width="24" height="22" rx="5" fill="var(--grid)"/>
+        <text class="svgtxt sm" x="426" y="74" font-family="ui-monospace,monospace">test</text>
+        <text class="svgtxt sm" x="560" y="74" text-anchor="end">0.03</text>
+        <rect x="418" y="86" width="12" height="22" rx="5" fill="var(--grid)"/>
+        <text class="svgtxt sm" x="426" y="102" font-family="ui-monospace,monospace">size</text>
+        <text class="svgtxt sm" x="560" y="102" text-anchor="end">0.01</text>
+        <text class="svgtxt sm" x="426" y="122">…</text>
+      </g>
+      <path d="M574 68 L 610 68" stroke="var(--axis)" stroke-width="2"/><path d="M610 68 l -8 -4.5 v 9 z" fill="var(--axis)"/>
+      <text class="svgtxt b" x="616" y="64">เลือกหนึ่งตัว</text>
+      <text class="svgtxt sm" x="616" y="82">ต่อท้าย แล้วทำซ้ำ</text>
+      <path d="M660 92 C 660 150, 300 158, 93 158 L 93 122" fill="none" stroke="var(--s4)" stroke-width="2" stroke-dasharray="5 4"/>
+      <path d="M93 120 l -4.5 8 h 9 z" fill="var(--s4)"/>
+      <text class="svgtxt sm" x="380" y="176" text-anchor="middle" fill="var(--s4)">ทำซ้ำทีละ token จนจบโค้ด</text>
+    </svg>
+  </figure>
+
+  <div class="key"><span class="lb">⭐ ใจความแบบภาษาคนธรรมดา</span>
+    <b>โมเดลผลิตโค้ดที่ <i>หน้าตาเหมือน</i> โค้ดที่มันเคยเห็นมา</b> รูปแบบที่นิยมและพบบ่อยจะออกมาดี ⚠️ <b>แต่ “พบบ่อย” ไม่เหมือนกับ “ถูกต้องสำหรับการศึกษาของเรา”</b>
+  </div>
+  </div>
+</section>
+
+<section class="ch" id="ch4" data-ch="4">
+  <h3>บทที่ 4 — มันรู้อะไร ไม่รู้อะไร และมันทำให้เร็วขึ้นจริงไหม</h3>
+  <div class="chbody">
+  <div class="tw"><table>
+    <thead><tr><th>มันเก่งเรื่อง</th><th>สิ่งที่มันไม่รู้ เว้นแต่เราบอก</th></tr></thead>
+    <tbody>
+      <tr><td>รูปแบบมาตรฐานของไลบรารี เช่น pandas และ scikit-learn</td><td><b>คอลัมน์ หน่วย และการลงรหัสของเรา เช่น 0 หมายถึงไม่มีข้อมูลหรือเปล่า</b></td></tr>
+      <tr><td>โค้ดพื้น ๆ อย่างการโหลด การพล็อต การจัดรูปแบบ</td><td><b>คำถามทางคลินิกและประชากรเป้าหมายของเรา</b></td></tr>
+      <tr><td>การอธิบายข้อความ error</td><td><b>ความผิดพลาดแบบไหนแย่กว่า เคสที่พลาดหรือการเตือนผิด</b></td></tr>
+      <tr><td>การเสนอทางเลือกอื่นอย่างรวดเร็ว</td><td><b>เวอร์ชันของไลบรารีที่ติดตั้งอยู่บนเครื่องเรา</b></td></tr>
+      <tr><td>การแปลข้ามภาษา เช่นจาก R ไป Python</td><td><b>อะไรก็ตามที่เกิดขึ้นหลังวันตัดข้อมูลที่ใช้เทรนมัน</b></td></tr>
+    </tbody>
+  </table></div>
+  <p>⚠️ สามข้อที่ต้องจำเพิ่ม — <b>ผลลัพธ์เป็นเชิงความน่าจะเป็น prompt เดิมอาจให้โค้ดต่างไปในวันพรุ่งนี้</b> · ⚠️ <b>มันฟังดูมั่นใจเท่ากันทั้งตอนที่ถูกและตอนที่ผิด</b> · และ <b>ผู้ช่วยแบบแชตไม่ได้รันโค้ดของเรา มีแต่เครื่องมือแบบ agentic ที่รันและเห็นผลจริง</b></p>
+
+  <figure>
+    <div class="figtitle">⭐ มันทำให้เร็วขึ้นจริงไหม — หลักฐานยังขัดกันอยู่</div>
+    <div class="figsub">แกนศูนย์คือ “เท่าเดิม” · ขวาคือเร็วขึ้น · ซ้ายคือช้าลง</div>
+    <svg viewBox="0 0 700 212" role="img" aria-label="กราฟแท่งแสดงเร็วขึ้น 55.8% ในงานที่ควบคุมไว้ แต่ช้าลง 19% ในโปรเจกต์จริง ทั้งที่เชื่อว่าเร็วขึ้น 20%">
+      <g stroke="var(--grid)">
+        <line x1="214" y1="26" x2="214" y2="168"/><line x1="390" y1="26" x2="390" y2="168"/>
+        <line x1="480" y1="26" x2="480" y2="168"/><line x1="570" y1="26" x2="570" y2="168"/>
+      </g>
+      <line x1="300" y1="20" x2="300" y2="174" stroke="var(--ink)" stroke-width="2"/>
+      <text class="svgtxt sm" x="300" y="190" text-anchor="middle">เท่าเดิม</text>
+      <g class="svgtxt sm" text-anchor="middle">
+        <text x="214" y="190">−20%</text><text x="390" y="190">+20%</text><text x="480" y="190">+40%</text><text x="570" y="190">+60%</text>
+      </g>
+      <text class="svgtxt sm" x="380" y="208" text-anchor="middle">← ช้าลง · เร็วขึ้น →</text>
+
+      <text class="svgtxt b" x="0" y="26">งานเล็กที่ควบคุมไว้ — สร้าง web server ด้วย JavaScript</text>
+      <rect x="300" y="34" width="251" height="26" rx="5" fill="var(--good)" fill-opacity=".55" stroke="var(--good)"/>
+      <text class="svgval" x="559" y="52">เร็วขึ้น 55.8%</text>
+      <text class="svgtxt sm" x="0" y="52" fill="var(--muted)">(ประโยชน์มากกว่าในกลุ่มที่มีประสบการณ์น้อย)</text>
+
+      <text class="svgtxt b" x="0" y="92">โปรเจกต์จริง — นักพัฒนาที่มีประสบการณ์ 16 คน · 246 งาน · การทดลองแบบสุ่มปี 2025</text>
+      <rect x="300" y="100" width="90" height="24" rx="5" fill="var(--s4)" fill-opacity=".40" stroke="var(--s4)" stroke-dasharray="5 3"/>
+      <text class="svgtxt" x="398" y="117">สิ่งที่พวกเขา <tspan font-weight="700">เชื่อ</tspan> — เร็วขึ้น 20%</text>
+      <rect x="214" y="130" width="86" height="26" rx="5" fill="var(--crit)" fill-opacity=".55" stroke="var(--crit)" stroke-width="2"/>
+      <text class="svgval" x="206" y="148" text-anchor="end" fill="var(--crit)">⚠️ ช้าลง 19%</text>
+      <text class="svgtxt sm" x="398" y="148">สิ่งที่ <tspan font-weight="700">วัดได้จริง</tspan></text>
+    </svg>
+    <figcaption>ช่องว่าง <b>39 จุด</b> ระหว่างความรู้สึกกับการวัด คือใจความของแผ่นนี้</figcaption>
+  </figure>
+
+  <div class="key"><span class="lb">⭐ บทเรียนสำหรับนักวิจัย</span>
+    <b>ความเร็วที่เพิ่มขึ้นเป็นเรื่องจริงสำหรับงานเล็กที่นิยามไว้ชัดเจน แต่เวลาย้ายไปอยู่ที่การตรวจทานและการแก้</b> และ <b>ความรู้สึกว่าอะไรใช้ได้นั้นเป็นการวัดที่แย่ ซึ่งเป็นเหตุผลเดียวกับที่เราวัดโมเดลด้วยข้อมูลที่กันไว้ แทนที่จะเชื่อความรู้สึก</b>
+  </div>
+  </div>
+</section>
+
+<section class="ch" id="ch5" data-ch="5">
+  <h3>บทที่ 5 — Quiz 1 — จริงหรือเท็จ</h3>
+  <div class="chbody">
+  <div class="quiz" data-quiz="1">
+    <div class="qhead"><span class="qt">Quiz 1</span><span class="chip">4 ข้อ · เฉลยทุกข้อคือ “เท็จ”</span></div>
+    <div class="qitem"><div class="qq"><span class="qn">1</span><span>ผู้ช่วยแบบแชตได้ตรวจแล้วว่าโค้ดของมันรันได้บนชุดข้อมูลของฉัน</span></div>
+      <button class="qreveal">ดูเฉลย</button><div class="qa" hidden><span class="ans">เท็จ</span> — <b>โมเดลแชตไม่เคยเห็นไฟล์ของเราและไม่เคยรันโค้ด</b> ส่วนเครื่องมือแบบ agentic รันได้ แต่รันได้แค่บนสิ่งที่เราให้มันเท่านั้น</div></div>
+    <div class="qitem"><div class="qq"><span class="qn">2</span><span>ถ้าให้ prompt เดิมสองครั้ง ฉันจะได้โค้ดเดิม</span></div>
+      <button class="qreveal">ดูเฉลย</button><div class="qa" hidden><span class="ans">เท็จ</span> — <b>การสร้างเป็นเชิงความน่าจะเป็น</b> คำตอบเปลี่ยนได้ทั้งระหว่างการรันและระหว่างเวอร์ชันของโมเดล ⭐ <b>ให้เก็บโค้ดที่เราใช้จริงไว้</b></div></div>
+    <div class="qitem"><div class="qq"><span class="qn">3</span><span>ผู้ช่วยรู้ว่าค่า glucose เท่ากับ 0 ในไฟล์ของฉันหมายถึง “ไม่ได้วัด”</span></div>
+      <button class="qreveal">ดูเฉลย</button><div class="qa" hidden><span class="ans">เท็จ</span> — <b>มันเดาได้จากธรรมเนียมทั่วไปเท่านั้น</b> ⭐ <b>ความหมายของข้อมูลคือความรู้เชิงสาขาของเรา ต้องใส่ลงไปใน prompt</b></div></div>
+    <div class="qitem"><div class="qq"><span class="qn">4</span><span>ถ้าโค้ดที่สร้างมารันได้โดยไม่มี error การวิเคราะห์ก็ถูกต้อง</span></div>
+      <button class="qreveal">ดูเฉลย</button><div class="qa" hidden><span class="ans">เท็จ</span> — <b>“รันได้” แปลว่าไวยากรณ์ถูกต้องเท่านั้น</b> ⚠️ <b>การรั่วของข้อมูล ตัววัดที่ผิด หรือการทิ้งคนไข้ไป ล้วนรันได้อย่างสมบูรณ์แบบ</b></div></div>
+  </div>
+  <div class="key"><span class="lb">⭐ สิ่งที่ต้องจำ</span>
+    <b>ผู้ช่วยคือผู้ร่วมงานรุ่นน้องที่เร็วแต่สะเพร่า มีประโยชน์ ไม่รู้จักเหนื่อย และไม่เคยต้องรับผิดชอบ</b> — <b>ความรับผิดชอบยังอยู่ที่เรา</b>
+  </div>
+  </div>
+</section>
+
+<h2 class="sec" id="s2"><span class="pill">ส่วนที่ 2</span> ผู้ช่วย, Prompt และ ML Pipeline</h2>
+<p class="secintro">บทที่ 6–10 · เขียน prompt ให้เหลือการเดาน้อยที่สุด แล้วอ่าน pipeline ที่เราไม่ได้เขียนให้ออก</p>
+
+<section class="ch" id="ch6" data-ch="6" data-lite="1">
+  <details class="chfold">
+    <summary><h3>บทที่ 6 — ภูมิทัศน์ของผู้ช่วยเขียนโค้ด</h3><span class="chip">ไม่เน้นสอบ</span></summary>
+    <div class="chbody">
+    <div class="tw"><table>
+      <thead><tr><th>ประเภท</th><th>ตัวอย่าง</th><th>มันเห็นอะไร</th><th>ใช้ทำอะไร และต้องระวังอะไร</th></tr></thead>
+      <tbody>
+        <tr><td><b>อยู่ใน notebook</b></td><td>Gemini in Colab</td><td><b>cell และ error ใน notebook ของเรา</b></td><td>ทำ pipeline เร็ว ๆ — ⚠️ <b>มันอาจเห็นข้อมูลที่ถูกพิมพ์ออกมา</b></td></tr>
+        <tr><td><b>แชต</b></td><td>ChatGPT, Claude, Gemini / AI Studio</td><td><b>เฉพาะสิ่งที่เราวางลงไป</b></td><td>อธิบายและร่างโค้ด — ⚠️ <b>ความเพี้ยนจากการคัดลอกไปวาง</b></td></tr>
+        <tr><td><b>ฝังใน IDE</b></td><td>GitHub Copilot, Cursor</td><td><b>ไฟล์ที่เปิดอยู่ในโปรเจกต์</b></td><td>เติมโค้ดอัตโนมัติ — ⚠️ <b>การกดรับเร็วเกินไป</b></td></tr>
+        <tr><td><b>Agentic</b></td><td>Claude Code, Copilot agent mode</td><td><b>ทั้งโฟลเดอร์ และ <i>รันคำสั่งได้</i></b></td><td>งานหลายขั้นตอน — ⚠️ <b>มันแก้ไฟล์เอง ต้องตรวจทุก diff</b></td></tr>
+      </tbody>
+    </table></div>
+    <div class="key"><span class="lb">⭐</span>
+      <b>ไล่ลงมาตามตาราง ผู้ช่วยทำอะไรได้ด้วยตัวเองมากขึ้น และเราต้องตรวจละเอียดขึ้น</b> 💡 ส่วน lab ทั้งหมดในคอร์สนี้ใช้ได้ด้วยแพ็กเกจฟรี โดย Lab 2 ใช้ <b>Gemini in Colab</b> หรือโมเดลแชตฟรีตัวใดก็ได้
+    </div>
+    </div>
+  </details>
+</section>
+
+<section class="ch" id="ch7" data-ch="7">
+  <h3>บทที่ 7 — กายวิภาคของ prompt ที่ดี</h3>
+  <div class="chbody">
+  <div class="key"><span class="lb">⭐</span>
+    <b>ผู้ช่วยจะเติมทุกช่องว่างใน prompt ของเราด้วยการเดา</b> เพราะฉะนั้น prompt วิจัยที่ดีคือ prompt ที่ <b>กำจัดการเดาที่สำคัญออกไป</b>
+  </div>
+  <div class="tw"><table>
+    <thead><tr><th>ต้องระบุ</th><th>ตัวอย่างสำหรับโมเดลคัดกรองเบาหวาน</th></tr></thead>
+    <tbody>
+      <tr><td><b>ข้อมูล</b></td><td>DataFrame ชื่อ <code>df</code> มี 768 แถว ตัวแปรตัวเลข 8 ตัว และเป้าหมายเป็นค่าสองค่าชื่อ <code>Outcome</code></td></tr>
+      <tr><td><b>ความหมาย</b></td><td><b>0 ใน Glucose, BloodPressure, SkinThickness, Insulin และ BMI หมายถึงไม่มีข้อมูล</b></td></tr>
+      <tr><td><b>การแบ่งข้อมูล</b></td><td><b>แบ่งแบบ stratified 80/20 ก่อนการ preprocess ทุกชนิด</b></td></tr>
+      <tr><td><b>เมล็ดสุ่ม</b></td><td><code>random_state=42</code> <b>ทุกจุดที่มีความสุ่มปรากฏ</b></td></tr>
+      <tr><td><b>ตัววัด</b></td><td><b>ROC AUC พร้อมความไวและความจำเพาะบนชุดทดสอบ</b></td></tr>
+      <tr><td><b>ข้อจำกัด</b></td><td>ใช้เฉพาะ scikit-learn · <b>ใช้ Pipeline</b> · ใส่คอมเมนต์ทุกขั้น</td></tr>
+      <tr><td><b>การตรวจ</b></td><td><b>พิมพ์ขนาดข้อมูล ความสมดุลของกลุ่ม และเส้นฐานของกลุ่มที่พบมากที่สุด</b></td></tr>
+    </tbody>
+  </table></div>
+  <div class="key"><span class="lb">⭐ กฎที่ใช้ได้เสมอ</span>
+    <b>ถ้านักสถิติจะถามคำถามอะไรกับเราก่อนเริ่มงาน คำตอบของคำถามนั้นควรอยู่ใน prompt</b>
+  </div>
+
+  <div class="cards">
+    <div class="card" style="border-left:4px solid var(--crit)">
+      <h4>⚠️ prompt อ่อน</h4>
+      <p><i>“สร้างโมเดล machine learning เพื่อทำนายเบาหวานจากข้อมูลนี้ แล้วบอกฉันว่ามันแม่นแค่ไหน”</i></p>
+      <p style="margin-top:8px">เปิดช่องให้เดาสามเรื่องทันที — ⚠️ <b>จะแบ่งข้อมูลยังไง ใช้เมล็ดสุ่มอะไร</b> · ⚠️ <b>คำว่า “แม่น” ชักชวนให้มันตอบด้วย accuracy</b> · ⚠️ <b>เลขศูนย์จะถูกใช้เป็นค่าจริง</b></p>
+    </div>
+    <div class="card" style="border-left:4px solid var(--good)">
+      <h4>✓ prompt แข็ง</h4>
+      <p><i>“ฉันมี pandas DataFrame ชื่อ df (ข้อมูล Pima diabetes เป้าหมายชื่อ Outcome มีผลบวกประมาณ 35%) เลขศูนย์ใน Glucose, BloodPressure, SkinThickness, Insulin และ BMI หมายถึงไม่มีข้อมูล ใช้ scikit-learn โดยแบ่ง 80/20 แบบ stratified ด้วย random_state=42 สร้าง Pipeline ที่มีการเติมค่าด้วยค่ามัธยฐานและ random forest เทรนบนชุดเทรนเท่านั้น รายงาน ROC AUC ความไว และความจำเพาะบนชุดทดสอบ พร้อมเส้นฐานของกลุ่มที่พบมากที่สุด และใส่คอมเมนต์ทุกขั้น”</i></p>
+    </div>
+  </div>
+
+  <div class="key"><span class="lb">⭐ ทำไมมันได้ผล</span>
+    <b>prompt ที่แข็งเข้ารหัสการออกแบบการศึกษาลงไป</b> และ <b>การเขียนมันบังคับให้เราตัดสินใจเรื่องการออกแบบก่อน ซึ่งเป็นวิทยาศาสตร์ที่ดี ไม่ว่าจะมี AI หรือไม่มีก็ตาม</b>
+  </div>
+  </div>
+</section>
+
+<section class="ch" id="ch8" data-ch="8">
+  <h3>บทที่ 8 — วงจรการทำงาน: ระบุ สร้าง รัน ตรวจ ปรับ</h3>
+  <div class="chbody">
+  <figure>
+    <div class="figtitle">วงจรห้าจังหวะ — และจังหวะที่คนข้ามกัน</div>
+    <svg viewBox="0 0 700 250" role="img" aria-label="วงจร ระบุ สร้าง รัน ตรวจ ปรับ โดยขั้นตรวจถูกเน้นว่าเป็นขั้นที่คนข้าม">
+      <g fill="none" stroke="var(--axis)" stroke-width="2">
+        <path d="M300 48 C 376 48, 420 76, 436 104"/>
+        <path d="M444 142 C 436 174, 396 202, 344 206"/>
+        <path d="M256 206 C 204 202, 164 174, 156 142"/>
+        <path d="M164 104 C 180 76, 224 48, 300 48"/>
+      </g>
+      <path d="M436 104 l 1 -9 l -7 5 z" fill="var(--axis)"/>
+      <path d="M344 206 l -7 -6 l -1 9 z" fill="var(--axis)"/>
+      <path d="M156 142 l -1 -9 l 7 5 z" fill="var(--axis)" transform="rotate(180 156 138)"/>
+      <path d="M300 48 l -8 5 l 8 4 z" fill="var(--axis)"/>
+
+      <rect x="226" y="24" width="148" height="46" rx="11" fill="var(--s4)" fill-opacity=".20" stroke="var(--s4)" stroke-width="2"/>
+      <text class="svgtxt b" x="300" y="44" text-anchor="middle">1 · ระบุ (Specify)</text>
+      <text class="svgtxt sm" x="300" y="62" text-anchor="middle">ข้อมูล แบ่ง เมล็ดสุ่ม ตัววัด</text>
+
+      <rect x="430" y="98" width="150" height="46" rx="11" fill="var(--surface2)" stroke="var(--axis)"/>
+      <text class="svgtxt b" x="505" y="118" text-anchor="middle">2 · สร้าง (Generate)</text>
+      <text class="svgtxt sm" x="505" y="136" text-anchor="middle">⭐ อ่านก่อนรัน</text>
+
+      <rect x="352" y="184" width="150" height="46" rx="11" fill="var(--surface2)" stroke="var(--axis)"/>
+      <text class="svgtxt b" x="427" y="204" text-anchor="middle">3 · รัน (Run)</text>
+      <text class="svgtxt sm" x="427" y="222" text-anchor="middle">session ที่เพิ่งเปิดใหม่</text>
+
+      <rect x="106" y="184" width="150" height="46" rx="11" fill="var(--starbg)" stroke="var(--star)" stroke-width="2.5"/>
+      <text class="svgtxt b" x="181" y="204" text-anchor="middle">4 · ตรวจ (Verify)</text>
+      <text class="svgtxt sm" x="181" y="222" text-anchor="middle">ขนาด baseline รั่ว ตัววัด</text>
+
+      <rect x="24" y="98" width="140" height="46" rx="11" fill="var(--surface2)" stroke="var(--axis)"/>
+      <text class="svgtxt b" x="94" y="118" text-anchor="middle">5 · ปรับ (Refine)</text>
+      <text class="svgtxt sm" x="94" y="136" text-anchor="middle">วาง error กลับไป</text>
+
+      <text class="svgtxt b" x="300" y="128" text-anchor="middle" fill="var(--star)">⭐ “ตรวจ” คือขั้นเดียว</text>
+      <text class="svgtxt b" x="300" y="148" text-anchor="middle" fill="var(--star)">ที่ผู้ช่วยทำแทนเราไม่ได้</text>
+    </svg>
+    <figcaption>⭐ <b>ให้กันเวลาไว้สำหรับการตรวจอย่างน้อยเท่ากับเวลาที่ใช้สร้าง</b></figcaption>
+  </figure>
+  </div>
+</section>
+
+<section class="ch" id="ch9" data-ch="9">
+  <h3>บทที่ 9 — กายวิภาคของ ML pipeline ขั้นต่ำ และการอ่านโค้ดที่เราไม่ได้เขียน</h3>
+  <div class="chbody">
+  <div class="key"><span class="lb">⭐</span>
+    <b>สคริปต์ ML แบบตารางที่ถูกสร้างขึ้นเกือบทุกตัวเดินตามห้าขั้นเดียวกันนี้ ถ้าจับทางได้ เราจะอ่านโค้ดที่เราไม่ได้เขียนเองได้</b>
+  </div>
+  <figure>
+    <div class="figtitle">ห้าขั้นที่ใช้ได้กับทุกสคริปต์</div>
+    <svg viewBox="0 0 700 132" role="img" aria-label="ห้าขั้น โหลด แบ่ง preprocess fit ประเมินผล">
+      <g>
+        <rect x="0"   y="30" width="124" height="54" rx="10" fill="var(--surface2)" stroke="var(--axis)"/>
+        <rect x="144" y="30" width="124" height="54" rx="10" fill="var(--s4)" fill-opacity=".18" stroke="var(--s4)" stroke-width="2"/>
+        <rect x="288" y="30" width="124" height="54" rx="10" fill="var(--surface2)" stroke="var(--axis)"/>
+        <rect x="432" y="30" width="124" height="54" rx="10" fill="var(--surface2)" stroke="var(--axis)"/>
+        <rect x="576" y="30" width="124" height="54" rx="10" fill="var(--surface2)" stroke="var(--axis)"/>
+      </g>
+      <g class="svgtxt b" text-anchor="middle">
+        <text x="62" y="52">1 โหลด</text><text x="206" y="52">2 แบ่ง</text><text x="350" y="52">3 Preprocess</text>
+        <text x="494" y="52">4 Fit</text><text x="638" y="52">5 ประเมินผล</text>
+      </g>
+      <g class="svgtxt sm" text-anchor="middle">
+        <text x="62" y="70">อ่านตาราง</text><text x="206" y="70">ชุดเทรน / ชุดทดสอบ</text><text x="350" y="70">เติมค่า ปรับสเกล</text>
+        <text x="494" y="70">เรียนจากชุดเทรน</text><text x="638" y="70">ให้คะแนนบนชุดทดสอบ</text>
+      </g>
+      <g stroke="var(--axis)" stroke-width="2"><path d="M128 57 L 140 57"/><path d="M272 57 L 284 57"/><path d="M416 57 L 428 57"/><path d="M560 57 L 572 57"/></g>
+      <path d="M288 94 L 556 94" stroke="var(--good)" stroke-width="2"/>
+      <path d="M288 94 l 8 -4 v 8 z" fill="var(--good)"/><path d="M556 94 l -8 -4 v 8 z" fill="var(--good)"/>
+      <text class="svgtxt sm" x="422" y="112" text-anchor="middle" fill="var(--good)">⭐ ขั้น 3–4 คือ “การอ่านหนังสือ” — ใช้ได้แต่กับคนไข้ในชุดเทรนเท่านั้น</text>
+      <text class="svgtxt sm" x="206" y="22" text-anchor="middle" fill="var(--s4)">⭐ ลำดับสำคัญมาก — แบ่งก่อน</text>
+      <text class="svgtxt sm" x="638" y="22" text-anchor="middle">ข้อสอบที่ปิดผนึกไว้</text>
+    </svg>
+  </figure>
+
+  <p><b>อ่านห้าขั้นนั้นในสิบบรรทัด</b></p>
+<pre><code>df = pd.read_csv("diabetes.csv")                               # 1 โหลด
+X, y = df.drop(columns="Outcome"), df["Outcome"]
+X_tr, X_te, y_tr, y_te = train_test_split(                     # 2 แบ่ง
+    X, y, test_size=0.2, stratify=y, random_state=42)
+pipe = Pipeline([("impute", SimpleImputer(strategy="median")), # 3 preprocess
+                 ("model", LogisticRegression(max_iter=1000))]) # 4 โมเดล
+pipe.fit(X_tr, y_tr)                                           # fit บนชุดเทรนเท่านั้น
+prob = pipe.predict_proba(X_te)[:, 1]                          # 5 ประเมินผล
+print("ROC AUC:", roc_auc_score(y_te, prob))</code></pre>
+
+  <div class="key"><span class="lb">⭐ กลยุทธ์การอ่านสำหรับคนที่ไม่ได้เขียนโปรแกรม</span>
+    <b>เราไม่จำเป็นต้องเขียนโค้ดนี้เองได้</b> แต่ให้ถามสามคำถามกับสคริปต์ใดก็ได้ คือ <b>การแบ่งข้อมูลอยู่ที่ไหน · <code>fit</code> ถูกเรียกบนอะไร · และตัวเลขที่พิมพ์ออกมานั้นคือตัวเลขอะไร คำนวณบนข้อมูลชุดไหน</b> ⚠️ <b>ถ้าตอบไม่ได้ ให้ขอให้ผู้ช่วยอธิบายบรรทัดนั้น แล้วเอาคำอธิบายไปเทียบกับโค้ดด้วยตัวเอง</b>
+  </div>
+  </div>
+</section>
+
+<section class="ch" id="ch10" data-ch="10">
+  <h3>บทที่ 10 — ห้าคำที่ปลดล็อกโค้ด scikit-learn</h3>
+  <div class="chbody">
+  <div class="tw"><table>
+    <thead><tr><th>คำในโค้ด</th><th>มันหมายถึงอะไร</th><th>เทียบกับงานคลินิก</th></tr></thead>
+    <tbody>
+      <tr><td><code>fit(X, y)</code></td><td><b>เรียนค่าพารามิเตอร์จากแถวเหล่านี้</b></td><td>การอ่านแฟ้มเคส</td></tr>
+      <tr><td><code>transform(X)</code></td><td><b>เอาสิ่งที่เรียนมาแล้วไปใช้ ไม่มีการเรียนใหม่</b></td><td>การใช้ค่าอ้างอิงของห้องแล็บ</td></tr>
+      <tr><td><code>predict(X)</code></td><td><b>ให้ผลเป็นกลุ่ม 0 หรือ 1</b></td><td>“ส่งต่อ” หรือ “ไม่ส่งต่อ”</td></tr>
+      <tr><td><code>predict_proba(X)</code></td><td><b>ให้ผลเป็นความเสี่ยงระหว่าง 0 ถึง 1</b></td><td>คะแนนความเสี่ยง เช่นความเสี่ยงโรคหัวใจ</td></tr>
+      <tr><td><code>random_state</code></td><td><b>ตรึงลูกเต๋าไว้ให้ผลซ้ำได้</b></td><td>การบันทึกรายการสุ่มของการวิจัย</td></tr>
+    </tbody>
+  </table></div>
+  <div class="warnbox"><span class="lb">⚠️ ธงแดงที่ต้องจับให้ได้ทันที</span>
+    <b>การเรียก <code>fit</code> หรือ <code>fit_transform</code> บนข้อมูลทั้งชุด หรือบนข้อมูลชุดทดสอบ</b>
+  </div>
+  <p>⭐ <b><code>Pipeline</code> คือการห่อขั้นที่ 3 กับ 4 ไว้ด้วยกัน เพื่อให้ <code>fit</code> ได้เห็นแต่แถวของชุดเทรนเท่านั้นตลอด</b> · และ <b><code>cross_val_score</code> คือการทำ แบ่ง–fit–ประเมิน ซ้ำหลายรอบ ซึ่งเรียกว่า fold แล้วเฉลี่ยผล</b></p>
+  </div>
+</section>
+
+<h2 class="sec" id="s3"><span class="pill">ส่วนที่ 3</span> โค้ดที่ AI สร้างพังอย่างไร — ห้าโหมด</h2>
+<p class="secintro">บทที่ 11–17 · ⭐ มีแต่โหมดที่ 4 เท่านั้นที่ให้ error ออกมา อีกสี่โหมดให้ตัวเลขที่ชวนให้เชื่อ</p>
+
+<section class="ch" id="ch11" data-ch="11">
+  <h3>บทที่ 11 — ดูน่าเชื่อ ไม่เท่ากับถูกต้อง</h3>
+  <div class="chbody">
+  <div class="key"><span class="lb">⭐</span>
+    <b>โค้ด ML ที่ถูกสร้างขึ้นแทบไม่เคยพังแบบมี error มันพังแบบเงียบ ๆ โดยผลลัพธ์ดูเป็นมืออาชีพและตัวเลขดูสมเหตุสมผล</b>
+  </div>
+
+  <figure>
+    <div class="figtitle">ห้าโหมด และโหมดเดียวที่ส่งเสียง</div>
+    <svg viewBox="0 0 700 212" role="img" aria-label="ห้าโหมดความล้มเหลว โดยมีเพียงโหมดที่ 4 ที่ให้ข้อความ error">
+      <g>
+        <rect x="0"   y="34" width="132" height="92" rx="11" fill="var(--crit)" fill-opacity=".12" stroke="var(--crit)"/>
+        <rect x="142" y="34" width="132" height="92" rx="11" fill="var(--crit)" fill-opacity=".12" stroke="var(--crit)"/>
+        <rect x="284" y="34" width="132" height="92" rx="11" fill="var(--crit)" fill-opacity=".12" stroke="var(--crit)"/>
+        <rect x="426" y="34" width="132" height="92" rx="11" fill="var(--good)" fill-opacity=".14" stroke="var(--good)" stroke-width="2"/>
+        <rect x="568" y="34" width="132" height="92" rx="11" fill="var(--crit)" fill-opacity=".12" stroke="var(--crit)"/>
+      </g>
+      <g class="svgtxt b" text-anchor="middle">
+        <text x="66"  y="56">1 การรั่วของข้อมูล</text>
+        <text x="208" y="56">2 ตัววัดผิด</text>
+        <text x="350" y="56">3 ใช้ข้อมูลผิด</text>
+        <text x="492" y="56">4 API ไม่มีจริง</text>
+        <text x="634" y="56">5 สถิติที่ผิด</text>
+      </g>
+      <g class="svgtxt sm" text-anchor="middle">
+        <text x="66"  y="78">ข้อมูลทดสอบ</text><text x="66" y="94">ไปถึงการเทรน</text>
+        <text x="208" y="78">accuracy บนข้อมูล</text><text x="208" y="94">ที่ไม่สมดุล</text>
+        <text x="350" y="78">เลขศูนย์เป็นค่าจริง</text><text x="350" y="94">หรือแถวถูกทิ้ง</text>
+        <text x="492" y="78">ฟังก์ชันที่ไม่มีอยู่</text><text x="492" y="94">หรือเปลี่ยนไปแล้ว</text>
+        <text x="634" y="78">การทดสอบผิด</text><text x="634" y="94">ไม่รายงานการกระจาย</text>
+      </g>
+      <g class="svgtxt sm" text-anchor="middle" font-weight="700">
+        <text x="66"  y="116" fill="var(--crit)">ผลดีเกินจริง</text>
+        <text x="208" y="116" fill="var(--crit)">พลาดคนไข้</text>
+        <text x="350" y="116" fill="var(--crit)">โมเดลเอนเอียง</text>
+        <text x="492" y="116" fill="var(--good)">มี error ✓</text>
+        <text x="634" y="116" fill="var(--crit)">ผิดอย่างมั่นใจ</text>
+      </g>
+      <text class="svgtxt b" x="0" y="22">อาการที่เราจะเห็น</text>
+      <rect x="0" y="146" width="700" height="56" rx="11" fill="var(--starbg)" stroke="var(--star)"/>
+      <text class="svgtxt b" x="350" y="170" text-anchor="middle">⭐ มีแต่โหมดที่ 4 เท่านั้นที่ให้ข้อความ error ออกมาอย่างน่าเชื่อถือ</text>
+      <text class="svgtxt b" x="350" y="190" text-anchor="middle">อีกสี่โหมดให้ตัวเลขออกมา และตัวเลขนั้นชวนให้เชื่อ</text>
+    </svg>
+  </figure>
+  </div>
+</section>
+
+<section class="ch" id="ch12" data-ch="12">
+  <h3>บทที่ 12 — โหมดที่ 1: การรั่วของข้อมูล</h3>
+  <div class="chbody">
+  <div class="key"><span class="lb">⭐ นิยาม</span>
+    <b>การรั่วของข้อมูล (data leakage) คือการที่ข้อมูลซึ่งจะไม่มีอยู่ ณ เวลาที่ต้องทำนายจริง เล็ดลอดเข้าไปในการเทรนโมเดล</b> — <b>ผลคือโมเดลถูกประเมินด้วยข้อสอบที่มันเห็นมาแล้วบางส่วน</b>
+  </div>
+  <p><b>การรั่วแบบคลาสสิกในโค้ดที่ AI สร้าง</b></p>
+  <ul class="bul">
+    <li>⚠️ <b>ตัวเติมค่าหรือตัวปรับสเกลถูก fit บนทุกแถวก่อนการแบ่งข้อมูล</b></li>
+    <li>⚠️ <b>การคัดเลือกตัวแปรโดยใช้ทุกแถว</b></li>
+    <li>⚠️ <b>การเพิ่มตัวอย่างกลุ่มน้อย เช่น SMOTE ก่อนการแบ่ง</b></li>
+    <li>⚠️ <b>คนไข้คนเดียวกันอยู่ทั้งในชุดเทรนและชุดทดสอบ</b></li>
+    <li>⚠️ <b>ตัวแปรที่ถูกบันทึกหลังผลลัพธ์เกิดขึ้นแล้ว เช่นการเริ่มให้อินซูลิน</b></li>
+  </ul>
+  <div class="key"><span class="lb">⭐ เคสจริงที่การรั่วซ่อนอยู่ในเส้นเวลา</span>
+    โมเดลทำนายการติดเชื้อในกระแสเลือดที่ใช้ตัวแปร <i>“มีการสั่งเพาะเชื้อในเลือด”</i> ⚠️ <b>ไปเรียนรู้ว่าแพทย์สงสัยการติดเชื้ออยู่แล้ว</b> มันจึง <b>ดูเก่งมากในข้อมูลย้อนหลัง แต่ไม่ได้ช่วยอะไรเลยข้างเตียงคนไข้</b>
+  </div>
+  <div class="key"><span class="lb">⭐ การทดสอบว่ามีการรั่วไหม</span>
+    สำหรับทุกตัวแปรและทุกขั้นของการ preprocess ให้ถามว่า <b><i>“ฉันจะมีข้อมูลนี้ คำนวณด้วยวิธีนี้ ณ ขณะที่ต้องทำนายให้คนไข้คนใหม่หรือเปล่า”</i></b>
+  </div>
+  </div>
+</section>
+
+<section class="ch" id="ch13" data-ch="13">
+  <h3>บทที่ 13 — pipeline ที่รั่ว กับ pipeline ที่ถูก และวิธีแก้</h3>
+  <div class="chbody">
+  <figure>
+    <div class="figtitle">กดสลับดูความต่าง — ต่างกันแค่ลำดับ แต่เปลี่ยนความหมายของคะแนนทั้งหมด</div>
+    <div class="seg" role="group" aria-label="สลับระหว่าง pipeline ที่รั่วกับที่ถูก">
+      <button class="segbtn on" data-mode="leak" aria-pressed="true">⚠️ pipeline ที่รั่ว</button>
+      <button class="segbtn" data-mode="ok" aria-pressed="false">✓ pipeline ที่ถูก</button>
+    </div>
+    <div class="swap" id="pipeswap" data-mode="leak">
+      <div class="pane leak">
+        <svg viewBox="0 0 700 152" role="img" aria-label="แผนภาพ pipeline ที่รั่ว">
+          <rect x="0" y="40" width="118" height="46" rx="10" fill="var(--surface2)" stroke="var(--axis)"/>
+          <text class="svgtxt b" x="59" y="68" text-anchor="middle">คนไข้ทั้งหมด</text>
+          <path d="M122 63 L 150 63" stroke="var(--crit)" stroke-width="2.5"/><path d="M150 63 l -8 -4.5 v 9 z" fill="var(--crit)"/>
+          <rect x="154" y="34" width="178" height="58" rx="10" fill="var(--crit)" fill-opacity=".16" stroke="var(--crit)" stroke-width="2.5"/>
+          <text class="svgtxt b" x="243" y="56" text-anchor="middle" fill="var(--crit)">fit ตัวเติมค่า / ตัวปรับสเกล</text>
+          <text class="svgtxt b" x="243" y="76" text-anchor="middle" fill="var(--crit)">บนทุกแถว</text>
+          <path d="M336 63 L 364 63" stroke="var(--axis)" stroke-width="2"/><path d="M364 63 l -8 -4.5 v 9 z" fill="var(--axis)"/>
+          <rect x="368" y="40" width="104" height="46" rx="10" fill="var(--surface2)" stroke="var(--axis)"/>
+          <text class="svgtxt b" x="420" y="68" text-anchor="middle">แบ่ง train/test</text>
+          <path d="M476 63 L 504 63" stroke="var(--axis)" stroke-width="2"/><path d="M504 63 l -8 -4.5 v 9 z" fill="var(--axis)"/>
+          <rect x="508" y="40" width="88" height="46" rx="10" fill="var(--surface2)" stroke="var(--axis)"/>
+          <text class="svgtxt b" x="552" y="68" text-anchor="middle">fit โมเดล</text>
+          <path d="M600 63 L 622 63" stroke="var(--crit)" stroke-width="2.5"/><path d="M622 63 l -8 -4.5 v 9 z" fill="var(--crit)"/>
+          <rect x="626" y="34" width="74" height="58" rx="10" fill="var(--crit)" fill-opacity=".16" stroke="var(--crit)" stroke-width="2"/>
+          <text class="svgtxt b" x="663" y="56" text-anchor="middle" fill="var(--crit)">คะแนน</text>
+          <text class="svgtxt b" x="663" y="76" text-anchor="middle" fill="var(--crit)">สูงเกินจริง</text>
+          <text class="svgtxt b" x="0" y="122" fill="var(--crit)">⚠️ แถวของชุดทดสอบได้เข้าไปกำหนดรูปร่างของการ preprocess ไปแล้ว</text>
+          <text class="svgtxt sm" x="0" y="142">ค่ามัธยฐานที่ใช้เติม ถูกคำนวณจากคนไข้ที่ควรจะ “ยังไม่เคยเห็น” ด้วย</text>
+        </svg>
+<pre><code>X = df.drop(columns="Outcome")
+X = X.replace(0, np.nan)
+imp = SimpleImputer(strategy="median")
+X = imp.fit_transform(X)      # เห็นทุกแถว ⚠️
+X_tr, X_te, y_tr, y_te = \
+    train_test_split(X, y, test_size=0.2)
+rf = RandomForestClassifier().fit(X_tr, y_tr)
+print(accuracy_score(y_te, rf.predict(X_te)))</code></pre>
+      </div>
+      <div class="pane ok">
+        <svg viewBox="0 0 700 152" role="img" aria-label="แผนภาพ pipeline ที่ถูก">
+          <rect x="0" y="40" width="118" height="46" rx="10" fill="var(--surface2)" stroke="var(--axis)"/>
+          <text class="svgtxt b" x="59" y="68" text-anchor="middle">คนไข้ทั้งหมด</text>
+          <path d="M122 63 L 150 63" stroke="var(--good)" stroke-width="2.5"/><path d="M150 63 l -8 -4.5 v 9 z" fill="var(--good)"/>
+          <rect x="154" y="40" width="96" height="46" rx="10" fill="var(--good)" fill-opacity=".16" stroke="var(--good)" stroke-width="2.5"/>
+          <text class="svgtxt b" x="202" y="68" text-anchor="middle">แบ่งก่อน</text>
+          <path d="M254 52 L 282 30" stroke="var(--axis)" stroke-width="2"/>
+          <path d="M254 74 L 282 104" stroke="var(--axis)" stroke-width="2"/>
+          <rect x="286" y="6" width="256" height="48" rx="10" fill="var(--s1)" fill-opacity=".14" stroke="var(--s1)" stroke-width="2"/>
+          <text class="svgtxt b" x="414" y="26" text-anchor="middle">ชุดเทรน: fit ตัวเติมค่า + โมเดล</text>
+          <text class="svgtxt sm" x="414" y="44" text-anchor="middle">ห่อไว้ด้วยกันใน Pipeline</text>
+          <rect x="286" y="82" width="256" height="48" rx="10" fill="var(--s3)" fill-opacity=".14" stroke="var(--s3)" stroke-width="2"/>
+          <text class="svgtxt b" x="414" y="102" text-anchor="middle">ชุดทดสอบ: transform + predict</text>
+          <text class="svgtxt sm" x="414" y="120" text-anchor="middle">เท่านั้น ไม่มี fit</text>
+          <path d="M546 63 L 578 63" stroke="var(--good)" stroke-width="2.5"/><path d="M578 63 l -8 -4.5 v 9 z" fill="var(--good)"/>
+          <rect x="582" y="34" width="118" height="58" rx="10" fill="var(--good)" fill-opacity=".16" stroke="var(--good)" stroke-width="2"/>
+          <text class="svgtxt b" x="641" y="56" text-anchor="middle">คะแนนทดสอบ</text>
+          <text class="svgtxt b" x="641" y="76" text-anchor="middle">ที่ซื่อสัตย์</text>
+          <text class="svgtxt b" x="0" y="148">⭐ ทุกอย่างที่ถูกเรียนรู้ มาจากคนไข้ในชุดเทรนเพียงกลุ่มเดียว</text>
+        </svg>
+<pre><code>X_tr, X_te, y_tr, y_te = train_test_split(
+    X, y, test_size=0.2, stratify=y,
+    random_state=42)                  # แบ่งก่อน ✓
+pipe = Pipeline([
+    ("imp", SimpleImputer(strategy="median")),
+    ("rf", RandomForestClassifier(random_state=42))])
+pipe.fit(X_tr, y_tr)                  # ชุดเทรนเท่านั้น ✓
+prob = pipe.predict_proba(X_te)[:, 1]
+print(roc_auc_score(y_te, prob))</code></pre>
+      </div>
+    </div>
+    <figcaption>⭐ <b>ใน pipeline ที่ถูก คนไข้ในชุดทดสอบถูกแตะด้วย <code>transform</code> และ <code>predict</code> เท่านั้น</b> — ค่ามัธยฐาน ค่าเฉลี่ย ตัวแปรที่ถูกคัดเลือก และตัวโมเดลเอง ล้วนมาจากชุดเทรน</figcaption>
+  </figure>
+
+  <div class="warnbox"><span class="lb">⚠️ ร่างที่รั่วยังมีปัญหาอีกสามข้อ</span>
+    มัน <b>แทนเลขศูนย์ในทุกคอลัมน์ รวมถึง <code>Pregnancies</code> ซึ่งเลขศูนย์เป็นค่าจริง</b> · <b>ไม่มีเมล็ดสุ่มและไม่มี stratify ผลจึงเปลี่ยนทุกครั้งที่รัน</b> · และข้อสังเกตเรื่องขนาดของปัญหา ⭐ <b>การเติมค่าด้วยมัธยฐานรั่วแค่เล็กน้อยในกรณีนี้ แต่การคัดเลือกตัวแปรหรือการเพิ่มตัวอย่างกลุ่มน้อยก่อนการแบ่ง รั่วได้มากมาย</b>
+  </div>
+  </div>
+</section>
+
+<section class="ch" id="ch14" data-ch="14">
+  <h3>บทที่ 14 — การรั่วเป็นเรื่องปกติในงานที่ตีพิมพ์แล้ว</h3>
+  <div class="chbody">
+  <figure>
+    <div class="figtitle">⭐ เคสจริง: โมเดลภาพถ่ายโควิด-19 — กรวยที่จบลงที่ศูนย์</div>
+    <svg viewBox="0 0 700 180" role="img" aria-label="กรวยจากงานวิจัย 2212 ชิ้น เหลือ 62 ชิ้นที่ผ่านคุณภาพ และไม่มีชิ้นใดมีประโยชน์ทางคลินิก">
+      <rect x="0"   y="30" width="440" height="42" rx="8" fill="var(--s1)" fill-opacity=".40" stroke="var(--s1)"/>
+      <text class="svgtxt b" x="16" y="56">งานวิจัย ML วินิจฉัย/พยากรณ์โควิดจากภาพ X-ray และ CT</text>
+      <text class="svgval" x="424" y="57" text-anchor="end" font-size="16">2,212 ชิ้น</text>
+
+      <path d="M120 76 L 120 92" stroke="var(--axis)" stroke-width="2"/><path d="M120 92 l -4.5 -8 h 9 z" fill="var(--axis)"/>
+      <text class="svgtxt sm" x="134" y="90">ผ่านการคัดกรองคุณภาพ</text>
+
+      <rect x="0" y="96" width="124" height="42" rx="8" fill="var(--s2)" fill-opacity=".45" stroke="var(--s2)"/>
+      <text class="svgval" x="62" y="123" text-anchor="middle" font-size="16">62 ชิ้น</text>
+
+      <path d="M140 117 L 196 117" stroke="var(--crit)" stroke-width="2.5"/><path d="M196 117 l -8 -4.5 v 9 z" fill="var(--crit)"/>
+      <rect x="200" y="96" width="330" height="42" rx="8" fill="var(--crit)" fill-opacity=".16" stroke="var(--crit)" stroke-width="2"/>
+      <text class="svgtxt b" x="216" y="123" fill="var(--crit)">⚠️ ไม่มีชิ้นใดเลยที่ถูกตัดสินว่ามีประโยชน์ทางคลินิก</text>
+
+      <text class="svgtxt sm" x="0" y="164">สาเหตุใหญ่คือข้อบกพร่องเชิงวิธีวิจัยและข้อมูลที่เอนเอียง ⚠️ <tspan font-weight="700">รวมถึงภาพซ้ำและคนไข้ซ้ำข้ามชุดแบ่งข้อมูล</tspan></text>
+    </svg>
+  </figure>
+
+  <div class="key"><span class="lb">⭐ เคสจริง: วิกฤตการทำซ้ำได้ที่ข้ามสาขาวิชา</span>
+    มีการทบทวนวรรณกรรมที่พบ <b>การรั่วของข้อมูลกระทบงานวิจัย 294 ฉบับ ใน 17 สาขาวิชา รวมถึงการแพทย์</b> ⚠️ และในกรณีศึกษาเชิงลึกหนึ่งกรณี <b>ข้อได้เปรียบของโมเดล ML ที่ซับซ้อนเหนือสถิติแบบง่าย หายไปทั้งหมดเมื่อแก้การรั่วแล้ว</b> ผู้วิจัยจึงเสนอให้ทำ <i>“model info sheet”</i> เพื่อบันทึกว่าชุดเทรนกับชุดทดสอบถูกแยกจากกันอย่างไร
+  </div>
+  <div class="key"><span class="lb">⭐ สิ่งที่ต้องจำ</span>
+    <b>การรั่วไม่ใช่ความผิดพลาดของมือใหม่ที่ผู้เชี่ยวชาญจะหลีกเลี่ยงได้</b> — <b>มันเป็นค่าตั้งต้น เว้นแต่มีใครไปตรวจ</b> ⚠️ <b>และผู้ช่วยที่ถูกเทรนบนวรรณกรรมชุดนี้ ก็ทำนิสัยเดิมซ้ำออกมา</b>
+  </div>
+
+  <h4 style="font-size:16px;margin:24px 0 10px">การรั่วที่ละเอียดกว่า — โมเดลเรียนรู้โรงพยาบาล ไม่ได้เรียนรู้โรค</h4>
+  <div class="key"><span class="lb">⭐ เคสจริง: ปอดบวมบนฟิล์ม X-ray ทรวงอก</span>
+    โมเดล deep learning สำหรับปอดบวมถูกเทรนบนฟิล์มจากหลายระบบโรงพยาบาล ⚠️ <b>มันระบุได้ด้วยความแม่นสูงมากว่าภาพมาจากโรงพยาบาลไหน</b> และเพราะอัตราปอดบวมต่างกันระหว่างโรงพยาบาล <b>มันจึงใช้ชื่อโรงพยาบาลเป็นทางลัดไปบางส่วน</b> ⚠️ <b>และประสิทธิภาพตกลงเมื่อทดสอบที่โรงพยาบาลภายนอก</b>
+  </div>
+  <p><b>สัญญาณรั่วมาจากไหน</b> — เครื่องหมายเฉพาะของแต่ละไซต์ เครื่องสแกน และส่วนผสมของคนไข้ · และ <b>การแบ่งข้อมูลแบบสุ่มที่ผสมไซต์และคนไข้ปนกันทั้งในชุดเทรนและชุดทดสอบ</b><br>
+  ⭐ <b>การป้องกันที่เราขอใน prompt ได้</b> — <b>แบ่งตามคนไข้ด้วย <code>GroupKFold</code> หรือแบ่งตามไซต์</b> · และ <b>ทดสอบกับข้อมูลจากภายนอกหรือจากช่วงเวลาที่หลังกว่า</b></p>
+  </div>
+</section>
+
+<section class="ch" id="ch15" data-ch="15">
+  <h3>บทที่ 15 — โหมด 2 ตัววัดที่ผิดสำหรับข้อมูลที่ไม่สมดุล</h3>
+  <div class="chbody">
+  <p>ในชุดข้อมูล Pima ⭐ <b>คนไข้ประมาณ 65% ไม่เป็นเบาหวาน</b> ซึ่งหมายความว่า “โมเดล” ที่ตอบว่า <i>ไม่เป็น</i> กับทุกคน ได้ accuracy 65% ⚠️ <b>และหาคนไข้ได้ศูนย์คน</b></p>
+  <div class="tw"><table>
+    <thead><tr><th>ตัววัด</th><th>ตอบคำถามว่า</th><th>สำคัญเมื่อไหร่</th></tr></thead>
+    <tbody>
+      <tr><td><b>Sensitivity (recall)</b></td><td>ในคนไข้ที่เป็นโรค เราจับได้กี่คน</td><td><b>การคัดกรอง</b> — เคสที่หลุดมีราคาแพง</td></tr>
+      <tr><td><b>Specificity</b></td><td>ในคนไข้ที่ไม่เป็นโรค เราปล่อยผ่านได้กี่คน</td><td>การเลี่ยงการตามผลที่ไม่จำเป็น</td></tr>
+      <tr><td><b>Precision (PPV)</b></td><td>ในคนที่ถูกตีธง เป็นโรคจริงกี่คน</td><td>ภาระงานจากการแจ้งเตือน</td></tr>
+      <tr><td><b>ROC AUC</b></td><td>เคสถูกจัดอันดับเหนือคนที่ไม่เป็น ได้ดีแค่ไหน</td><td>การเปรียบเทียบที่ไม่ขึ้นกับ threshold</td></tr>
+      <tr><td><b>PR AUC</b></td><td>จุดแลกเปลี่ยนระหว่าง precision กับ recall</td><td>ผลลัพธ์ที่เกิดน้อย</td></tr>
+    </tbody>
+  </table></div>
+  <div class="key"><span class="lb">⭐ นิสัยที่ต้องติด</span>
+    <b>พิมพ์ค่า baseline ของกลุ่มที่มากที่สุดไว้ข้างคะแนนของเราเสมอ</b> และ <b>เมื่อเคสที่เป็นบวกเกิดน้อย มุมมองแบบ precision–recall ให้ข้อมูลมากกว่า ROC</b>
+  </div>
+
+  <h4 style="font-size:16px;margin:24px 0 10px">Quiz 2 — นี่เป็นโมเดลคัดกรองที่ดีหรือไม่</h4>
+  <p>ผู้ช่วยสร้างโมเดลคัดกรองเบาหวานบนข้อมูล Pima (บวกราว 35%) แล้วรายงานบนชุดทดสอบว่า <b>accuracy 0.74 · sensitivity 0.41 · specificity 0.92</b></p>
+
+  <figure>
+    <div class="figtitle">ตัวเลขเดียวกัน มองสองมุม</div>
+    <svg viewBox="0 0 700 228" role="img" aria-label="กราฟเทียบ accuracy 0.74 กับ baseline 0.65 และแผนภาพคนไข้ที่พลาด 59 จาก 100">
+      <text class="svgtxt b" x="0" y="18">accuracy 0.74 เทียบกับ “ตอบไม่เป็นทุกคน”</text>
+      <g stroke="var(--grid)">
+        <line x1="0" y1="34" x2="262" y2="34"/><line x1="0" y1="98" x2="262" y2="98"/>
+      </g>
+      <rect x="0" y="40" width="194" height="24" rx="4" fill="var(--grid)"/>
+      <text class="svgtxt sm" x="200" y="57">baseline 0.65</text>
+      <rect x="0" y="70" width="221" height="24" rx="4" fill="var(--s1)"/>
+      <text class="svgval" x="227" y="87">0.74</text>
+      <path d="M194 112 L 221 112" stroke="var(--crit)" stroke-width="2"/>
+      <text class="svgtxt sm" x="0" y="130" fill="var(--crit)">⚠️ โมเดลเพิ่มมาแค่ <tspan font-weight="700">9 จุด</tspan> เหนือกฎที่หาใครไม่ได้เลย</text>
+      <rect x="0" y="146" width="262" height="60" rx="10" fill="var(--surface2)" stroke="var(--axis)"/>
+      <text class="svgtxt b" x="14" y="168">sensitivity 0.41</text>
+      <text class="svgtxt b" x="14" y="190">specificity 0.92</text>
+      <text class="svgtxt sm" x="140" y="168" fill="var(--crit)">⚠️ จับได้ 41 จาก 100</text>
+      <text class="svgtxt sm" x="140" y="190">ปล่อยผ่านได้ 92 จาก 100</text>
+
+      <line x1="300" y1="8" x2="300" y2="220" stroke="var(--grid)"/>
+
+      <text class="svgtxt b" x="330" y="18">ในคนไข้เบาหวาน 100 คน ⚠️ พลาดราว 59 คน</text>
+      <g transform="translate(330,32)">
+      <rect x="0" y="0" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="11" y="0" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="22" y="0" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="33" y="0" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="44" y="0" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="55" y="0" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="66" y="0" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="77" y="0" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="88" y="0" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="99" y="0" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="110" y="0" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="121" y="0" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="132" y="0" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="143" y="0" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="154" y="0" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="165" y="0" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="176" y="0" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="187" y="0" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="198" y="0" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="209" y="0" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="0" y="11" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="11" y="11" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="22" y="11" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="33" y="11" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="44" y="11" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="55" y="11" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="66" y="11" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="77" y="11" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="88" y="11" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="99" y="11" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="110" y="11" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="121" y="11" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="132" y="11" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="143" y="11" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="154" y="11" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="165" y="11" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="176" y="11" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="187" y="11" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="198" y="11" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="209" y="11" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="0" y="22" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="11" y="22" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="22" y="22" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="33" y="22" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="44" y="22" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="55" y="22" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="66" y="22" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="77" y="22" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="88" y="22" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="99" y="22" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="110" y="22" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="121" y="22" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="132" y="22" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="143" y="22" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="154" y="22" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="165" y="22" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="176" y="22" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="187" y="22" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="198" y="22" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="209" y="22" width="9" height="9" rx="2" fill="var(--good)"/>
+      <rect x="0" y="33" width="9" height="9" rx="2" fill="var(--good)"/>
+      <rect x="11" y="33" width="9" height="9" rx="2" fill="var(--good)"/>
+      <rect x="22" y="33" width="9" height="9" rx="2" fill="var(--good)"/>
+      <rect x="33" y="33" width="9" height="9" rx="2" fill="var(--good)"/>
+      <rect x="44" y="33" width="9" height="9" rx="2" fill="var(--good)"/>
+      <rect x="55" y="33" width="9" height="9" rx="2" fill="var(--good)"/>
+      <rect x="66" y="33" width="9" height="9" rx="2" fill="var(--good)"/>
+      <rect x="77" y="33" width="9" height="9" rx="2" fill="var(--good)"/>
+      <rect x="88" y="33" width="9" height="9" rx="2" fill="var(--good)"/>
+      <rect x="99" y="33" width="9" height="9" rx="2" fill="var(--good)"/>
+      <rect x="110" y="33" width="9" height="9" rx="2" fill="var(--good)"/>
+      <rect x="121" y="33" width="9" height="9" rx="2" fill="var(--good)"/>
+      <rect x="132" y="33" width="9" height="9" rx="2" fill="var(--good)"/>
+      <rect x="143" y="33" width="9" height="9" rx="2" fill="var(--good)"/>
+      <rect x="154" y="33" width="9" height="9" rx="2" fill="var(--good)"/>
+      <rect x="165" y="33" width="9" height="9" rx="2" fill="var(--good)"/>
+      <rect x="176" y="33" width="9" height="9" rx="2" fill="var(--good)"/>
+      <rect x="187" y="33" width="9" height="9" rx="2" fill="var(--good)"/>
+      <rect x="198" y="33" width="9" height="9" rx="2" fill="var(--good)"/>
+      <rect x="209" y="33" width="9" height="9" rx="2" fill="var(--good)"/>
+      <rect x="0" y="44" width="9" height="9" rx="2" fill="var(--good)"/>
+      <rect x="11" y="44" width="9" height="9" rx="2" fill="var(--good)"/>
+      <rect x="22" y="44" width="9" height="9" rx="2" fill="var(--good)"/>
+      <rect x="33" y="44" width="9" height="9" rx="2" fill="var(--good)"/>
+      <rect x="44" y="44" width="9" height="9" rx="2" fill="var(--good)"/>
+      <rect x="55" y="44" width="9" height="9" rx="2" fill="var(--good)"/>
+      <rect x="66" y="44" width="9" height="9" rx="2" fill="var(--good)"/>
+      <rect x="77" y="44" width="9" height="9" rx="2" fill="var(--good)"/>
+      <rect x="88" y="44" width="9" height="9" rx="2" fill="var(--good)"/>
+      <rect x="99" y="44" width="9" height="9" rx="2" fill="var(--good)"/>
+      <rect x="110" y="44" width="9" height="9" rx="2" fill="var(--good)"/>
+      <rect x="121" y="44" width="9" height="9" rx="2" fill="var(--good)"/>
+      <rect x="132" y="44" width="9" height="9" rx="2" fill="var(--good)"/>
+      <rect x="143" y="44" width="9" height="9" rx="2" fill="var(--good)"/>
+      <rect x="154" y="44" width="9" height="9" rx="2" fill="var(--good)"/>
+      <rect x="165" y="44" width="9" height="9" rx="2" fill="var(--good)"/>
+      <rect x="176" y="44" width="9" height="9" rx="2" fill="var(--good)"/>
+      <rect x="187" y="44" width="9" height="9" rx="2" fill="var(--good)"/>
+      <rect x="198" y="44" width="9" height="9" rx="2" fill="var(--good)"/>
+      <rect x="209" y="44" width="9" height="9" rx="2" fill="var(--good)"/>
+      </g>
+      <rect x="330" y="112" width="12" height="12" rx="2" fill="var(--crit)"/>
+      <text class="svgtxt sm" x="350" y="123">พลาด 59 คน</text>
+      <rect x="440" y="112" width="12" height="12" rx="2" fill="var(--good)"/>
+      <text class="svgtxt sm" x="460" y="123">จับได้ 41 คน</text>
+      <text class="svgtxt b" x="330" y="152">ควรปรับตัวไหนก่อน → <tspan fill="var(--good)">sensitivity</tspan></text>
+      <text class="svgtxt sm" x="330" y="172">ลด threshold ลง เช่นตีธงเมื่อความเสี่ยง &gt; 0.3 แทน &gt; 0.5</text>
+      <text class="svgtxt sm" x="330" y="190" fill="var(--crit)">⚠️ โดยเลือกจากชุดเทรนหรือชุด validation ไม่ใช่ชุดทดสอบ</text>
+      <text class="svgtxt sm" x="330" y="208">แล้วยอมรับว่า specificity จะต่ำลง</text>
+    </svg>
+  </figure>
+
+  <div class="quiz" data-quiz="2">
+    <div class="qhead"><span class="qt">Quiz 2</span><span class="chip">3 ข้อ</span></div>
+    <div class="qitem"><div class="qq"><span class="qn">1</span><span>accuracy 0.74 น่าประทับใจไหม</span></div>
+      <button class="qreveal">ดูเฉลย</button><div class="qa" hidden>⚠️ <span class="ans">แค่พอประมาณ</span> เพราะ “ตอบไม่เป็นทุกคน” ได้ราว 0.65 อยู่แล้ว <b>โมเดลเพิ่มมาแค่ 9 จุด</b> เหนือกฎที่หาใครไม่ได้เลย</div></div>
+    <div class="qitem"><div class="qq"><span class="qn">2</span><span>ในคนไข้เบาหวาน 100 คน โมเดลพลาดกี่คน</span></div>
+      <button class="qreveal">ดูเฉลย</button><div class="qa" hidden>sensitivity 0.41 คือจับได้ 41 คน ⚠️ <span class="ans">พลาดราว 59 คน</span></div></div>
+    <div class="qitem"><div class="qq"><span class="qn">3</span><span>สำหรับการคัดกรอง ควรปรับตัวไหนก่อน</span></div>
+      <button class="qreveal">ดูเฉลย</button><div class="qa" hidden><span class="ans">sensitivity</span> เพราะการคัดกรองมีไว้เพื่อหาเคส — <b>ลด threshold ลง</b> (เช่นตีธงเมื่อความเสี่ยง &gt; 0.3 แทน &gt; 0.5) ⚠️ <b>โดยเลือกจากชุดเทรนหรือชุด validation ไม่ใช่ชุดทดสอบ</b> แล้วยอมรับว่า specificity จะต่ำลง</div></div>
+  </div>
+
+  <div class="key"><span class="lb">⭐ สิ่งที่ต้องจำ</span>
+    <b>accuracy ผสมความผิดพลาดสองแบบที่ต่างกันมากเข้าเป็นเลขตัวเดียว</b> — <b>ในงานสุขภาพต้องถามเสมอว่าความผิดพลาดแบบไหนแย่กว่า แล้วรายงาน sensitivity กับ specificity แยกกัน</b> ⚠️ <b>ผู้ช่วยจะไม่ถามเราเรื่องนี้ เราต้องเป็นคนบอกมันเอง</b>
+  </div>
+  </div>
+</section>
+
+<section class="ch" id="ch16" data-ch="16">
+  <h3>บทที่ 16 — โหมด 3 การใช้ข้อมูลผิดแบบเงียบ ๆ และโหมด 4 API ที่ไม่มีอยู่จริง</h3>
+  <div class="chbody">
+  <p>ในข้อมูล Pima ⭐ <b>เลขศูนย์มักหมายถึง “ไม่ได้วัด” ไม่ใช่ค่าศูนย์จริง</b> ⚠️ <b>ความดันเลือดช่วงหัวใจคลายตัวเท่ากับ 0 ไม่ใช่คนไข้ มันคือค่าที่หายไป</b></p>
+
+  <figure>
+    <div class="figtitle">จำนวนเลขศูนย์ในแต่ละคอลัมน์ (จาก 768 แถว)</div>
+    <svg viewBox="0 0 660 214" role="img" aria-label="กราฟแท่งจำนวนเลขศูนย์ Insulin 374 SkinThickness 227 BloodPressure 35 BMI 11 Glucose 5">
+      <g stroke="var(--grid)">
+        <line x1="150" y1="6" x2="150" y2="178"/><line x1="259" y1="6" x2="259" y2="178"/>
+        <line x1="368" y1="6" x2="368" y2="178"/><line x1="477" y1="6" x2="477" y2="178"/>
+        <line x1="586" y1="6" x2="586" y2="178"/>
+      </g>
+      <g class="svgtxt sm" text-anchor="middle">
+        <text x="150" y="196">0</text><text x="259" y="196">100</text><text x="368" y="196">200</text>
+        <text x="477" y="196">300</text><text x="586" y="196">400</text>
+      </g>
+      <text class="svgtxt sm" x="368" y="212" text-anchor="middle">จำนวนแถวที่เป็นเลขศูนย์</text>
+      <g class="svgtxt" text-anchor="end">
+        <text x="142" y="22">Insulin</text><text x="142" y="56">SkinThickness</text>
+        <text x="142" y="90">BloodPressure</text><text x="142" y="124">BMI</text><text x="142" y="158">Glucose</text>
+      </g>
+      <rect x="150" y="8"   width="408" height="20" rx="4" fill="var(--crit)"/>
+      <rect x="150" y="42"  width="248" height="20" rx="4" fill="var(--serious)"/>
+      <rect x="150" y="76"  width="38"  height="20" rx="4" fill="var(--seq3)"/>
+      <rect x="150" y="110" width="12"  height="20" rx="4" fill="var(--seq3)"/>
+      <rect x="150" y="144" width="5.5" height="20" rx="2" fill="var(--seq3)"/>
+      <g class="svgval">
+        <text x="548" y="23" text-anchor="end" fill="#ffffff">374 · เกือบครึ่ง</text>
+        <text x="388" y="57" text-anchor="end" fill="#ffffff">227</text>
+        <text x="196" y="91">35</text><text x="170" y="125">11</text><text x="163" y="159">5</text>
+      </g>
+    </svg>
+  </figure>
+
+  <div class="tw"><table>
+    <thead><tr><th>⚠️ ผู้ช่วยมักทำอะไร</th><th>เราต้องตรวจอะไร</th></tr></thead>
+    <tbody>
+      <tr><td>⚠️ <b>ใช้ 0 เป็นตัวเลขจริง</b> ซึ่งทำให้โมเดลเอนเอียง</td><td><b>จำนวนแถวก่อนและหลังทุกขั้นตอน</b></td></tr>
+      <tr><td>⚠️ <b><code>dropna()</code> ที่ลบคนไข้ไปครึ่งหนึ่งอย่างเงียบ ๆ</b></td><td><b><code>describe()</code> แล้วดูว่าค่าต่ำสุด–สูงสุดเป็นไปได้จริงไหม</b></td></tr>
+      <tr><td>⚠️ <b>แทนค่า 0 ในทุกคอลัมน์ รวมถึง <code>Pregnancies</code></b></td><td></td></tr>
+      <tr><td>⚠️ <b>เปลี่ยนการเข้ารหัสตัวแปรเป้าหมายหรือลำดับแถวโดยไม่บอก</b></td><td></td></tr>
+    </tbody>
+  </table></div>
+  <div class="key"><span class="lb">⭐ ความคิดหลัก</span>
+    <b>โค้ดไม่มีทางรู้ความหมายของค่าหนึ่ง มีแต่คนที่ทำงานคลินิกที่รู้</b> — <b>ความหมายของข้อมูลคือส่วนของ prompt ที่มีแต่เราเขียนได้</b>
+  </div>
+
+  <h4 style="font-size:16px;margin:24px 0 10px">API ที่ไม่มีอยู่จริงและที่เลิกใช้แล้ว</h4>
+  <figure>
+    <div class="figtitle">⚠️ แพ็กเกจที่ถูกแต่งขึ้น — จาก 16 LLM และตัวอย่าง 576,000 ชิ้น</div>
+    <svg viewBox="0 0 700 140" role="img" aria-label="แถบแสดงสัดส่วนแพ็กเกจที่ไม่มีอยู่จริง 5.2 ถึง 21.7 เปอร์เซ็นต์">
+      <g stroke="var(--grid)">
+        <line x1="60" y1="26" x2="60" y2="92"/><line x1="188" y1="26" x2="188" y2="92"/>
+        <line x1="316" y1="26" x2="316" y2="92"/><line x1="444" y1="26" x2="444" y2="92"/>
+        <line x1="572" y1="26" x2="572" y2="92"/><line x1="700" y1="26" x2="700" y2="92"/>
+      </g>
+      <g class="svgtxt sm" text-anchor="middle">
+        <text x="60" y="108">0%</text><text x="188" y="108">5%</text><text x="316" y="108">10%</text>
+        <text x="444" y="108">15%</text><text x="572" y="108">20%</text><text x="700" y="108">25%</text>
+      </g>
+      <rect x="193" y="42" width="423" height="34" rx="8" fill="var(--crit)" fill-opacity=".30" stroke="var(--crit)" stroke-width="2"/>
+      <line x1="193" y1="36" x2="193" y2="82" stroke="var(--crit)" stroke-width="3"/>
+      <line x1="616" y1="36" x2="616" y2="82" stroke="var(--crit)" stroke-width="3"/>
+      <text class="svgval" x="193" y="30" text-anchor="middle">5.2%</text>
+      <text class="svgtxt sm" x="193" y="96" text-anchor="middle">ตัวเชิงพาณิชย์</text>
+      <text class="svgval" x="616" y="30" text-anchor="middle">21.7%</text>
+      <text class="svgtxt sm" x="616" y="96" text-anchor="middle">ตัวโอเพนซอร์ส</text>
+      <text class="svgtxt b" x="404" y="64" text-anchor="middle">ของแพ็กเกจที่ถูกแนะนำ ไม่มีอยู่จริง</text>
+      <text class="svgtxt sm" x="0" y="132" fill="var(--crit)">⚠️ ผู้โจมตีไปจดชื่อเหล่านั้นพร้อมโค้ดมุ่งร้ายได้ ซึ่งเรียกว่า <tspan font-style="italic">slopsquatting</tspan></text>
+    </svg>
+  </figure>
+
+  <div class="tw"><table>
+    <thead><tr><th>ที่ถูกแต่งขึ้นมา — ไม่มีอยู่จริง</th><th>ที่เลิกใช้แล้ว — นิสัยเก่าจากข้อมูลเทรน</th></tr></thead>
+    <tbody>
+      <tr><td>ฟังก์ชันหรือพารามิเตอร์ที่ถูกแต่งขึ้น มัก <b>ขึ้น error</b> ซึ่งเป็นกรณีที่ดี</td><td><code>load_boston</code> <b>ถูกถอดออกจาก scikit-learn 1.2</b></td></tr>
+      <tr><td>⚠️ <b>แพ็กเกจที่ถูกแต่งขึ้น 5.2–21.7%</b></td><td><code>OneHotEncoder(sparse=...)</code> <b>ถูกเปลี่ยนชื่อเป็น <code>sparse_output</code></b></td></tr>
+      <tr><td>⚠️ <b><i>slopsquatting</i></b> — ผู้โจมตีจดชื่อที่ถูกแต่งขึ้น</td><td><code>sklearn.cross_validation</code> ไม่มีอยู่แล้ว</td></tr>
+      <tr><td></td><td>⚠️ <b>กรณีที่แย่ที่สุดคือค่าตั้งต้นเก่าที่ยังรันได้ แต่ทำงานต่างไป</b></td></tr>
+    </tbody>
+  </table></div>
+  <div class="key"><span class="lb">⭐ การป้องกัน</span>
+    <b>อย่า <code>pip install</code> แพ็กเกจที่ยังไม่เคยไปค้นดูว่ามีจริง</b> · <b>พิมพ์เวอร์ชันของไลบรารีออกมา</b> · และ <b>วาง error ตัวจริงกลับไปให้ผู้ช่วยพร้อมเลขเวอร์ชันของเรา</b>
+  </div>
+  </div>
+</section>
+
+<section class="ch" id="ch17" data-ch="17">
+  <h3>บทที่ 17 — โหมด 5 สถิติที่ดูน่าเชื่อแต่ผิด</h3>
+  <div class="chbody">
+  <div class="warnbox"><span class="lb">⚠️ โหมดที่เงียบที่สุดของทั้งห้า</span>
+    <b>โค้ดรันได้ ตารางจัดรูปสวย ค่า p น้อย — แต่ข้อสรุปยังผิดอยู่</b> เพราะไม่มีอะไรพังให้เห็น
+  </div>
+  <div class="tw"><table>
+    <thead><tr><th>รูปแบบที่ถูกสร้างออกมา</th><th>ทำไมมันผิด</th></tr></thead>
+    <tbody>
+      <tr><td><b>รายงานคะแนนบนข้อมูลชุดเทรน</b></td><td>วัดการจำ ไม่ได้วัดการวางนัยทั่วไป</td></tr>
+      <tr><td>⚠️ <b>เลือก threshold หรือเลือกโมเดลบนชุดทดสอบ</b></td><td>ชุดทดสอบไม่ใช่ข้อมูลที่ “ยังไม่เคยเห็น” อีกต่อไป</td></tr>
+      <tr><td><b>ลองหลายโมเดลแล้วรายงานตัวที่ดีที่สุด</b></td><td>การเปรียบเทียบหลายครั้ง ทำให้มองโลกสวยด้วยการคัดเลือก</td></tr>
+      <tr><td><b>ใช้ t-test แบบอิสระกับข้อมูลก่อน–หลัง</b></td><td>ข้อมูลที่จับคู่กันต้องใช้การทดสอบแบบจับคู่</td></tr>
+      <tr><td><b>เลขตัวเดียว ไม่มีการกระจายหรือช่วงความเชื่อมั่น</b></td><td>ซ่อนว่าผลแปรปรวนมากแค่ไหนข้าม fold</td></tr>
+      <tr><td>⚠️ <b>อ่านความสำคัญของตัวแปรว่าเป็น “สาเหตุ”</b></td><td>การพยากรณ์ไม่ใช่ความเป็นเหตุเป็นผล</td></tr>
+    </tbody>
+  </table></div>
+  <div class="key"><span class="lb">⭐ นิสัยที่ต้องติด</span>
+    สำหรับทุกตัวเลข ให้ถามผู้ช่วยว่า <i>“เลขนี้คำนวณบนแถวไหน และถ้าเดาสุ่มจะได้เท่าไหร่”</i> <b>แล้วไปตรวจคำตอบนั้นในโค้ดด้วยตัวเองอีกที</b>
+  </div>
+  </div>
+</section>
+
+<h2 class="sec" id="s4"><span class="pill">ส่วนที่ 4</span> หลักฐานและเช็คลิสต์ตรวจสอบ</h2>
+<p class="secintro">บทที่ 18–22 · “ผ่านการทดสอบ” ดีได้แค่เท่าที่การทดสอบนั้นดี</p>
+
+<section class="ch" id="ch18" data-ch="18">
+  <h3>บทที่ 18 — โค้ดที่ AI สร้าง ถูกแค่ไหน</h3>
+  <div class="chbody">
+  <figure>
+    <div class="figtitle">ตัวเลข benchmark และเหตุผลที่มันเชื่อไม่ได้ทั้งหมด</div>
+    <svg viewBox="0 0 700 206" role="img" aria-label="Codex แก้โจทย์ HumanEval ได้ 28.8 เปอร์เซ็นต์ครั้งแรก 70.2 เปอร์เซ็นต์ถ้าลอง 100 ครั้ง และเมื่อเพิ่มการทดสอบ 80 เท่า คะแนนลด 19 ถึง 29 เปอร์เซ็นต์">
+      <text class="svgtxt b" x="0" y="18">Codex (โมเดลเบื้องหลัง GitHub Copilot รุ่นแรก) บนโจทย์ HumanEval</text>
+      <g stroke="var(--grid)">
+        <line x1="150" y1="28" x2="150" y2="104"/><line x1="260" y1="28" x2="260" y2="104"/>
+        <line x1="370" y1="28" x2="370" y2="104"/><line x1="480" y1="28" x2="480" y2="104"/>
+        <line x1="590" y1="28" x2="590" y2="104"/>
+      </g>
+      <g class="svgtxt sm" text-anchor="middle">
+        <text x="150" y="120">0%</text><text x="260" y="120">25%</text><text x="370" y="120">50%</text>
+        <text x="480" y="120">75%</text><text x="590" y="120">100%</text>
+      </g>
+      <text class="svgtxt" x="142" y="48" text-anchor="end">ลองครั้งแรก</text>
+      <rect x="150" y="34" width="126.7" height="22" rx="4" fill="var(--s1)"/>
+      <text class="svgval" x="284" y="51">28.8%</text>
+      <text class="svgtxt" x="142" y="84" text-anchor="end">ให้ลองได้ 100 ครั้ง</text>
+      <rect x="150" y="70" width="308.9" height="22" rx="4" fill="var(--s1)" fill-opacity=".55"/>
+      <text class="svgval" x="466" y="87">70.2%</text>
+      <text class="svgtxt sm" x="600" y="51" fill="var(--muted)">โมเดลปัจจุบัน</text>
+      <text class="svgtxt sm" x="600" y="67" fill="var(--muted)">สูงกว่านี้มาก</text>
+
+      <rect x="0" y="136" width="700" height="62" rx="11" fill="var(--warnbg)" stroke="var(--crit)" stroke-width="2"/>
+      <text class="svgtxt b" x="16" y="158" fill="var(--crit)">⚠️ แต่ชุดทดสอบเดิมนั้นอ่อน</text>
+      <text class="svgtxt" x="16" y="178">เติมกรณีทดสอบเข้าไป <tspan font-weight="700">มากขึ้น 80 เท่า</tspan> → อัตราความสำเร็จที่วัดได้ <tspan font-weight="700" fill="var(--crit)">ลดลง 19–29% ข้าม 26 LLM</tspan></text>
+      <text class="svgtxt sm" x="16" y="194" fill="var(--crit)">⚠️ และยังเปลี่ยนอันดับว่าโมเดลไหนดีที่สุดด้วย</text>
+    </svg>
+  </figure>
+
+  <div class="key"><span class="lb">⭐ บทเรียน</span>
+    <i>“ผ่านการทดสอบ”</i> ดีได้แค่เท่าที่การทดสอบนั้นดี <b>และเรื่องเดียวกันใช้กับ ML pipeline ของเรา เพราะ “รันได้และให้ค่า AUC” คือการทดสอบที่อ่อนมาก</b> ⭐ <b>เช็คลิสต์ตรวจสอบคือชุดทดสอบที่แข็งกว่า ซึ่งเราเขียนขึ้นเอง</b>
+  </div>
+  <p>💡 เหตุผลที่ตัวเลข benchmark ใช้ไม่ได้ตรง ๆ กับงานเรา คือ ⚠️ <b>benchmark วัดโจทย์เล็กที่ระบุไว้ชัดเจน ไม่ใช่ข้อมูลคลินิกที่รุงรังและมีความหมายซ่อนอยู่ ซึ่งเป็นที่ที่บั๊กในงานวิจัยอาศัยอยู่</b></p>
+  </div>
+</section>
+
+<section class="ch" id="ch19" data-ch="19" data-lite="1">
+  <details class="chfold">
+    <summary><h3>บทที่ 19 — ความปลอดภัย โค้ดที่ทำงานได้แต่ไม่ปลอดภัย</h3><span class="chip">ไม่เน้นสอบ</span></summary>
+    <div class="chbody">
+    <figure>
+      <div class="figtitle">⭐ เคสจริง: “หลับอยู่หน้าแป้นพิมพ์หรือเปล่า”</div>
+      <div class="figsub">89 สถานการณ์ที่เกี่ยวกับความปลอดภัย → โปรแกรม 1,689 ชิ้น · หนึ่งช่อง = 1%</div>
+      <svg viewBox="0 0 700 140" role="img" aria-label="ราว 40 เปอร์เซ็นต์ของโปรแกรมมีช่องโหว่ความปลอดภัย">
+        <g transform="translate(0,16)">
+        <rect x="0" y="0" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="11" y="0" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="22" y="0" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="33" y="0" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="44" y="0" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="55" y="0" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="66" y="0" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="77" y="0" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="88" y="0" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="99" y="0" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="110" y="0" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="121" y="0" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="132" y="0" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="143" y="0" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="154" y="0" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="165" y="0" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="176" y="0" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="187" y="0" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="198" y="0" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="209" y="0" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="0" y="11" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="11" y="11" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="22" y="11" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="33" y="11" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="44" y="11" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="55" y="11" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="66" y="11" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="77" y="11" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="88" y="11" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="99" y="11" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="110" y="11" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="121" y="11" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="132" y="11" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="143" y="11" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="154" y="11" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="165" y="11" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="176" y="11" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="187" y="11" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="198" y="11" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="209" y="11" width="9" height="9" rx="2" fill="var(--crit)"/>
+      <rect x="0" y="22" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="11" y="22" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="22" y="22" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="33" y="22" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="44" y="22" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="55" y="22" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="66" y="22" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="77" y="22" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="88" y="22" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="99" y="22" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="110" y="22" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="121" y="22" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="132" y="22" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="143" y="22" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="154" y="22" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="165" y="22" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="176" y="22" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="187" y="22" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="198" y="22" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="209" y="22" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="0" y="33" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="11" y="33" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="22" y="33" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="33" y="33" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="44" y="33" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="55" y="33" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="66" y="33" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="77" y="33" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="88" y="33" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="99" y="33" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="110" y="33" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="121" y="33" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="132" y="33" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="143" y="33" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="154" y="33" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="165" y="33" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="176" y="33" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="187" y="33" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="198" y="33" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="209" y="33" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="0" y="44" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="11" y="44" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="22" y="44" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="33" y="44" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="44" y="44" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="55" y="44" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="66" y="44" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="77" y="44" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="88" y="44" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="99" y="44" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="110" y="44" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="121" y="44" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="132" y="44" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="143" y="44" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="154" y="44" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="165" y="44" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="176" y="44" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="187" y="44" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="198" y="44" width="9" height="9" rx="2" fill="var(--grid)"/>
+      <rect x="209" y="44" width="9" height="9" rx="2" fill="var(--grid)"/>
+        </g>
+        <rect x="246" y="20" width="12" height="12" rx="2" fill="var(--crit)"/>
+        <text class="svgtxt b" x="266" y="31">ราว 40% มีช่องโหว่ความปลอดภัยชนิดที่รู้จักกันอยู่แล้ว</text>
+        <rect x="246" y="46" width="12" height="12" rx="2" fill="var(--grid)"/>
+        <text class="svgtxt sm" x="266" y="57">ที่เหลือ</text>
+        <text class="svgtxt b" x="246" y="88" fill="var(--crit)">⚠️ เคสจริง: ความมั่นใจเกินจริง</text>
+        <text class="svgtxt sm" x="246" y="106">ผู้เข้าร่วมที่มีผู้ช่วย AI เขียนโค้ด <tspan font-weight="700">ปลอดภัยน้อยกว่า</tspan> กลุ่มที่ไม่มี</text>
+        <text class="svgtxt sm" x="246" y="122">และยังมีแนวโน้มจะ <tspan font-weight="700">เชื่อว่าโค้ดของตัวเองปลอดภัยมากกว่า</tspan> ด้วย</text>
+        </svg>
+    </figure>
+    <p><b>ทำไมเรื่องนี้สำคัญกับงานสุขภาพ</b> — แอปและแดชบอร์ดด้านสุขภาพจัดการข้อมูลส่วนบุคคล ⭐ <b>โค้ดที่ไม่ปลอดภัยจึงเป็นเรื่องความปลอดภัยของคนไข้และเรื่องกฎหมาย ไม่ใช่แค่เรื่องเทคนิค</b><br>
+    <b>ความเสี่ยงที่พบทั่วไป</b> — รหัสผ่านหรือคีย์ API ที่ฝังลงไปในโค้ดตรง ๆ · การจัดการไฟล์ที่ไม่ปลอดภัย · และการส่งข้อมูลไปยังบริการที่เราไม่รู้จัก</p>
+    <div class="key"><span class="lb">⭐ ความคิดหลัก</span>
+      <b>อันตรายไม่ใช่แค่โค้ดที่ผิด แต่เป็นความเชื่อใจที่วางไว้ผิดที่</b> ⚠️ <b>ผลลัพธ์ที่ลื่นไหลทำให้เราลดการ์ดลง</b>
+    </div>
+    </div>
+  </details>
+</section>
+
+<section class="ch" id="ch20" data-ch="20">
+  <h3>บทที่ 20 — เมื่อตัวเลขที่ดูน่าเชื่อเดินไปถึงข้างเตียงคนไข้</h3>
+  <div class="chbody">
+  <div class="tiles">
+    <div class="tile bad"><div class="v">0.63</div><div class="k">AUC จากการตรวจสอบภายนอกอย่างอิสระ ⚠️ ต่ำกว่าที่ผู้พัฒนารายงานไว้มาก</div></div>
+    <div class="tile bad"><div class="v">2 / 3</div><div class="k">สัดส่วนเคสพิษเหตุติดเชื้อที่ <b>มันพลาด</b></div></div>
+    <div class="tile bad"><div class="v">18<span style="font-size:15px">%</span></div><div class="k">ของคนไข้ที่นอนโรงพยาบาล <b>ทั้งหมด</b> ถูกแจ้งเตือน</div></div>
+    <div class="tile acc"><div class="v">38,455</div><div class="k">การรับไว้ในโรงพยาบาล · คนไข้ 27,697 คน ที่ Michigan Medicine</div></div>
+  </div>
+  <figure>
+    <div class="figtitle">⭐ เคสจริง: Epic Sepsis Model — ใช้ในโรงพยาบาลหลายร้อยแห่งในสหรัฐ</div>
+    <svg viewBox="0 0 700 96" role="img" aria-label="แถบมาตร AUC แสดงค่า 0.63 ใกล้ฝั่งโยนหัวก้อย">
+      <defs><linearGradient id="aucg2" x1="0" x2="1">
+        <stop offset="0" stop-color="var(--crit)" stop-opacity=".30"/>
+        <stop offset="1" stop-color="var(--good)" stop-opacity=".30"/>
+      </linearGradient></defs>
+      <rect x="40" y="30" width="620" height="22" rx="11" fill="url(#aucg2)" stroke="var(--axis)"/>
+      <line x1="40" y1="26" x2="40" y2="56" stroke="var(--axis)" stroke-width="2"/>
+      <line x1="660" y1="26" x2="660" y2="56" stroke="var(--axis)" stroke-width="2"/>
+      <text class="svgtxt sm" x="40" y="72" text-anchor="middle">0.50 โยนหัวก้อย</text>
+      <text class="svgtxt sm" x="660" y="72" text-anchor="middle">1.00 สมบูรณ์แบบ</text>
+      <line x1="201" y1="20" x2="201" y2="62" stroke="var(--crit)" stroke-width="3"/>
+      <circle cx="201" cy="41" r="6" fill="var(--crit)" stroke="var(--surface)" stroke-width="2"/>
+      <text class="svgval" x="201" y="14" text-anchor="middle" fill="var(--crit)">AUC 0.63</text>
+      <text class="svgtxt sm" x="0" y="92" fill="var(--crit)">⚠️ ตัวเลขนั้นดูน่าเชื่อ และไม่มีใครจากภายนอกตรวจโค้ดได้</text>
+    </svg>
+  </figure>
+  <div class="tw"><table>
+    <thead><tr><th>เชื่อมโยงกับเรื่องของเราวันนี้</th><th>อะไรที่น่าจะช่วยได้</th></tr></thead>
+    <tbody>
+      <tr><td>⚠️ <b>ตัวเลขนั้นดูน่าเชื่อ และไม่มีใครจากภายนอกตรวจโค้ดได้</b></td><td><b>pipeline ที่โปร่งใสและรันซ้ำได้</b></td></tr>
+      <tr><td>⚠️ <b>นิยามของ label และเรื่องเวลา — “พิษเหตุติดเชื้อ” รู้ตอนไหน — เป็นตัวขับการรั่วของข้อมูล</b></td><td><b>การประเมินที่ซื่อสัตย์ มาจากภายนอก และคำนึงถึงลำดับเวลา</b> · และ <b>รายงาน sensitivity กับภาระการแจ้งเตือน ไม่ใช่แค่ AUC</b></td></tr>
+    </tbody>
+  </table></div>
+  </div>
+</section>
+
+<section class="ch" id="ch21" data-ch="21">
+  <h3>บทที่ 21 — เช็คลิสต์ตรวจสอบโค้ด ML ที่ AI สร้าง</h3>
+  <div class="chbody">
+  <div class="key"><span class="lb">⭐</span>
+    นี่คือแผ่นที่ควรจำให้ได้ทั้งแผ่น เพราะมันเป็น <b>เครื่องมือหลักที่คาบนี้มอบให้</b>
+  </div>
+  <div class="tw"><table>
+    <thead><tr><th>ตรวจอะไร</th><th>คำถามที่ต้องตอบให้ได้</th><th>จับอะไรได้</th></tr></thead>
+    <tbody>
+      <tr><td><b>1 · อ่าน</b></td><td>อธิบายทุกบรรทัดเป็นคำพูดได้ไหม</td><td>ขั้นตอนที่ซ่อนอยู่</td></tr>
+      <tr><td><b>2 · ข้อมูล</b></td><td>จำนวนแถว เลขศูนย์ ช่วงค่า และการเข้ารหัสเป้าหมาย ถูกไหม</td><td>⚠️ การใช้ข้อมูลผิดแบบเงียบ</td></tr>
+      <tr><td><b>3 · การแบ่ง</b></td><td>แบ่งข้อมูลก่อนที่จะ fit อะไรทั้งนั้นหรือเปล่า</td><td>⚠️ การรั่วของข้อมูล</td></tr>
+      <tr><td><b>4 · Pipeline</b></td><td>การเตรียมข้อมูลอยู่ใน <code>Pipeline</code> หรือใน CV ไหม</td><td>⚠️ การรั่วของข้อมูล</td></tr>
+      <tr><td><b>5 · ตัววัด</b></td><td>ตรงกับเป้าหมายทางคลินิกไหม เทียบกับ baseline แล้วไหม</td><td>ตัววัดผิด</td></tr>
+      <tr><td><b>6 · ชุดทดสอบ</b></td><td>ใช้ครั้งเดียว เพื่อตัวเลขสุดท้ายเท่านั้น ใช่ไหม</td><td>การคัดเลือกที่มองโลกสวย</td></tr>
+      <tr><td><b>7 · ทำซ้ำ</b></td><td>ตรึงเมล็ดสุ่มแล้ว และรันใหม่ได้เลขเดิมไหม</td><td>ความสุ่ม สถานะที่ซ่อนอยู่</td></tr>
+      <tr><td><b>8 · เวอร์ชันและ API</b></td><td>แพ็กเกจมีจริงไหม พิมพ์เวอร์ชันแล้วไหม</td><td>⚠️ API ที่ไม่มีอยู่จริง</td></tr>
+    </tbody>
+  </table></div>
+  <div class="key"><span class="lb">⭐ เคล็ดในทางปฏิบัติ</span>
+    <b>วางเช็คลิสต์นี้ลงใน prompt แล้วขอให้ผู้ช่วยตรวจตัวเอง</b> ⚠️ <b>แล้วเราตรวจเองอีกทีอยู่ดี เพราะการตรวจตัวเองจับบั๊กได้บางส่วน แต่ไม่ได้แทนการตรวจของเรา</b>
+  </div>
+
+  <h4 style="font-size:16px;margin:24px 0 10px">การตรวจความสมเหตุสมผลที่เพิ่มได้ในห้าบรรทัด</h4>
+<pre><code>print(X_tr.shape, X_te.shape)                      # ขนาดตามที่คาดไหม แถวหายหรือเปล่า
+print(y_tr.mean().round(3), y_te.mean().round(3))  # สัดส่วนกลุ่มใกล้กันไหม
+print(X_tr.describe().loc[["min", "max"]])         # ยังมีค่าที่เป็นไปไม่ได้เหลืออยู่ไหม
+base = DummyClassifier(strategy="most_frequent").fit(X_tr, y_tr)
+print("baseline acc:", base.score(X_te, y_te))     # ราว 0.65 บน Pima</code></pre>
+
+  <div class="tw"><table>
+    <thead><tr><th>⚠️ สัญญาณว่ามีอะไรผิด</th><th>การตรวจที่แข็งกว่า</th></tr></thead>
+    <tbody>
+      <tr><td>⚠️ <b>AUC เกิน 0.95 ในโจทย์คลินิกที่ยาก</b></td><td><b>สลับ label แบบสุ่ม แล้ว AUC ควรตกลงมาราว 0.5</b></td></tr>
+      <tr><td>⚠️ <b>ประสิทธิภาพสูงกว่า baseline แค่เล็กน้อย</b></td><td><b>ถอดตัวแปรที่สำคัญที่สุดออก แล้วดูว่าประสิทธิภาพพังไหม</b></td></tr>
+      <tr><td>⚠️ <b>ตัวเลขเปลี่ยนทุกครั้งที่รัน</b></td><td><b>รีสตาร์ท runtime แล้วรันทุกเซลล์ใหม่</b></td></tr>
+    </tbody>
+  </table></div>
+  </div>
+</section>
+
+<section class="ch" id="ch22" data-ch="22">
+  <h3>บทที่ 22 — Quiz 3 หาปัญหาให้ได้อย่างน้อยสี่ข้อ</h3>
+  <div class="chbody">
+  <p>ผู้ช่วยสร้าง pipeline นี้ออกมาให้งานวิจัยคัดกรองเบาหวาน ⭐ <b>ห้าบรรทัด ห้าปัญหา ศูนย์ข้อความ error</b></p>
+
+  <figure>
+    <div class="figtitle">ลองหาเองก่อน แล้วคลิกทีละบรรทัดเพื่อเฉลย</div>
+    <div class="hunt" id="hunt">
+      <div class="huntbar">เจอแล้ว <b id="huntN">0</b> / 5 ปัญหา</div>
+      <div class="huntcode">
+        <button class="ln" data-p="2"><span class="lnno">1</span><span class="lncode">X = df.drop(columns="Outcome"); y = df["Outcome"]</span></button>
+        <button class="ln" data-p="1,5"><span class="lnno">2</span><span class="lncode">X = StandardScaler().fit_transform(X)</span></button>
+        <button class="ln" data-p="3"><span class="lnno">3</span><span class="lncode">X_tr, X_te, y_tr, y_te = train_test_split(X, y, test_size=0.2)</span></button>
+        <button class="ln" data-p="3"><span class="lnno">4</span><span class="lncode">model = RandomForestClassifier().fit(X_tr, y_tr)</span></button>
+        <button class="ln" data-p="4"><span class="lnno">5</span><span class="lncode">print("Accuracy:", model.score(X_te, y_te))</span></button>
+      </div>
+      <div class="huntnotes">
+        <div class="note" data-pid="1" hidden><b>1 · ⚠️ การรั่ว</b> — <b>ตัวปรับสเกลถูก fit บนทุกแถวก่อนการแบ่งข้อมูล</b> คนไข้ชุดทดสอบจึงเข้าไปกำหนดค่าเฉลี่ยและส่วนเบี่ยงเบนที่ใช้ปรับสเกลแล้ว</div>
+        <div class="note" data-pid="2" hidden><b>2 · ⚠️ การใช้ข้อมูลผิดแบบเงียบ</b> — <b>เลขศูนย์ใน Glucose, BloodPressure, Insulin ฯลฯ ถูกนับเป็นค่าจริง</b> ไม่มีบรรทัดไหนแปลงเป็น NaN เลย</div>
+        <div class="note" data-pid="3" hidden><b>3 · ⚠️ ทำซ้ำไม่ได้</b> — <b>ไม่มี <code>random_state</code> ทั้งในการแบ่งและในป่าสุ่ม และไม่มี <code>stratify</code></b> ตัวเลขจึงเปลี่ยนทุกครั้งที่รัน</div>
+        <div class="note" data-pid="4" hidden><b>4 · ⚠️ ตัววัดผิด</b> — <b>มีแต่ accuracy ไม่มี sensitivity, specificity, AUC หรือ baseline</b> ซึ่ง baseline บน Pima อยู่ที่ราว 0.65 อยู่แล้ว</div>
+        <div class="note" data-pid="5" hidden><b>5 · 💡 ของแถม</b> — <b>ป่าสุ่มไม่ต้องการการปรับสเกล</b> ขั้นตอนนั้นเพิ่มความเสี่ยงโดยไม่ได้ประโยชน์</div>
+      </div>
+      <button class="btn" id="huntAll">เฉลยทั้งหมด</button>
+    </div>
+    <figcaption>⚠️ <b>และนี่คือร่างแรกที่สมจริง</b> ⭐ ซึ่งเป็นเหตุผลที่ lab ให้เรารันโค้ดที่ถูกสร้างมาแบบไม่แก้อะไรก่อน แล้วค่อยตรวจ</figcaption>
+  </figure>
+  </div>
+</section>
+
+<h2 class="sec" id="s5"><span class="pill">ส่วนที่ 5</span> การทำซ้ำได้ การเปิดเผย และความเป็นส่วนตัว</h2>
+<p class="secintro">บทที่ 23–30 · ⭐ prompt เป็นส่วนหนึ่งของวิธีวิจัย และผู้ช่วยเห็นได้แค่รูปร่างของข้อมูล ไม่ใช่เนื้อหา</p>
+
+<section class="ch" id="ch23" data-ch="23">
+  <h3>บทที่ 23 — ทำไมการทำซ้ำได้ยากขึ้นเมื่อมี ML และผู้ช่วย AI</h3>
+  <div class="chbody">
+  <p>⭐ <b>ผลลัพธ์ของ ML ขึ้นกับเวอร์ชันของข้อมูล เมล็ดสุ่ม เวอร์ชันของไลบรารี และฮาร์ดแวร์</b> ⚠️ <b>และงานวิจัย health-ML จำนวนมากไม่สามารถถูกรันซ้ำโดยคนอื่นได้</b></p>
+  <p>⚠️ <b>ผู้ช่วย AI เพิ่มแหล่งความแปรปรวนใหม่เข้ามา</b> คือ <b>prompt เดิมให้โค้ดที่ต่างกันได้ และโมเดลที่อยู่เบื้องหลังเครื่องมือก็เปลี่ยนไปตามเวลา</b> ส่วน ⚠️ <b>notebook เพิ่มสถานะที่ซ่อนอยู่ เพราะเซลล์ถูกรันข้ามลำดับ และมีตัวแปรค้างจากการทดลองก่อนหน้า</b></p>
+
+  <figure>
+    <div class="figtitle">⭐ ห่วงโซ่ห้าข้อต่อ — ขาดข้อไหน ผลลัพธ์ก็สร้างขึ้นใหม่ไม่ได้</div>
+    <svg viewBox="0 0 700 140" role="img" aria-label="ห่วงโซ่จากข้อมูล prompt โค้ด สภาพแวดล้อม ถึงผลลัพธ์">
+      <g>
+        <rect x="0"   y="34" width="124" height="56" rx="10" fill="var(--seq1)" fill-opacity=".45" stroke="var(--axis)"/>
+        <rect x="144" y="34" width="124" height="56" rx="10" fill="var(--seq2)" fill-opacity=".45" stroke="var(--axis)"/>
+        <rect x="288" y="34" width="124" height="56" rx="10" fill="var(--seq3)" fill-opacity=".45" stroke="var(--axis)"/>
+        <rect x="432" y="34" width="124" height="56" rx="10" fill="var(--seq4)" fill-opacity=".45" stroke="var(--axis)"/>
+        <rect x="576" y="34" width="124" height="56" rx="10" fill="var(--good)" fill-opacity=".22" stroke="var(--good)" stroke-width="2"/>
+      </g>
+      <g class="svgtxt b" text-anchor="middle">
+        <text x="62" y="58">ข้อมูล</text><text x="206" y="58">prompt</text><text x="350" y="58">โค้ด</text>
+        <text x="494" y="58">สภาพแวดล้อม</text><text x="638" y="58">ผลลัพธ์</text>
+      </g>
+      <g class="svgtxt sm" text-anchor="middle">
+        <text x="62" y="78">ไฟล์ + เวอร์ชัน</text><text x="206" y="78">+ เครื่องมือ + วันที่</text><text x="350" y="78">อย่างที่รันจริง</text>
+        <text x="494" y="78">เวอร์ชัน + เมล็ดสุ่ม</text><text x="638" y="78">ได้เลขเดิมอีกครั้ง</text>
+      </g>
+      <g stroke="var(--axis)" stroke-width="2"><path d="M128 62 L 140 62"/><path d="M272 62 L 284 62"/><path d="M416 62 L 428 62"/><path d="M560 62 L 572 62"/></g>
+      <text class="svgtxt b" x="350" y="20" text-anchor="middle">บันทึกทุกข้อต่อในห่วงโซ่นี้</text>
+      <text class="svgtxt sm" x="350" y="116" text-anchor="middle" fill="var(--crit)">⚠️ notebook ที่รันเซลล์ข้ามลำดับ ทำให้ข้อต่อ “โค้ดอย่างที่รันจริง” ขาดโดยที่เราไม่รู้ตัว</text>
+    </svg>
+  </figure>
+  </div>
+</section>
+
+<section class="ch" id="ch24" data-ch="24" data-lite="1">
+  <details class="chfold">
+    <summary><h3>บทที่ 24 — สิบกฎง่าย ๆ สำหรับงานวิจัยเชิงคำนวณที่ทำซ้ำได้</h3><span class="chip">ไม่เน้นสอบ</span></summary>
+    <div class="chbody">
+    <div class="tw"><table>
+      <thead><tr><th>กฎ</th><th>แปลเป็นงานใน notebook ที่มี AI ช่วย</th></tr></thead>
+      <tbody>
+        <tr><td>1 ตามรอยได้ว่าทุกผลลัพธ์ถูกสร้างมาอย่างไร</td><td>⭐ <b>เก็บ prompt ไว้คู่กับโค้ด</b></td></tr>
+        <tr><td>2 เลี่ยงการจัดการข้อมูลด้วยมือ</td><td>⚠️ <b>ไม่แก้ CSV หรือค่าพยากรณ์ด้วยมือ</b></td></tr>
+        <tr><td>3 เก็บเวอร์ชันที่แน่ชัดของโปรแกรม</td><td><b>พิมพ์หรือบันทึกเวอร์ชันของไลบรารี</b></td></tr>
+        <tr><td>4 ใช้ version control กับสคริปต์ทุกตัว</td><td><b>บันทึกขึ้น GitHub อย่างที่ทำในวิชานี้</b></td></tr>
+        <tr><td>5 บันทึกผลลัพธ์ระหว่างทาง</td><td><b>เก็บตารางสำคัญไว้ ไม่ใช่เก็บแต่ค่า AUC สุดท้าย</b></td></tr>
+        <tr><td>6 จดเมล็ดสุ่มไว้</td><td>⭐ <b>ใส่ <code>random_state</code> ทุกที่</b></td></tr>
+        <tr><td>7 เก็บข้อมูลดิบที่อยู่เบื้องหลังกราฟ</td><td><b>เก็บตัวเลขที่แต่ละรูปใช้</b></td></tr>
+        <tr><td>8–10 ผูกข้อสรุปกับผลลัพธ์ และแบ่งปันอย่างเปิดเผย</td><td>⭐ <b>ทุกตัวเลขในบทความต้องตามรอยกลับไปถึงเซลล์ที่คำนวณมันได้</b></td></tr>
+      </tbody>
+    </table></div>
+    </div>
+  </details>
+</section>
+
+<section class="ch" id="ch25" data-ch="25" data-lite="1">
+  <details class="chfold">
+    <summary><h3>บทที่ 25 — เมล็ดสุ่ม เวอร์ชัน และ prompt ในฐานะส่วนหนึ่งของวิธีวิจัย</h3><span class="chip">ไม่เน้นสอบ</span></summary>
+    <div class="chbody">
+    <p><b>สภาพแวดล้อมและเมล็ดสุ่ม</b></p>
+<pre><code>import sys, sklearn, numpy as np, pandas as pd
+print(sys.version.split()[0], sklearn.__version__,
+      np.__version__, pd.__version__)
+SEED = 42
+split = train_test_split(X, y, test_size=0.2,
+            stratify=y, random_state=SEED)
+model = RandomForestClassifier(random_state=SEED)
+# !pip freeze &gt; requirements.txt</code></pre>
+    <p><b>บันทึกการใช้ AI ที่หัว notebook</b></p>
+<pre><code># Tool/model : Gemini in Colab, 2026-10-02
+# Prompt     : "DataFrame df (Pima) ... split
+#               80/20 stratified, seed 42 ..."
+# My changes : moved imputer into Pipeline
+#              (leakage); added baseline
+# Verified by: CV AUC, restart + run all,
+#              shuffled-label check</code></pre>
+    <div class="key"><span class="lb">⭐ ความคิดหลัก</span>
+      <b>prompt เป็นส่วนหนึ่งของวิธีวิจัยของเรา เพราะมันกำหนดรูปร่างของการวิเคราะห์เหมือนที่โปรโตคอลทำ</b> ⚠️ <b>และเพราะโมเดลอาจสร้างโค้ดเดิมซ้ำไม่ได้ สิ่งที่เราเก็บถาวรจึงคือโค้ดที่รันจริง ส่วน prompt เอาไว้อธิบายว่าโค้ดนั้นมาได้อย่างไร</b>
+    </div>
+    </div>
+  </details>
+</section>
+
+<section class="ch" id="ch26" data-ch="26">
+  <h3>บทที่ 26 — การรายงานโมเดลพยากรณ์ที่สร้างด้วย AI</h3>
+  <div class="chbody">
+  <div class="key"><span class="lb">⭐ TRIPOD+AI (2024)</span>
+    <b>แนวทางการรายงานสำหรับโมเดลพยากรณ์ทางคลินิกที่สร้างด้วยการถดถอยหรือด้วย ML</b> — <b>เป็นเช็คลิสต์ 27 ข้อ ครอบคลุมข้อมูล ค่าที่หายไป การแบ่งข้อมูล ประสิทธิภาพ และการเปิดให้เข้าถึงโค้ด</b>
+  </div>
+  <p>💡 ข้อดีคือหลายข้อในนั้น <b>แมปตรงกับโหมดความล้มเหลวห้าโหมดของเราวันนี้</b></p>
+  <div class="tw"><table>
+    <thead><tr><th>โหมดความล้มเหลว</th><th>สิ่งที่ผู้ประเมินบทความจะขอให้เรารายงาน</th></tr></thead>
+    <tbody>
+      <tr><td>การใช้ข้อมูลผิดแบบเงียบ</td><td><b>ค่าที่หายไปถูกระบุและจัดการอย่างไร</b></td></tr>
+      <tr><td>การรั่วของข้อมูล</td><td><b>ข้อมูลถูกแบ่งอย่างไรและเมื่อไหร่ และการเตรียมข้อมูลอยู่ข้างในการแบ่งหรือไม่</b></td></tr>
+      <tr><td>ตัววัดผิด</td><td><b>การจำแนก (discrimination) และการปรับเทียบ (calibration) พร้อม threshold ที่เกี่ยวข้องทางคลินิก</b></td></tr>
+      <tr><td>ทำซ้ำไม่ได้</td><td><b>ซอฟต์แวร์ เวอร์ชัน และที่ที่เข้าถึงโค้ดได้</b></td></tr>
+    </tbody>
+  </table></div>
+  <div class="key"><span class="lb">⭐ เคล็ดในทางปฏิบัติ</span>
+    <b>เขียน prompt ไปพร้อมกับเปิดเช็คลิสต์การรายงานไว้</b> ⚠️ <b>ถ้าโค้ดเติมข้อใดข้อหนึ่งไม่ได้ งานวิจัยนั้นยังไม่พร้อม</b>
+  </div>
+  </div>
+</section>
+
+<section class="ch" id="ch27" data-ch="27" data-lite="1">
+  <details class="chfold">
+    <summary><h3>บทที่ 27 — การเปิดเผยและความซื่อตรงทางวิชาการ</h3><span class="chip">ไม่เน้นสอบ</span></summary>
+    <div class="chbody">
+    <div class="tw"><table>
+      <thead><tr><th>ผู้วางนโยบาย</th><th>จุดยืน</th></tr></thead>
+      <tbody>
+        <tr><td><b>ICMJE</b></td><td>⭐ <b>เครื่องมือ AI เป็นผู้นิพนธ์ไม่ได้</b> · ผู้นิพนธ์ <b>ควรเปิดเผยการใช้ AI</b> — การช่วยเขียนไว้ในกิตติกรรมประกาศ ส่วนการเก็บข้อมูล การวิเคราะห์ หรือการทำรูปไว้ในวิธีวิจัย · และ <b>ยังรับผิดชอบเนื้อหาทั้งหมด</b></td></tr>
+        <tr><td><b>Nature Portfolio</b></td><td><b>LLM ไม่เข้าเกณฑ์การเป็นผู้นิพนธ์</b> และการใช้ควรถูกบันทึกในวิธีวิจัยหรือหมวดที่เหมาะสม</td></tr>
+        <tr><td><b>Science</b></td><td><i>“โปรแกรม AI เป็นผู้นิพนธ์ไม่ได้”</i> — <b>มนุษย์ต้องรับผิดชอบทุกข้อสรุป</b></td></tr>
+      </tbody>
+    </table></div>
+    <div class="key"><span class="lb">⭐ ความคิดหลัก</span>
+      <i>“AI เขียนให้”</i> <b>ไม่เคยเป็นข้อแก้ตัว</b> ⚠️ <b>ถ้าโค้ดที่ถูกสร้างขึ้นให้ผลที่ผิดในบทความหรือวิทยานิพนธ์ของเรา นั่นคือความผิดพลาดของเรา</b> 💡 และเพราะนโยบายเหล่านี้ยังเปลี่ยนอยู่ ควรไปดูนโยบายปัจจุบันของวารสารและของจุฬาฯ ก่อนส่งงานทุกครั้ง
+    </div>
+    </div>
+  </details>
+</section>
+
+<section class="ch" id="ch28" data-ch="28">
+  <h3>บทที่ 28 — ความเป็นส่วนตัว อย่าวางข้อมูลคนไข้ลงในผู้ช่วยสาธารณะ</h3>
+  <div class="chbody">
+  <div class="key"><span class="lb">⭐ PDPA ของไทย</span>
+    <b>ข้อมูลสุขภาพเป็นข้อมูลส่วนบุคคลที่อ่อนไหว</b> ซึ่งต้องมี <b>ความยินยอมโดยชัดแจ้งหรือฐานทางกฎหมายอื่น และการโอนออกนอกประเทศถูกจำกัด</b>
+  </div>
+  <div class="key"><span class="lb">⭐ ประโยคที่ต้องจำ</span>
+    <b>prompt หนึ่งอันคือการโอนข้อมูลหนึ่งครั้ง</b> ⚠️ <b>มักไปยังเซิร์ฟเวอร์นอกประเทศไทย และบางครั้งถูกเก็บไว้หรือถูกใช้เทรนต่อ</b> ⚠️ <b>ผู้ช่วยที่ฝังอยู่ใน notebook ยังเห็นผลลัพธ์ที่ถูกพิมพ์ออกมาอย่าง <code>df.head()</code> ได้ด้วย</b>
+  </div>
+  <div class="key"><span class="lb">⭐ เคสจริง: โค้ดความลับถูกวางลงในแชตบอต</span>
+    ในปี 2023 วิศวกรของ Samsung วางซอร์สโค้ดที่เป็นความลับลงใน ChatGPT ⚠️ <b>บริษัทจึงจำกัดการใช้ generative AI บนอุปกรณ์ของบริษัท</b> 💡 ถ้าซอร์สโค้ดได้รับการระวังระดับนั้น <b>เวชระเบียนคนไข้ควรได้รับอย่างน้อยเท่ากัน</b>
+  </div>
+
+  <figure>
+    <div class="figtitle">⚠️ การลบตัวระบุตัวตน ไม่เท่ากับการไม่ระบุตัวตน</div>
+    <svg viewBox="0 0 700 108" role="img" aria-label="คุณลักษณะทางประชากร 15 อย่าง ระบุตัวคนอเมริกันกลับได้ 99.98 เปอร์เซ็นต์">
+      <rect x="0" y="16" width="214" height="74" rx="11" fill="var(--warnbg)" stroke="var(--crit)" stroke-width="2"/>
+      <text class="svgval" x="107" y="52" text-anchor="middle" font-size="26" fill="var(--crit)">99.98%</text>
+      <text class="svgtxt sm" x="107" y="74" text-anchor="middle">คุณลักษณะทางประชากร <tspan font-weight="700">15 อย่าง</tspan></text>
+      <text class="svgtxt sm" x="107" y="88" text-anchor="middle">ระบุตัวคนอเมริกันกลับได้</text>
+
+      <rect x="230" y="16" width="214" height="74" rx="11" fill="var(--surface2)" stroke="var(--axis)"/>
+      <text class="svgval" x="337" y="52" text-anchor="middle" font-size="26">18</text>
+      <text class="svgtxt sm" x="337" y="74" text-anchor="middle">ตัวระบุตาม HIPAA Safe Harbor</text>
+      <text class="svgtxt sm" x="337" y="88" text-anchor="middle">การลบออกเป็นเพียง <tspan font-weight="700">ขั้นต่ำ</tspan></text>
+
+      <rect x="460" y="16" width="240" height="74" rx="11" fill="var(--crit)" fill-opacity=".10" stroke="var(--crit)"/>
+      <text class="svgtxt b" x="580" y="46" text-anchor="middle" fill="var(--crit)">ข้อมูลที่ถูกแทนด้วยนามแฝง</text>
+      <text class="svgtxt b" x="580" y="66" text-anchor="middle" fill="var(--crit)">ยังเป็นข้อมูลส่วนบุคคล</text>
+      <text class="svgtxt b" x="580" y="84" text-anchor="middle" fill="var(--crit)">ภายใต้ PDPA</text>
+    </svg>
+  </figure>
+  </div>
+</section>
+
+<section class="ch" id="ch29" data-ch="29">
+  <h3>บทที่ 29 — ขั้นตอนการทำงานที่ปลอดภัย และการจับคู่เครื่องมือกับข้อมูล</h3>
+  <div class="chbody">
+  <figure>
+    <div class="figtitle">⭐ ห้าขั้น — ผู้ช่วยเข้ามาเกี่ยวตรงไหน และข้อมูลจริงอยู่ตรงไหน</div>
+    <svg viewBox="0 0 700 180" role="img" aria-label="ห้าขั้นของขั้นตอนการทำงานที่ปลอดภัย">
+      <g>
+        <rect x="0"   y="34" width="124" height="62" rx="10" fill="var(--s4)" fill-opacity=".18" stroke="var(--s4)"/>
+        <rect x="144" y="34" width="124" height="62" rx="10" fill="var(--s4)" fill-opacity=".18" stroke="var(--s4)"/>
+        <rect x="288" y="34" width="124" height="62" rx="10" fill="var(--s4)" fill-opacity=".18" stroke="var(--s4)"/>
+        <rect x="432" y="34" width="124" height="62" rx="10" fill="var(--crit)" fill-opacity=".14" stroke="var(--crit)" stroke-width="2"/>
+        <rect x="576" y="34" width="124" height="62" rx="10" fill="var(--good)" fill-opacity=".16" stroke="var(--good)"/>
+      </g>
+      <g class="svgtxt b" text-anchor="middle">
+        <text x="62" y="56">1 บรรยาย</text><text x="206" y="56">2 สร้าง</text><text x="350" y="56">3 ตรวจ</text>
+        <text x="494" y="56">4 รันของจริง</text><text x="638" y="56">5 แบ่งปัน</text>
+      </g>
+      <g class="svgtxt sm" text-anchor="middle">
+        <text x="62" y="74">schema +</text><text x="62" y="88">data dictionary</text>
+        <text x="206" y="74">โค้ดบนข้อมูล</text><text x="206" y="88">ปลอม</text>
+        <text x="350" y="74">ทดสอบบน</text><text x="350" y="88">ข้อมูลปลอม</text>
+        <text x="494" y="74">ไซต์ที่ได้รับอนุมัติ</text><text x="494" y="88">ปิดผู้ช่วย</text>
+        <text x="638" y="74">เฉพาะค่ารวม</text>
+      </g>
+      <g stroke="var(--axis)" stroke-width="2"><path d="M128 65 L 140 65"/><path d="M272 65 L 284 65"/><path d="M416 65 L 428 65"/><path d="M560 65 L 572 65"/></g>
+      <path d="M0 116 L 412 116" stroke="var(--s4)" stroke-width="2.5"/>
+      <path d="M0 116 l 8 -4 v 8 z" fill="var(--s4)"/><path d="M412 116 l -8 -4 v 8 z" fill="var(--s4)"/>
+      <text class="svgtxt b" x="206" y="134" text-anchor="middle" fill="var(--s4)">← ผู้ช่วยเข้ามาเกี่ยวแค่ตรงนี้ →</text>
+      <path d="M432 116 L 700 116" stroke="var(--crit)" stroke-width="2.5"/>
+      <path d="M432 116 l 8 -4 v 8 z" fill="var(--crit)"/><path d="M700 116 l -8 -4 v 8 z" fill="var(--crit)"/>
+      <text class="svgtxt b" x="566" y="134" text-anchor="middle" fill="var(--crit)">← ข้อมูลจริงอยู่แค่ตรงนี้ →</text>
+      <rect x="0" y="146" width="700" height="30" rx="9" fill="var(--starbg)" stroke="var(--star)"/>
+      <text class="svgtxt b" x="350" y="166" text-anchor="middle">⭐ ผู้ช่วยเขียนโค้ดให้กับ <tspan font-style="italic">รูปร่าง</tspan> ของข้อมูลเรา ไม่เคยเขียนให้กับ <tspan font-style="italic">เนื้อหา</tspan> ของมัน</text>
+    </svg>
+  </figure>
+
+  <div class="tw"><table>
+    <thead><tr><th>ผู้ช่วยเห็นได้</th><th>⚠️ ผู้ช่วยต้องไม่เห็นเด็ดขาด</th></tr></thead>
+    <tbody>
+      <tr><td><b>ชื่อคอลัมน์ ชนิดข้อมูล หน่วย รหัสที่อนุญาต และช่วงค่า</b></td><td><b>ชื่อ HN เลขบัตรประชาชน เบอร์โทร ที่อยู่ และวันที่แบบเจาะจง</b></td></tr>
+      <tr><td><b>แถวสังเคราะห์ หรือแถวจากข้อมูลสาธารณะที่หน้าตาคล้ายกัน</b></td><td><b>แถวข้อมูลจริง แม้แค่ “ห้าแถว” จาก <code>df.head()</code></b></td></tr>
+      <tr><td><b>ข้อความ error ที่ลบค่าข้อมูลออกแล้ว</b></td><td><b>บันทึกข้อความอิสระ หรือภาพที่มีรายละเอียดคนไข้ประทับติดอยู่</b></td></tr>
+      <tr><td><b>ค่ารวมอย่างจำนวนนับและค่าเฉลี่ย โดยกดช่องที่มีจำนวนน้อยไว้</b></td><td><b>ผลลัพธ์ใน notebook ที่พิมพ์เวชระเบียนจริงออกมา</b></td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="key"><span class="lb">⭐ หลักคิดง่าย ๆ</span>
+    <b>โค้ดที่เขียนบนข้อมูลปลอมรันกับข้อมูลจริงได้โดยไม่ต้องแก้ เราจึงไม่มีความจำเป็นต้องให้มันเห็นข้อมูลจริงเลย</b>
+  </div>
+
+  <h4 style="font-size:16px;margin:24px 0 10px">จับคู่เครื่องมือกับข้อมูล และปิดประตูข้าง</h4>
+  <div class="tw"><table>
+    <thead><tr><th>ผู้ช่วยรันที่ไหน</th><th>ให้อะไรได้</th><th>เงื่อนไข</th></tr></thead>
+    <tbody>
+      <tr><td><b>แชตบอตสาธารณะ รุ่นฟรี</b></td><td>schema · แถวสังเคราะห์ · error ที่ลบค่าแล้ว</td><td>⚠️ <b>prompt อาจถูกเก็บหรือถูกใช้เทรน</b></td></tr>
+      <tr><td><b>บริการ AI ที่สถาบันอนุมัติ</b></td><td>ยังคงให้เท่าที่จำเป็นน้อยที่สุด</td><td><b>มีสัญญา ไม่เทรนบนข้อมูลที่เราป้อน และรู้ว่าข้อมูลอยู่ที่ไหน — ถามฝ่าย IT หรือ DPO</b></td></tr>
+      <tr><td><b>โมเดลน้ำหนักเปิดที่รันบนเครื่องของโรงพยาบาล</b></td><td>โค้ดและข้อมูลอยู่ในไซต์</td><td><b>ยังต้องผ่านจริยธรรมการวิจัยและต้องควบคุมการเข้าถึง</b></td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="warnbox"><span class="lb">⚠️ ประตูข้างที่คนลืมปิดบ่อย</span>
+    <b>ผู้ช่วยใน notebook อ่านผลลัพธ์ของเรา</b> จึงควรพิมพ์แต่ค่าสรุปไม่ใช่ตัวแถว และล้างผลลัพธ์ก่อนขอความช่วยเหลือ · <b>เครื่องมือแบบ agentic เปิดไฟล์ไหนก็ได้ในโฟลเดอร์โปรเจกต์</b> จึงต้องเก็บข้อมูลจริงไว้นอกโฟลเดอร์นั้น และไม่ commit ข้อมูลลง Git โดยใช้ <code>.gitignore</code> · <b>error ที่วางไปรั่วค่าข้อมูล</b> เพราะ traceback มักยกแถวที่มีปัญหามาแสดง ต้องลบออกก่อน
+  </div>
+
+  <h4 style="font-size:16px;margin:24px 0 10px">ตัวอย่างจริง ข้อมูลปลอมมาก่อน ข้อมูลจริงมาท้ายสุด</h4>
+  <p><b>1. prompt ที่ให้แต่ schema</b></p>
+  <div class="tip"><span class="lb">prompt</span>
+    <i>“ฉันมี pandas DataFrame ชื่อ <code>df</code> อย่าขอตัวแถว คอลัมน์คือ age (int, 18–95), sex ('M'/'F'), hba1c (float %, อาจเป็น NaN), egfr (float, mL/min), readmit30 (0/1, ราว 11%) 1) สร้าง df สังเคราะห์ตาม schema นี้ (500 แถว เมล็ดสุ่ม 42) เพื่อให้ฉันทดสอบได้ 2) เขียน pipeline ที่ไม่รั่ว โดยแบ่งแบบ stratified ใส่ตัวเติมค่าไว้ใน Pipeline ใช้ logistic regression และรายงาน ROC AUC พิมพ์แต่ผลรวม ไม่พิมพ์ตัวแถว”</i>
+  </div>
+  <p><b>2. ข้อมูลปลอมที่มีรูปร่างเดียวกัน</b></p>
+<pre><code>rng = np.random.default_rng(42)
+n = 500
+df = pd.DataFrame({
+  "age": rng.integers(18, 96, n),
+  "sex": rng.choice(["M", "F"], n),
+  "hba1c": rng.normal(7.2, 1.3, n).round(1),
+  "egfr": rng.normal(75, 20, n).clip(5, 130),
+  "readmit30": rng.binomial(1, 0.11, n)})</code></pre>
+  <p>💡 ถ้าต้องการเวชระเบียนปลอมที่สมจริงกว่านี้ <b>Synthea สร้าง EHR สังเคราะห์ได้ทั้งระบบ</b></p>
+  <p><b>3. สลับข้อมูลจริงเข้ามา</b> — ⭐ <b>โหลดข้อมูลจริงข้างในสภาพแวดล้อมที่ได้รับอนุมัติ โดยปิดผู้ช่วย แล้วรันโค้ดที่ตรวจแล้วโดยไม่แก้อะไร</b></p>
+
+  <div class="key"><span class="lb">⭐ ก่อนกด Enter ให้เช็ค</span>
+    ไม่มีตัวระบุตัวตน · ไม่มีแถวจริงหรือผลลัพธ์จริงที่ผู้ช่วยมองเห็น · ข้อความ error ถูกลบค่าแล้ว · เครื่องมือได้รับอนุมัติให้ใช้กับข้อมูลชุดนี้ · และ prompt ถูกบันทึกลงใน log การใช้ AI แล้ว
+  </div>
+  </div>
+</section>
+
+<section class="ch" id="ch30" data-ch="30">
+  <h3>บทที่ 30 — สรุปปิดคาบ vibe coding ที่มีจิตสำนึกของนักวิจัย</h3>
+  <div class="chbody">
+  <div class="tw"><table>
+    <thead><tr><th>สิ่งที่ต้องจำ</th><th>สิ่งที่ต้องทำ</th></tr></thead>
+    <tbody>
+      <tr><td>⭐ <b>ผู้ช่วยทำนายโค้ดที่น่าจะเป็น ไม่ใช่โค้ดที่ถูก</b></td><td><b>รันเช็คลิสต์ตรวจสอบกับสคริปต์ที่ถูกสร้างขึ้นทุกตัว</b></td></tr>
+      <tr><td>⭐ <b>ใส่การออกแบบงานวิจัยลงใน prompt — ความหมายของข้อมูล การแบ่ง เมล็ดสุ่ม ตัววัด</b></td><td><b>เทียบกับ baseline และระแวงคะแนนที่สมบูรณ์แบบ</b></td></tr>
+      <tr><td>⭐ <b>อ่านทุก pipeline เป็นลำดับ โหลด → แบ่ง → เตรียม → fit → ประเมิน</b></td><td><b>บันทึก prompt เครื่องมือ วันที่ เวอร์ชัน และเมล็ดสุ่ม</b></td></tr>
+      <tr><td>⭐ <b>ความล้มเหลวที่เงียบห้าแบบ — การรั่ว ตัววัดผิด การใช้ข้อมูลผิด API ที่ไม่ดี และสถิติที่ผิด</b></td><td><b>เปิดเผยการใช้ AI และไม่วางข้อมูลคนไข้ลงไปเด็ดขาด</b></td></tr>
+    </tbody>
+  </table></div>
+  <div class="key"><span class="lb">⭐ กฎทอง</span>
+    <b>อย่าเชื่อโค้ดที่ยังไม่ได้อ่าน</b> · <b>อย่าเชื่อตัววัดที่อธิบายไม่ได้</b> · <b>เก็บทั้ง prompt และโค้ด</b> — <b>ปฏิบัติกับผู้ช่วยเหมือนรุ่นน้องที่เร็วแต่สะเพร่า คือให้มันเขียนเร็วไป แล้วเราเป็นคนตัดสินว่ามันถูกหรือไม่</b>
+  </div>
+  </div>
+</section>
+
+<h2 class="sec" id="s6"><span class="pill">ส่วนที่ 6</span> Lab 2: สร้าง ตรวจ แก้ และปรับ</h2>
+<p class="secintro">บทที่ 31–37 · ลงมือทำทั้งคาบบน Pima ชุดเดิม — ห้าขั้น และเช็คลิสต์ A–H</p>
+
+<section class="ch" id="ch31" data-ch="31" data-lite="1">
+  <details class="chfold">
+    <summary><h3>บทที่ 31 — ภาพรวมของ Lab 2 และกฎพื้นฐาน</h3><span class="chip">ขั้นตอน lab</span></summary>
+    <div class="chbody">
+    <p>notebook ชื่อ <code>Labs/lab02_vibe_coding.ipynb</code> รันบน Google Colab รุ่นฟรี ⭐ <b>ใช้ CPU เท่านั้นไม่ต้องมี GPU ใช้เวลา 60–90 นาที เป็นงานเดี่ยว</b></p>
+    <div class="flow">
+      <span class="nd">1 สร้าง (Ex. 1)</span><span class="ar">→</span><span class="nd">2 ตรวจ A–H</span><span class="ar">→</span>
+      <span class="nd">3 แก้ (Ex. 2)</span><span class="ar">→</span><span class="nd">4 threshold (Ex. 3)</span><span class="ar">→</span>
+      <span class="nd">5 สะท้อนคิด</span><span class="ar">→</span><span class="nd">leaderboard (ทางเลือก)</span>
+    </div>
+    <p><b>วัตถุประสงค์การเรียนรู้</b> — <b>สร้าง ML pipeline ทั้งอันจาก prompt ภาษาคนธรรมดา</b> · <b>ตรวจหาการรั่ว ตัววัดผิด และบั๊กเงียบ</b> · <b>สร้างขั้นตอนการทำงานแบบ prompt → รัน → ตรวจสอบ → ปรับ</b> · และ <b>เข้าใจข้อกำหนดเรื่องการทำซ้ำได้ของงานวิจัยที่มี AI ช่วย</b></p>
+    <p><b>ก่อนเริ่ม</b> — ⭐ <b>รันเซลล์ “การตั้งค่า” ก่อนเสมอ</b> โดย <code>NAME</code> และ <code>JOIN_CODE</code> ต้องใส่เฉพาะกรณีจะเล่น leaderboard · รันเซลล์ข้อมูลเพื่อโหลด <b>ข้อมูล Pima จาก Lab 1 คือผู้หญิง 768 คน เข้าสู่ <code>df</code> ซึ่งมี 8 การวัด บวกกับ <code>Outcome</code> (1 = เบาหวาน)</b> · และเลือกผู้ช่วยฟรีหนึ่งตัว ได้ทั้ง <b>Gemini ใน Colab</b> · <b>Google AI Studio</b> · หรือรุ่นฟรีของ <b>ChatGPT / Claude / Copilot</b></p>
+    <div class="key"><span class="lb">⭐ สี่กฎของ notebook</span>
+      <b>อย่าเชื่อโค้ดที่ยังไม่ได้ตรวจ</b> · <b>อย่าเชื่อตัวเลขที่อธิบายไม่ได้</b> · <b>เก็บทั้ง prompt และโค้ดไว้เพื่อการทำซ้ำได้</b> · <b>และไม่วางข้อมูลคนไข้ลงในผู้ช่วยเด็ดขาด</b>
+    </div>
+    <p>⚠️ <b>แม้ใน lab นี้ก็ให้บรรยายข้อมูล — ชื่อคอลัมน์ ชนิด ความหมายของ label — แทนการวางตัวแถว</b> ⚠️ <b>และกับข้อมูลคนไข้จริง ไม่ว่าจะชื่อ HN บันทึก หรือผลแล็บ การวางลงไปไม่ได้รับอนุญาตเลยไม่ว่ากรณีใด</b></p>
+    </div>
+  </details>
+</section>
+
+<section class="ch" id="ch32" data-ch="32" data-lite="1">
+  <details class="chfold">
+    <summary><h3>บทที่ 32 — ขั้นที่ 1 สร้างโค้ด (Exercise 1)</h3><span class="chip">ขั้นตอน lab</span></summary>
+    <div class="chbody">
+    <p>เราคัดลอก prompt ของ notebook ไปให้ผู้ช่วย <b>ตรงตามที่เขียนไว้ทุกตัวอักษร</b></p>
+    <div class="tip"><span class="lb">prompt ของ notebook</span>
+      <i>“ฉันทำงานใน Google Colab มี pandas DataFrame ชื่อ <code>df</code> โหลดข้อมูล Pima Indians Diabetes ไว้แล้ว คอลัมน์คือ Pregnancies, Glucose, BloodPressure, SkinThickness, Insulin, BMI, DiabetesPedigreeFunction, Age และ label สองค่า <code>Outcome</code> (1 = เบาหวาน) เขียนเซลล์โค้ด Python หนึ่งเซลล์โดยใช้ scikit-learn ที่ แทนเลขศูนย์ที่เป็นไปไม่ได้ด้วย NaN แล้วเติมค่า แบ่งข้อมูลเป็น train/test เทรนป่าสุ่ม และรายงานประสิทธิภาพที่เหมาะกับงานคัดกรองทางการแพทย์ ใช้ <code>df</code> ที่มีอยู่ ไม่ต้องดาวน์โหลดข้อมูล และไม่ต้องเขียนทับ <code>df</code>”</i>
+    </div>
+    <p><b>Exercise 1</b> — ⭐ <b>วางโค้ดที่ได้ลงในเซลล์ Exercise 1 โดยไม่แก้อะไรเลย</b> แล้วรัน · <b>บันทึก prompt ชื่อผู้ช่วย และวันที่ ไว้ใน comment</b> · ถ้ามันขึ้น error ให้ส่งข้อความ error กลับไปให้ผู้ช่วยแล้วลองอีกครั้ง 💡 ถ้ายังพลาด ให้รันเซลล์ Solution ⚠️ <b>ซึ่งเป็นคำตอบแบบที่ผู้ช่วยมักให้ คือรันได้แต่ไม่สมบูรณ์โดยเจตนา</b></p>
+    <div class="key"><span class="lb">⭐ ทำไมต้องใช้ prompt อันนี้</span>
+      <b>เพราะมันสั้นและฟังดูสมเหตุสมผล เป็นแบบที่คนส่วนใหญ่ถามจริง ๆ</b> ⚠️ <b>แต่มันไม่สมบูรณ์โดยเจตนา</b> และขั้นที่ 2 จะเผยว่ามันลืมอะไรไป
+    </div>
+    </div>
+  </details>
+</section>
+
+<section class="ch" id="ch33" data-ch="33">
+  <h3>บทที่ 33 — ขั้นที่ 2 ตรวจด้วยเช็คลิสต์ใช่/ไม่ใช่</h3>
+  <div class="chbody">
+  <p>⭐ <b>ขั้นนี้ไม่แก้โค้ด</b> เราแค่ดูผลลัพธ์ของ Exercise 1 และค้นในโค้ด หลังจากรันเซลล์ช่วยที่แสดงว่า <b>คนไข้ราว 65% ไม่เป็นเบาหวาน</b> ⚠️ <b>ดังนั้น “ทำนายว่าไม่เป็นเบาหวานทุกคน” ได้ accuracy ราว 0.65 โดยมี sensitivity เท่ากับศูนย์</b></p>
+  <div class="tw"><table>
+    <thead><tr><th>ข้อ</th><th>คำถาม</th><th>ธงแดงคือ</th><th>ทำไมสำคัญ</th></tr></thead>
+    <tbody>
+      <tr><td><b>A</b></td><td>รายงาน sensitivity (= recall ของคลาส 1) ไหม</td><td><b>ไม่</b></td><td><b>การคัดกรองต้องไม่พลาดคนไข้ (FN)</b></td></tr>
+      <tr><td><b>B</b></td><td>รายงาน specificity หรือ confusion matrix ไหม</td><td><b>ไม่</b></td><td>FP จำนวนมากเป็นภาระของคลินิก</td></tr>
+      <tr><td><b>C</b></td><td>รายงาน ROC AUC ไหม</td><td><b>ไม่</b></td><td>accuracy และ recall ขึ้นกับ threshold เดียว</td></tr>
+      <tr><td><b>D</b></td><td>accuracy สูงกว่าค่า “ไม่มีใครเป็น” ที่ราว 0.65 อย่างชัดเจนไหม</td><td><b>ไม่</b></td><td>ดีกว่าการไม่มีโมเดลแค่นิดเดียว</td></tr>
+      <tr><td><b>E</b></td><td>มีการเติมค่าบนข้อมูลทั้งหมดในบรรทัดก่อน <code>train_test_split</code> ไหม</td><td>⚠️ <b>ใช่</b></td><td><b>การรั่วของข้อมูล ทำให้มองโลกสวย</b></td></tr>
+      <tr><td><b>F</b></td><td>มี <code>random_state=</code> ทั้งในการแบ่งและในโมเดลไหม</td><td><b>ไม่</b></td><td>ทำซ้ำไม่ได้</td></tr>
+      <tr><td><b>G</b></td><td>ตัวเลขเปลี่ยนไหมเมื่อรันเซลล์ซ้ำ</td><td>⚠️ <b>ใช่</b></td><td>ตีพิมพ์ไม่ได้</td></tr>
+      <tr><td><b>H</b></td><td>เป็นการแบ่งแบบสุ่มครั้งเดียว ไม่มี <code>cross_val</code> ไหม</td><td>⚠️ <b>ใช่</b></td><td><b>คนไข้ชุดทดสอบราว 150 คน ผลจึงแกว่ง</b></td></tr>
+    </tbody>
+  </table></div>
+  <p><b>ที่ต้องบันทึกในเซลล์คำตอบ</b> — ผล A–H · ผู้ช่วยที่ใช้ · โค้ดรันผ่านครั้งแรกหรือไม่ · และตัวเลขสำคัญคือ accuracy กับ recall ของคลาส 1</p>
+  <p>💡 ทางเลือกคือขอให้ผู้ช่วยอธิบายโค้ดทีละบรรทัด ⚠️ <b>แต่ต้องตรวจคำตอบของมันกับเช็คลิสต์อยู่ดี เพราะผู้ช่วยมีแนวโน้มจะแก้ต่างให้โค้ดของตัวเอง</b></p>
+  </div>
+</section>
+
+<section class="ch" id="ch34" data-ch="34" data-lite="1">
+  <details class="chfold">
+    <summary><h3>บทที่ 34 — ขั้นที่ 3 แก้ด้วย pipeline อ้างอิง (Exercise 2)</h3><span class="chip">ขั้นตอน lab</span></summary>
+    <div class="chbody">
+    <div class="key"><span class="lb">⭐</span>
+      <b><code>Pipeline</code> ของ scikit-learn รวม “เติมค่า → เทรน” ไว้เป็นก้อนเดียว ค่ามัธยฐานจึงมาจากคนไข้ในชุดเทรนเท่านั้น และเป็นเช่นนั้นในทุก fold ของ cross-validation 5 ชั้นด้วย</b>
+    </div>
+<pre><code>pipe = Pipeline([
+    ("imputer", SimpleImputer(strategy=...)),
+    ("model", RandomForestClassifier(n_estimators=300, random_state=...)),
+])
+auc = cross_val_score(pipe, X, y, cv=5, scoring=...)
+sensitivity = ...
+specificity = ...</code></pre>
+    <p><b>Exercise 2 — เติมช่องว่างห้าช่อง</b> โดยคำตอบคือ <code>"median"</code> · <code>42</code> · <code>"roc_auc"</code> · <code>tp / (tp + fn)</code> · <code>tn / (tn + fp)</code></p>
+    <p>เซลล์นี้พิมพ์ <b>ROC AUC แบบ cross-validated (ค่าเฉลี่ย ± SD)</b> แล้วตามด้วย <b>TP/FN/TN/FP, sensitivity และ specificity ที่ threshold ตั้งต้น 0.5 บนการแบ่ง 80/20 แบบ stratified (<code>random_state=42</code>)</b> ⚠️ <b>โดย <code>X</code> ถูกแปลงศูนย์เป็น NaN แล้วเฉพาะในห้าคอลัมน์ทางคลินิก ไม่ใช่ทุกคอลัมน์</b></p>
+    <p><b>เทียบกับเช็คลิสต์</b> — ⭐ <b>ขั้นนี้แก้ข้อ E, F/G, H และ A–C ได้</b> ⚠️ <b>แต่ sensitivity ที่ 0.5 ยังแสดงว่าโมเดลพลาดคนเป็นเบาหวานไปมาก ซึ่งยอมรับไม่ได้สำหรับการคัดกรอง</b></p>
+    <p>💡 ข้อสังเกตเรื่องขนาดของปัญหา — ⭐ <b>บน Pima การรั่วขยับคะแนนขึ้นแค่เล็กน้อย</b> ⚠️ <b>แต่ถ้ามีการปรับสเกล การคัดเลือกตัวแปร การเพิ่มตัวอย่างกลุ่มน้อย หรือคนไข้ที่มาหลายครั้ง มันพองคะแนนได้มาก</b></p>
+    </div>
+  </details>
+</section>
+
+<section class="ch" id="ch35" data-ch="35" data-lite="1">
+  <details class="chfold">
+    <summary><h3>บทที่ 35 — ขั้นที่ 4 ปรับด้วย threshold สำหรับการคัดกรอง (Exercise 3)</h3><span class="chip">ขั้นตอน lab</span></summary>
+    <div class="chbody">
+    <p>โมเดลให้ค่าความน่าจะเป็นออกมา และค่าตั้งต้นคือตีธงเมื่อเกิน 0.5 ⭐ <b>แต่การคัดกรองยอมรับผลบวกลวงมากขึ้นเพื่อพลาดคนไข้น้อยลง จึงใช้ threshold ที่ต่ำกว่า</b></p>
+<pre><code>p_train_oof = cross_val_predict(pipe, X_tr, y_tr, cv=5, method="predict_proba")[:, 1]
+print(table.to_string(index=False))
+THRESHOLD = ...
+p_test = pipe.predict_proba(X_te)[:, 1]
+flag = p_test &gt;= THRESHOLD</code></pre>
+    <p><b>Exercise 3 — เปลี่ยนเลขตัวเดียว</b> ตารางแสดง sensitivity และ specificity ที่ threshold <b>0.2, 0.25, … ถึง 0.5</b> ⭐ <b>โดยคำนวณจากค่าพยากรณ์ out-of-fold บนคนไข้ชุดเทรนเท่านั้น</b> แล้วเราตั้ง <code>THRESHOLD</code> เป็นค่าที่ <b>sensitivity ≥ 0.80 และมี specificity สูงที่สุด</b> 💡 คำตอบอยู่ราว <b>0.3</b></p>
+    <div class="key"><span class="lb">⭐ สิ่งที่ต้องจำ</span>
+      ⚠️ <b>การเลือก threshold บนชุดทดสอบคือการรั่วอีกแบบหนึ่ง</b> · <b>การลด threshold เพิ่ม sensitivity และลด specificity แต่ ROC AUC ไม่เปลี่ยน เปลี่ยนแค่จุดทำงาน</b> · <b>และการตัดสินว่าจะยืนที่จุดไหนเป็นการตัดสินใจทางคลินิก ไม่ใช่การตัดสินใจเชิงโค้ด</b>
+    </div>
+    <p>💡 ตัวเลขบนชุดทดสอบอาจต่างจากในตารางเล็กน้อย เพราะ <b>ชุดทดสอบมีคนเป็นเบาหวานราว 54 คน</b></p>
+    </div>
+  </details>
+</section>
+
+<section class="ch" id="ch36" data-ch="36" data-lite="1">
+  <details class="chfold">
+    <summary><h3>บทที่ 36 — ขั้นที่ 5 สะท้อนคิด และงานที่ต้องส่ง</h3><span class="chip">ขั้นตอน lab</span></summary>
+    <div class="chbody">
+    <div class="tw"><table>
+      <thead><tr><th>คำถาม</th><th>สิ่งที่ต้องตอบ</th></tr></thead>
+      <tbody>
+        <tr><td><b>Q1</b></td><td>ครั้งแรกผู้ช่วยทำอะไรผิดหรือลืมอะไรไป <b>โดยอ้างธงแดงที่เราเจอ</b></td></tr>
+        <tr><td><b>Q2</b></td><td>เทียบตัวเลขของโค้ด AI (accuracy, recall ของคลาส 1) กับของ pipeline อ้างอิง (CV ROC AUC, sensitivity, specificity) ⭐ <b>ชุดไหนเหมาะกับการตีพิมพ์ และเพราะอะไร</b></td></tr>
+        <tr><td><b>Q3</b></td><td>⭐ <b>เขียน prompt ของขั้นที่ 1 ใหม่ให้กันปัญหาเหล่านี้ได้</b> โดยต้องมี <b>Pipeline, <code>random_state</code>, cross-validation และตัววัดที่เราต้องการ</b></td></tr>
+        <tr><td><b>Q4</b></td><td>เลือก threshold ไหนใน Exercise 3 เหมาะกับคลินิกคัดกรองจริงไหม ⭐ <b>และใครควรเป็นคนตัดสินจุดแลกเปลี่ยนระหว่างคนไข้ที่หลุดกับผลบวกลวง</b></td></tr>
+        <tr><td><b>Q5</b></td><td>ความเสี่ยงหนึ่งข้อของ vibe coding ในงานวิจัยคลินิก ด้วยคำพูดของเราเอง</td></tr>
+      </tbody>
+    </table></div>
+    <p><b>งานที่ต้องส่ง (งานเดี่ยว)</b> — ⭐ <b>notebook ที่รันจากบนลงล่างได้ คือ Runtime → Run all ต้องผ่านโดยไม่มี error</b> · และ <b>คำตอบของเรา คือเช็คลิสต์ A–H จากขั้นที่ 2 และ Q1–Q5 พร้อม prompt ที่บันทึกไว้ในเซลล์ Exercise 1</b></p>
+    <div class="key"><span class="lb">⭐</span><b>เก็บ prompt ข้อ Q3 ไว้ เพราะนั่นคือทักษะที่ติดตัวไปใช้ที่อื่นได้</b></div>
+    </div>
+  </details>
+</section>
+
+<section class="ch" id="ch37" data-ch="37">
+  <h3>บทที่ 37 — Leaderboard ทางเลือก และกับดักที่พบบ่อย</h3>
+  <div class="chbody">
+  <p><b>โจทย์ leaderboard (สำหรับสายโค้ด)</b> — ส่งค่าความน่าจะเป็นจาก pipeline ที่ไม่รั่ว สำหรับ ⭐ <b>คนไข้ที่กันไว้ชุดเดียวกัน 154 คน</b> ⚠️ <b>โดย fit บนแถวที่เหลือเท่านั้น</b> · ตัววัดคือ <b>ROC AUC</b> · ไฟล์ชื่อ <code>lab02_submission.csv</code> มีหัวตาราง <code>id,prob</code> · ⚠️ <b>และจำไว้ว่าการจูน threshold ไม่เปลี่ยน ROC AUC</b></p>
+
+  <div class="tw"><table>
+    <thead><tr><th>⚠️ กับดักใน lab</th><th>แนวคิดในคาบ</th></tr></thead>
+    <tbody>
+      <tr><td>⚠️ <b>ตัวเติมค่าถูก fit บน <code>df</code> ทั้งหมดก่อน <code>train_test_split</code></b> (ข้อ E)</td><td>การรั่ว — pipeline ที่ถูกเทียบกับที่รั่ว</td></tr>
+      <tr><td>⚠️ <b>“แทน 0 ด้วย NaN” ไปโดน <code>Pregnancies</code> ด้วย</b></td><td>การใช้ข้อมูลผิดแบบเงียบ — ความหมายของข้อมูล</td></tr>
+      <tr><td>⚠️ <b>รายงานแต่ accuracy ไม่เทียบกับค่าราว 0.65</b> (A–D)</td><td>ตัววัดที่ผิดสำหรับข้อมูลไม่สมดุล</td></tr>
+      <tr><td>⚠️ <b>ไม่มี <code>random_state</code> ตัวเลขเปลี่ยนทุกครั้งที่รัน</b> (F, G)</td><td>การทำซ้ำได้ — เมล็ดสุ่มและสถานะที่ซ่อนอยู่</td></tr>
+      <tr><td>⚠️ <b>เสนอการแบ่งแบบสุ่มครั้งเดียวเป็นผลลัพธ์</b> (H)</td><td>สถิติที่ดูน่าเชื่อแต่ผิด</td></tr>
+      <tr><td>⚠️ <b>เลือก threshold บนคนไข้ชุดทดสอบ</b> (Ex. 3)</td><td>การรั่วผ่านการคัดเลือกโมเดล</td></tr>
+      <tr><td>⚠️ <b>เชื่อคำว่า “ใช่ โค้ดนี้ถูกต้อง” ของผู้ช่วย</b></td><td>ดูน่าเชื่อไม่เท่ากับถูกต้อง</td></tr>
+      <tr><td>⚠️ <b>leaderboard — ส่ง <code>predict</code> (0/1) แทน <code>predict_proba</code> หรือ fit บน 154 รหัสที่กันไว้</b></td><td>ROC AUC ต้องการการจัดอันดับ และข้อสอบที่ถูกผนึกไว้</td></tr>
+      <tr><td>⚠️ <b>วางแถวข้อมูลคนไข้จริงลงในผู้ช่วย</b></td><td>ความเป็นส่วนตัวและ PDPA — บรรยาย อย่าวาง</td></tr>
+    </tbody>
+  </table></div>
+  </div>
+</section>
+
+<h2 class="sec" id="s7"><span class="pill">ปิดท้าย</span> ถ้ามองย้อนทั้งภาคพร้อมกัน</h2>
+<section class="ch" id="ch38" data-ch="0">
+  <div class="chbody">
+  <p>ทั้งภาคนี้เดินเป็นเส้นเดียว ⭐ <b>ผู้ช่วยทำนายโค้ดที่ <i>น่าจะเป็น</i> ไม่ใช่โค้ดที่ <i>ถูก</i></b> จากนั้นเราก็เห็นว่าความต่างนั้นแสดงตัวออกมาอย่างไร — <b>ห้าโหมดที่พังอย่างเงียบ ๆ โดยไม่มีข้อความ error</b></p>
+
+  <figure>
+    <div class="figtitle">⭐ ความเงียบคือหัวใจของเรื่องทั้งหมด</div>
+    <svg viewBox="0 0 700 126" role="img" aria-label="เทียบโค้ดที่พังซึ่งบอกเราเอง กับโค้ดที่รั่วซึ่งคืนค่า AUC 0.89 อย่างสุภาพ">
+      <rect x="0" y="12" width="336" height="76" rx="12" fill="var(--good)" fill-opacity=".14" stroke="var(--good)"/>
+      <text class="svgtxt b" x="18" y="36">โค้ดที่พัง</text>
+      <text class="svgtxt sm" x="18" y="58">ขึ้น error · หยุดทำงาน</text>
+      <text class="svgtxt b" x="18" y="78" fill="var(--good)">→ มันบอกเราเอง</text>
+
+      <rect x="364" y="12" width="336" height="76" rx="12" fill="var(--warnbg)" stroke="var(--crit)" stroke-width="2"/>
+      <text class="svgtxt b" x="382" y="36">โค้ดที่รั่ว</text>
+      <text class="svgtxt sm" x="382" y="58">คืนค่า AUC 0.89 กลับมาอย่างสุภาพ</text>
+      <text class="svgtxt b" x="382" y="78" fill="var(--crit)">⚠️ → ไม่มีอะไรบอกเราเลย</text>
+
+      <text class="svgtxt b" x="350" y="114" text-anchor="middle">สิ่งที่ทดแทนความเงียบได้มีอย่างเดียว — <tspan fill="var(--star)">การตรวจที่เราทำเอง</tspan></text>
+    </svg>
+  </figure>
+
+  <p>Epic Sepsis Model เดินไปถึงโรงพยาบาลหลายร้อยแห่งด้วยตัวเลขที่ดูน่าเชื่อ ⚠️ <b>เพราะไม่มีใครจากภายนอกตรวจโค้ดได้</b> นี่คือเหตุผลที่สิ่งที่ทดแทนความเงียบได้มีอย่างเดียว คือ <b>การตรวจที่เราทำเอง</b> — เช็คลิสต์แปดข้อ การเทียบกับ baseline การสลับ label การรีสตาร์ทแล้วรันใหม่</p>
+
+  <div class="cards">
+    <div class="card" style="border-left:4px solid var(--s1)"><h4>การตรวจ</h4><p><b>เช็คลิสต์แปดข้อ · เทียบกับ baseline · สลับ label · รีสตาร์ทแล้วรันใหม่</b></p></div>
+    <div class="card" style="border-left:4px solid var(--s2)"><h4>การทำซ้ำได้</h4><p>บันทึกทั้งห่วงโซ่จากข้อมูล prompt โค้ด สภาพแวดล้อม ไปถึงผลลัพธ์ เพราะ ⭐ <b>prompt เป็นส่วนหนึ่งของวิธีวิจัย</b></p></div>
+    <div class="card" style="border-left:4px solid var(--good)"><h4>ความเป็นส่วนตัว</h4><p>ผู้ช่วยได้เห็นแต่ <i>รูปร่าง</i> ของข้อมูลเรา ไม่เคยได้เห็น <i>เนื้อหา</i> ⭐ <b>เราจึงไม่เคยมีความจำเป็นต้องให้มันเห็นข้อมูลจริงแต่แรก</b></p></div>
+  </div>
+
+  <div class="key"><span class="lb">⭐ ทั้งคาบจบลงที่ประโยคเดียว</span>
+    <b>ให้มันเขียนเร็วไป แล้วเราเป็นคนตัดสินว่ามันถูกหรือไม่</b>
+  </div>
+  </div>
+</section>
+
+<div class="sheetfoot">
+  ชีตอ่านนี้เรียบเรียงจากไฟล์สรุป <code>AI2_Vibe_Coding.md</code> ซึ่งทำจากสไลด์ของอาจารย์ผู้สอนเพื่อใช้ทบทวนก่อนสอบ — เครื่องหมาย ⭐ ⚠️ 💡 เป็นการทำเครื่องหมายเพื่อช่วยจำ ไม่ใช่ส่วนหนึ่งของเอกสารต้นฉบับ · ภาพประกอบทั้งหมดวาดขึ้นใหม่จากเนื้อหา
+</div>
+</main>
+</div>
+<button class="backtop" id="backtop" aria-label="กลับขึ้นด้านบน">↑</button>
+<script>
+(function(){
+"use strict";
+var main = document.querySelector('main');
+var tocEl = document.getElementById('toc');
+var qEl = document.getElementById('q');
+var qclr = document.getElementById('qclr');
+var meta = document.getElementById('searchmeta');
+
+/* ---------- 1. build TOC ---------- */
+var links = [];
+(function buildToc(){
+  var kids = main.children, group = null;
+  for (var i=0;i<kids.length;i++){
+    var el = kids[i];
+    if (el.tagName === 'H2' && el.classList.contains('sec')){
+      group = document.createElement('div');
+      group.className = 'tocgroup';
+      var h = document.createElement('div');
+      h.className = 'sechead';
+      var pill = el.querySelector('.pill');
+      h.textContent = (pill ? pill.textContent + ' · ' : '') + el.textContent.replace(pill ? pill.textContent : '', '').trim();
+      group.appendChild(h);
+      tocEl.appendChild(group);
+    } else if (el.tagName === 'SECTION' && el.classList.contains('ch')){
+      if (!group){ group = document.createElement('div'); tocEl.appendChild(group); }
+      var h3 = el.querySelector('h3');
+      var n = el.getAttribute('data-ch') || '';
+      var title = h3 ? h3.textContent.replace(/^บทที่\s*\d+\s*[—-]\s*/,'').replace(/\s*(บทสำคัญที่สุดของส่วนนี้|ไม่เน้นสอบ|ขั้นตอน lab|⭐ เนียนที่สุด)\s*$/,'').trim()
+                     : 'ภาพรวมทั้งภาค';
+      var a = document.createElement('a');
+      a.href = '#' + el.id;
+      if (el.getAttribute('data-lite')) a.style.opacity = '.72';
+      a.innerHTML = '<span class="n">' + (n && n !== '0' ? n : '•') + '</span><span class="tt"></span>';
+      a.querySelector('.tt').textContent = title;
+      group.appendChild(a);
+      links.push({a:a, sec:el});
+    }
+  }
+})();
+
+/* ---------- 2. scroll spy ---------- */
+var byId = {};
+links.forEach(function(L){ byId[L.sec.id] = L.a; });
+var active = null;
+function spy(){
+  var best = null, bestTop = -1e9;
+  links.forEach(function(L){
+    var r = L.sec.getBoundingClientRect();
+    if (r.top <= 120 && r.top > bestTop){ bestTop = r.top; best = L; }
+  });
+  if (!best) best = links[0];
+  if (best && best.a !== active){
+    if (active) active.classList.remove('on');
+    active = best.a; active.classList.add('on');
+    var ar = active.getBoundingClientRect(), tr = tocEl.getBoundingClientRect();
+    if (ar.top < tr.top + 8 || ar.bottom > tr.bottom - 8){
+      tocEl.scrollTop += (ar.top - tr.top) - tocEl.clientHeight/2;
+    }
+  }
+}
+var spyTick = false;
+window.addEventListener('scroll', function(){
+  if (spyTick) return; spyTick = true;
+  requestAnimationFrame(function(){ spy(); spyTick = false; });
+}, {passive:true});
+
+/* ---------- 3. search ---------- */
+var textNodes = null, wraps = [];
+function collect(){
+  var w = document.createTreeWalker(main, NodeFilter.SHOW_TEXT, {
+    acceptNode: function(n){
+      if (!n.nodeValue || !n.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+      var p = n.parentElement;
+      if (!p) return NodeFilter.FILTER_REJECT;
+      var t = p.tagName;
+      if (t === 'SCRIPT' || t === 'STYLE' || t === 'MARK') return NodeFilter.FILTER_REJECT;
+      if (p.closest('svg')) return NodeFilter.FILTER_REJECT;
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+  var out = [], n;
+  while ((n = w.nextNode())) out.push(n);
+  return out;
+}
+function esc(s){ return s.replace(/[&<>"]/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); }
+function clearHl(){
+  wraps.forEach(function(o){
+    if (o.el.parentNode) o.el.parentNode.replaceChild(document.createTextNode(o.text), o.el);
+  });
+  wraps = []; textNodes = null;
+}
+function runSearch(raw){
+  clearHl();
+  var qs = raw.trim();
+  qclr.style.display = qs ? 'block' : 'none';
+  if (qs.length < 2){
+    links.forEach(function(L){ L.a.classList.remove('dim','hit'); });
+    document.querySelectorAll('.sechead').forEach(function(h){ h.style.display = ''; });
+    meta.textContent = '';
+    return;
+  }
+  var needle = qs.toLowerCase();
+  if (!textNodes) textNodes = collect();
+  var hitSecs = {}, total = 0;
+  textNodes.forEach(function(n){
+    var v = n.nodeValue, lv = v.toLowerCase();
+    if (lv.indexOf(needle) === -1) return;
+    var sec = n.parentElement.closest('section.ch');
+    if (sec) hitSecs[sec.id] = (hitSecs[sec.id]||0) + 1;
+    var html = '', i = 0, j;
+    while ((j = lv.indexOf(needle, i)) !== -1){
+      html += esc(v.slice(i, j)) + '<mark>' + esc(v.slice(j, j + needle.length)) + '</mark>';
+      i = j + needle.length; total++;
+    }
+    html += esc(v.slice(i));
+    var span = document.createElement('span');
+    span.innerHTML = html;
+    if (n.parentNode){
+      n.parentNode.replaceChild(span, n);
+      wraps.push({el:span, text:v});
+    }
+  });
+  var nSec = 0;
+  links.forEach(function(L){
+    var hit = !!hitSecs[L.sec.id];
+    L.a.classList.toggle('dim', !hit);
+    L.a.classList.toggle('hit', hit);
+    if (hit){
+      nSec++;
+      var d = L.sec.querySelector('details.chfold');
+      if (d) d.open = true;
+    }
+  });
+  document.querySelectorAll('.tocgroup').forEach(function(g){
+    var any = g.querySelector('a:not(.dim)');
+    var head = g.querySelector('.sechead');
+    if (head) head.style.display = any ? '' : 'none';
+  });
+  meta.textContent = total ? ('พบ ' + total + ' แห่ง ใน ' + nSec + ' บท') : 'ไม่พบคำนี้';
+}
+var tmr = null;
+qEl.addEventListener('input', function(){
+  clearTimeout(tmr);
+  var v = qEl.value;
+  tmr = setTimeout(function(){ runSearch(v); }, 170);
+});
+qclr.addEventListener('click', function(){ qEl.value=''; runSearch(''); qEl.focus(); });
+qEl.addEventListener('keydown', function(e){
+  if (e.key === 'Escape'){ qEl.value=''; runSearch(''); }
+  if (e.key === 'Enter'){
+    var first = tocEl.querySelector('a.hit');
+    if (first) { document.getElementById(first.getAttribute('href').slice(1)).scrollIntoView(); closeNav(); }
+  }
+});
+document.addEventListener('keydown', function(e){
+  if ((e.key === '/' || (e.key === 'k' && (e.metaKey || e.ctrlKey))) && document.activeElement !== qEl){
+    e.preventDefault(); openNav(); qEl.focus(); qEl.select();
+  }
+});
+
+/* ---------- 4. theme ---------- */
+var THEMES = [['auto','◐ ธีม: อัตโนมัติ'],['light','☀ ธีม: สว่าง'],['dark','☾ ธีม: มืด']];
+var tbtn = document.getElementById('themebtn');
+function store(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+function load(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+function setTheme(name){
+  document.documentElement.setAttribute('data-theme', name);
+  var row = THEMES.filter(function(t){ return t[0]===name; })[0] || THEMES[0];
+  tbtn.textContent = row[1];
+  store('ai2.theme', name);
+}
+setTheme(load('ai2.theme') || 'auto');
+tbtn.addEventListener('click', function(){
+  var cur = document.documentElement.getAttribute('data-theme');
+  var i = 0;
+  THEMES.forEach(function(t,k){ if (t[0]===cur) i = k; });
+  setTheme(THEMES[(i+1) % THEMES.length][0]);
+});
+
+/* ---------- 5. expand / collapse all ---------- */
+var exbtn = document.getElementById('expandbtn');
+exbtn.addEventListener('click', function(){
+  var ds = document.querySelectorAll('details.chfold');
+  var anyClosed = false;
+  ds.forEach(function(d){ if (!d.open) anyClosed = true; });
+  ds.forEach(function(d){ d.open = anyClosed; });
+  exbtn.textContent = anyClosed ? 'พับบทที่ไม่เน้น' : 'เปิดบททั้งหมด';
+  exbtn.setAttribute('aria-pressed', anyClosed ? 'true' : 'false');
+});
+
+/* ---------- 6. quiz reveal ---------- */
+document.querySelectorAll('.qreveal').forEach(function(b){
+  b.addEventListener('click', function(){
+    var qa = b.parentElement.querySelector('.qa');
+    var open = qa.hidden;
+    qa.hidden = !open;
+    b.textContent = open ? 'ซ่อนเฉลย' : 'ดูเฉลย';
+    b.classList.toggle('open', open);
+  });
+});
+var ansbtn = document.getElementById('allansbtn');
+ansbtn.addEventListener('click', function(){
+  var qas = document.querySelectorAll('.qa');
+  var anyHidden = false;
+  qas.forEach(function(q){ if (q.hidden) anyHidden = true; });
+  qas.forEach(function(q){ q.hidden = !anyHidden; });
+  document.querySelectorAll('.qreveal').forEach(function(b){
+    b.textContent = anyHidden ? 'ซ่อนเฉลย' : 'ดูเฉลย';
+    b.classList.toggle('open', anyHidden);
+  });
+  ansbtn.textContent = anyHidden ? 'ซ่อนเฉลยทั้งหมด' : 'เฉลยทั้งหมด';
+  ansbtn.setAttribute('aria-pressed', anyHidden ? 'true' : 'false');
+});
+
+/* ---------- 7a. pipeline swap ---------- */
+(function(){
+  var sw = document.getElementById('pipeswap');
+  if (!sw) return;
+  var btns = document.querySelectorAll('.segbtn');
+  btns.forEach(function(b){
+    b.addEventListener('click', function(){
+      sw.setAttribute('data-mode', b.getAttribute('data-mode'));
+      btns.forEach(function(x){
+        var on = (x === b);
+        x.classList.toggle('on', on);
+        x.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+    });
+  });
+})();
+
+/* ---------- 7b. bug hunt ---------- */
+(function(){
+  var root = document.getElementById('hunt');
+  if (!root) return;
+  var found = {}, nEl = document.getElementById('huntN');
+  var notes = root.querySelectorAll('.note');
+  function show(id){
+    found[id] = 1;
+    notes.forEach(function(n){ if (n.getAttribute('data-pid') === id) n.hidden = false; });
+  }
+  function upd(){ nEl.textContent = Object.keys(found).length; }
+  root.querySelectorAll('.ln').forEach(function(ln){
+    ln.addEventListener('click', function(){
+      ln.classList.add('found');
+      ln.getAttribute('data-p').split(',').forEach(show);
+      upd();
+    });
+  });
+  document.getElementById('huntAll').addEventListener('click', function(){
+    root.querySelectorAll('.ln').forEach(function(l){ l.classList.add('found'); });
+    ['1','2','3','4','5'].forEach(show);
+    upd();
+  });
+})();
+
+/* ---------- 8. nav + back to top ---------- */
+var menubtn = document.getElementById('menubtn'), scrim = document.getElementById('scrim');
+function openNav(){ if (window.innerWidth <= 880) document.body.classList.add('navopen'); }
+function closeNav(){ document.body.classList.remove('navopen'); }
+menubtn.addEventListener('click', function(){ document.body.classList.toggle('navopen'); });
+scrim.addEventListener('click', closeNav);
+tocEl.addEventListener('click', function(e){ if (e.target.closest('a')) closeNav(); });
+var bt = document.getElementById('backtop');
+bt.addEventListener('click', function(){ window.scrollTo({top:0, behavior:'smooth'}); });
+window.addEventListener('scroll', function(){
+  bt.style.display = window.scrollY > 700 ? 'block' : 'none';
+}, {passive:true});
+
+spy();
+})();
+</script>
+</body>
+</html>

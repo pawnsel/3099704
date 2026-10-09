@@ -1,0 +1,2313 @@
+<!doctype html>
+<html lang="th" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ชีตอ่าน AI4 — Deep Learning สำหรับภาพทางการแพทย์</title>
+<style>
+:root{
+  color-scheme: light;
+  --bg:#f9f9f7; --surface:#fcfcfb; --surface2:#f2f1ed;
+  --ink:#0b0b0b; --ink2:#52514e; --muted:#898781;
+  --grid:#e1e0d9; --axis:#c3c2b7; --border:rgba(11,11,11,.10);
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#4a3aa7;
+  --seq1:#86b6ef; --seq2:#5598e7; --seq3:#2a78d6; --seq4:#1c5cab; --seq5:#104281;
+  --good:#0ca30c; --warn:#fab219; --serious:#ec835a; --crit:#d03b3b;
+  --star:#b07900; --starbg:#fff8e6; --warnbg:#fdf0ee; --tipbg:#eef4fc;
+  --shadow:0 1px 2px rgba(11,11,11,.05), 0 8px 24px -16px rgba(11,11,11,.18);
+}
+@media (prefers-color-scheme: dark){
+  :root:where(:not([data-theme="light"])){
+    color-scheme: dark;
+    --bg:#0d0d0d; --surface:#1a1a19; --surface2:#222221;
+    --ink:#ffffff; --ink2:#c3c2b7; --muted:#898781;
+    --grid:#2c2c2a; --axis:#383835; --border:rgba(255,255,255,.10);
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#9085e9;
+    --seq1:#184f95; --seq2:#256abf; --seq3:#2a78d6; --seq4:#5598e7; --seq5:#9ec5f4;
+    --star:#fab219; --starbg:#2a2412; --warnbg:#2a1a18; --tipbg:#15202e;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --bg:#0d0d0d; --surface:#1a1a19; --surface2:#222221;
+  --ink:#ffffff; --ink2:#c3c2b7; --muted:#898781;
+  --grid:#2c2c2a; --axis:#383835; --border:rgba(255,255,255,.10);
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#9085e9;
+  --seq1:#184f95; --seq2:#256abf; --seq3:#2a78d6; --seq4:#5598e7; --seq5:#9ec5f4;
+  --star:#fab219; --starbg:#2a2412; --warnbg:#2a1a18; --tipbg:#15202e;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.7);
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth; scroll-padding-top:16px}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"IBM Plex Sans Thai","Noto Sans Thai","Sukhumvit Set",-apple-system,"Thonburi",system-ui,"Segoe UI",sans-serif;
+  font-size:16.5px; line-height:1.78; -webkit-text-size-adjust:100%;
+}
+.wrap{display:flex; gap:0; align-items:flex-start}
+
+/* ---------- sidebar ---------- */
+#side{
+  position:sticky; top:0; height:100vh; flex:0 0 298px; width:298px;
+  background:var(--surface); border-right:1px solid var(--border);
+  display:flex; flex-direction:column; z-index:40;
+}
+#side .sbhead{padding:16px 18px 10px; border-bottom:1px solid var(--border)}
+#side .sbtitle{font-weight:700; font-size:15px; letter-spacing:.01em}
+#side .sbsub{font-size:12.5px; color:var(--muted); margin-top:2px}
+.searchbox{position:relative; margin-top:12px}
+.searchbox input{
+  width:100%; padding:8px 30px 8px 11px; font:inherit; font-size:14px;
+  border:1px solid var(--border); border-radius:9px; background:var(--surface2); color:var(--ink);
+}
+.searchbox input:focus{outline:2px solid var(--s1); outline-offset:1px}
+.searchbox .clr{
+  position:absolute; right:6px; top:50%; transform:translateY(-50%);
+  border:0; background:none; color:var(--muted); cursor:pointer; font-size:16px; line-height:1; padding:4px;
+  display:none;
+}
+#searchmeta{font-size:12px; color:var(--muted); margin-top:6px; min-height:1.2em}
+#toc{overflow-y:auto; padding:10px 10px 40px; flex:1}
+#toc .sechead{
+  font-size:11.5px; font-weight:700; letter-spacing:.06em; color:var(--muted);
+  text-transform:none; padding:12px 8px 4px;
+}
+#toc a{
+  display:flex; gap:8px; align-items:baseline; text-decoration:none; color:var(--ink2);
+  font-size:13.5px; line-height:1.45; padding:5px 8px; border-radius:7px; border-left:2px solid transparent;
+}
+#toc a:hover{background:var(--surface2); color:var(--ink)}
+#toc a.on{background:var(--tipbg); color:var(--ink); border-left-color:var(--s1); font-weight:600}
+#toc a.hit{box-shadow:inset 0 0 0 1px var(--warn)}
+#toc a.dim{display:none}
+#toc a .n{flex:0 0 1.6em; color:var(--muted); font-variant-numeric:tabular-nums; font-size:12.5px}
+#toc a .st{color:var(--star); font-size:11px}
+.sbfoot{padding:10px 14px; border-top:1px solid var(--border); display:flex; gap:6px; flex-wrap:wrap}
+.btn{
+  font:inherit; font-size:12.5px; padding:5px 10px; border-radius:8px; cursor:pointer;
+  border:1px solid var(--border); background:var(--surface2); color:var(--ink2);
+}
+.btn:hover{color:var(--ink); border-color:var(--axis)}
+.btn[aria-pressed="true"]{background:var(--tipbg); border-color:var(--s1); color:var(--ink)}
+
+#menubtn{display:none}
+.scrim{display:none}
+
+/* ---------- main ---------- */
+main{flex:1 1 auto; min-width:0; padding:0 clamp(16px,3.5vw,44px) 120px; max-width:1000px}
+header.pg{padding:40px 0 10px; border-bottom:1px solid var(--border); margin-bottom:26px}
+h1{font-size:clamp(23px,3.1vw,33px); line-height:1.3; margin:0 0 10px; letter-spacing:-.01em}
+.meta{color:var(--ink2); font-size:14px; line-height:1.7}
+.meta em{font-style:normal; color:var(--muted)}
+
+h2.sec{
+  font-size:clamp(19px,2.3vw,24px); margin:58px 0 6px; padding-top:10px; line-height:1.35;
+  border-top:2px solid var(--ink); display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;
+}
+h2.sec .pill{
+  font-size:12px; font-weight:600; color:var(--surface); background:var(--ink);
+  padding:2px 9px; border-radius:20px; letter-spacing:.02em;
+}
+.secintro{color:var(--ink2); font-size:14.5px; margin:0 0 4px}
+
+section.ch{margin:30px 0 0; scroll-margin-top:14px}
+section.ch h3{
+  font-size:clamp(17px,1.9vw,20px); line-height:1.4; margin:0 0 12px; letter-spacing:-.005em;
+}
+.chfold>summary{list-style:none; cursor:pointer; display:flex; gap:10px; align-items:baseline; flex-wrap:wrap}
+.chfold>summary::-webkit-details-marker{display:none}
+.chfold>summary::before{
+  content:"▸"; color:var(--muted); font-size:13px; transform:translateY(-1px);
+}
+.chfold[open]>summary::before{content:"▾"}
+.chfold>summary h3{margin:0}
+.chfold>summary:hover h3{color:var(--s1)}
+.chip{
+  font-size:11.5px; font-weight:600; padding:1px 8px; border-radius:20px; white-space:nowrap;
+  border:1px solid var(--border); color:var(--muted); background:var(--surface2);
+}
+.chbody{padding-top:4px}
+.chfold .chbody{padding-top:10px}
+
+p{margin:0 0 13px}
+b,strong{font-weight:700; color:var(--ink)}
+code{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:.87em;
+  background:var(--surface2); padding:1px 5px; border-radius:5px; border:1px solid var(--border);
+}
+pre{
+  background:var(--surface); border:1px solid var(--border); border-radius:11px;
+  padding:14px 16px; overflow-x:auto; margin:0 0 15px; box-shadow:var(--shadow);
+}
+pre code{background:none; border:0; padding:0; font-size:13px; line-height:1.6; white-space:pre}
+
+/* callouts */
+.key,.warnbox,.tip{
+  margin:0 0 15px; padding:13px 16px; border-radius:11px; font-size:15.5px;
+  border:1px solid var(--border); border-left-width:4px;
+}
+.key{background:var(--starbg); border-left-color:var(--star)}
+.warnbox{background:var(--warnbg); border-left-color:var(--crit)}
+.tip{background:var(--tipbg); border-left-color:var(--s1)}
+.key .lb,.warnbox .lb,.tip .lb{display:block; font-size:12px; font-weight:700; letter-spacing:.05em; margin-bottom:3px}
+.key .lb{color:var(--star)} .warnbox .lb{color:var(--crit)} .tip .lb{color:var(--s1)}
+
+ul,ol{margin:0 0 14px; padding-left:1.35em}
+li{margin:0 0 6px}
+.bul{list-style:none; padding:0}
+.bul>li{position:relative; padding-left:1.25em}
+.bul>li::before{content:"·"; position:absolute; left:.35em; color:var(--muted); font-weight:700}
+
+/* tables */
+.tw{overflow-x:auto; margin:0 0 17px; border:1px solid var(--border); border-radius:11px; background:var(--surface); box-shadow:var(--shadow)}
+table{border-collapse:collapse; width:100%; font-size:14.5px}
+th,td{padding:9px 13px; text-align:left; vertical-align:top; border-bottom:1px solid var(--grid)}
+thead th{background:var(--surface2); font-size:13px; font-weight:700; color:var(--ink2); white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
+td.num,th.num{text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap}
+td .hi{font-weight:700}
+
+/* figures */
+figure{
+  margin:0 0 20px; padding:16px 16px 12px; background:var(--surface);
+  border:1px solid var(--border); border-radius:13px; box-shadow:var(--shadow);
+}
+figure svg{display:block; width:100%; height:auto; overflow:visible}
+figcaption{font-size:12.8px; color:var(--muted); margin-top:9px; line-height:1.6}
+.figtitle{font-size:14.5px; font-weight:700; margin:0 0 3px}
+.figsub{font-size:13px; color:var(--ink2); margin:0 0 12px}
+.legend{display:flex; gap:14px; flex-wrap:wrap; font-size:12.8px; color:var(--ink2); margin:0 0 10px}
+.legend span{display:inline-flex; align-items:center; gap:6px}
+.sw{width:11px; height:11px; border-radius:3px; display:inline-block; flex:0 0 auto}
+.svgtxt{font-size:12px; fill:var(--ink2)}
+.svgtxt.sm{font-size:11px; fill:var(--muted)}
+.svgtxt.b{font-weight:700; fill:var(--ink)}
+.svgval{font-size:12.5px; font-weight:700; fill:var(--ink); font-variant-numeric:tabular-nums}
+
+/* stat tiles */
+.tiles{display:grid; gap:12px; grid-template-columns:repeat(auto-fit,minmax(232px,1fr)); margin:0 0 18px}
+.tile{
+  background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:13px 15px; box-shadow:var(--shadow);
+}
+.tile .v{font-size:27px; font-weight:700; line-height:1.15; letter-spacing:-.02em}
+.tile .k{font-size:12.5px; color:var(--ink2); margin-top:4px; line-height:1.5}
+.tile.acc{border-left:4px solid var(--s1)}
+.tile.bad{border-left:4px solid var(--crit)}
+.tile.ok{border-left:4px solid var(--good)}
+.tile.gold{border-left:4px solid var(--star)}
+
+/* cards */
+.cards{display:grid; gap:12px; grid-template-columns:repeat(auto-fit,minmax(215px,1fr)); margin:0 0 18px}
+.card{background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:13px 15px; box-shadow:var(--shadow)}
+.card h4{margin:0 0 5px; font-size:14.5px}
+.card p{margin:0; font-size:13.5px; color:var(--ink2); line-height:1.65}
+
+/* quiz */
+.quiz{margin:0 0 20px}
+.qhead{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:0 0 11px}
+.qhead .qt{font-size:15.5px; font-weight:700}
+.qitem{
+  background:var(--surface); border:1px solid var(--border); border-radius:12px;
+  padding:13px 15px; margin:0 0 10px; box-shadow:var(--shadow);
+}
+.qitem .qn{
+  display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px;
+  border-radius:50%; background:var(--surface2); border:1px solid var(--border);
+  font-size:12.5px; font-weight:700; color:var(--ink2); margin-right:8px; flex:0 0 auto;
+}
+.qq{display:flex; align-items:flex-start; font-size:15px; line-height:1.68}
+.qa{
+  margin-top:11px; padding-top:11px; border-top:1px dashed var(--axis); font-size:14.5px;
+  animation:fade .18s ease;
+}
+@keyframes fade{from{opacity:0; transform:translateY(-3px)}to{opacity:1; transform:none}}
+.qa[hidden]{display:none}
+.qa .ans{font-weight:700; color:var(--good)}
+.qreveal{
+  margin-top:10px; font:inherit; font-size:13px; font-weight:600; padding:5px 12px; cursor:pointer;
+  border-radius:8px; border:1px solid var(--s1); background:none; color:var(--s1);
+}
+.qreveal:hover{background:var(--tipbg)}
+.qreveal.open{border-color:var(--border); color:var(--muted)}
+
+/* misc */
+mark{background:var(--warn); color:#0b0b0b; border-radius:3px; padding:0 2px}
+.flow{
+  display:flex; gap:8px; align-items:center; flex-wrap:wrap; font-size:13.5px;
+  margin:0 0 15px; color:var(--ink2);
+}
+.flow .nd{background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:5px 11px; color:var(--ink)}
+.flow .ar{color:var(--muted)}
+.topnote{
+  background:var(--surface); border:1px solid var(--border); border-left:4px solid var(--s4);
+  border-radius:11px; padding:13px 16px; margin:0 0 20px; font-size:15px;
+}
+.marks{display:flex; gap:16px; flex-wrap:wrap; font-size:13.5px; color:var(--ink2); margin:14px 0 0}
+hr.soft{border:0; border-top:1px solid var(--grid); margin:26px 0}
+.backtop{
+  position:fixed; right:18px; bottom:18px; z-index:50; border-radius:50%; width:42px; height:42px;
+  border:1px solid var(--border); background:var(--surface); color:var(--ink2); cursor:pointer;
+  box-shadow:var(--shadow); font-size:17px; display:none;
+}
+.sheetfoot{margin-top:50px; padding-top:18px; border-top:1px solid var(--border); font-size:13px; color:var(--muted)}
+
+
+/* interactive: windowing + dice */
+.seg{display:flex; gap:6px; margin:0 0 12px; flex-wrap:wrap}
+.segbtn{font:inherit; font-size:13px; font-weight:600; padding:6px 14px; border-radius:9px; cursor:pointer;
+  border:1px solid var(--border); background:var(--surface2); color:var(--ink2)}
+.segbtn:hover{color:var(--ink); border-color:var(--axis)}
+.segbtn.on{background:var(--tipbg); border-color:var(--s1); color:var(--ink)}
+.ctrls{display:flex; gap:14px; align-items:center; flex-wrap:wrap; margin:6px 0 14px}
+.ctrls label{font-size:13.5px; color:var(--ink2); font-weight:600; white-space:nowrap}
+.ctrls input[type=range]{flex:1 1 170px; accent-color:var(--s1); min-width:140px}
+.ctrls output{font-weight:700; font-variant-numeric:tabular-nums; min-width:5.2em}
+.swatch{width:26px; height:18px; border-radius:4px; border:1px solid var(--axis); display:inline-block; vertical-align:-4px}
+
+@media (max-width:880px){
+  #side{
+    position:fixed; left:0; top:0; height:100vh; transform:translateX(-100%);
+    transition:transform .22s ease; box-shadow:var(--shadow);
+  }
+  body.navopen #side{transform:none}
+  body.navopen .scrim{display:block; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:35}
+  #menubtn{
+    display:block; position:fixed; left:14px; bottom:18px; z-index:45; width:46px; height:46px;
+    border-radius:50%; border:1px solid var(--border); background:var(--surface); color:var(--ink);
+    font-size:19px; cursor:pointer; box-shadow:var(--shadow);
+  }
+  main{padding-left:16px; padding-right:16px; padding-bottom:150px}
+  header.pg{padding-top:26px}
+  section.ch{scroll-margin-top:10px}
+  .tiles{grid-template-columns:1fr 1fr; gap:10px}
+  .tile .v{font-size:23px}
+}
+@media print{
+  #side,#menubtn,.backtop,.qreveal,.scrim{display:none!important}
+  .qa{display:block!important}
+  body{background:#fff; font-size:11pt}
+  figure,.tw,.tile,.card,.qitem{box-shadow:none; break-inside:avoid}
+  section.ch{break-inside:avoid-page}
+  .chfold>summary::before{content:""}
+}
+</style>
+</head>
+<body>
+<button id="menubtn" aria-label="เปิดสารบัญ">☰</button>
+<div class="scrim" id="scrim"></div>
+<div class="wrap">
+
+<nav id="side" aria-label="สารบัญ">
+  <div class="sbhead">
+    <div class="sbtitle">ชีตอ่าน AI4</div>
+    <div class="sbsub">CNN · ภาพทางการแพทย์ · 39 บท</div>
+    <div class="searchbox">
+      <input id="q" type="search" placeholder="ค้นหาในชีต…" autocomplete="off" aria-label="ค้นหา">
+      <button class="clr" id="qclr" aria-label="ล้างคำค้น">×</button>
+    </div>
+    <div id="searchmeta"></div>
+  </div>
+  <div id="toc"></div>
+  <div class="sbfoot">
+    <button class="btn" id="themebtn">◐ ธีม: อัตโนมัติ</button>
+    <button class="btn" id="expandbtn">เปิดบททั้งหมด</button>
+    <button class="btn" id="allansbtn">เฉลยทั้งหมด</button>
+  </div>
+</nav>
+
+<main>
+<header class="pg">
+  <h1>เรื่องเล่า AI for Digital Health ภาค 4 — Deep Learning สำหรับภาพทางการแพทย์</h1>
+  <div class="meta">
+    Week 4 — CNN · การจำแนกภาพ · segmentation และการติด label<br>
+    <em>อ.ดิษยา วรรณวิไล · 3099704 AI for Digital Health · จุฬาลงกรณ์มหาวิทยาลัย · 8 ตุลาคม 2026</em><br>
+    <em>สรุปจากสไลด์ 68 แผ่น — ⚠️ ไม่มีไฟล์เสียงบรรยาย เนื้อหามาจากสไลด์ล้วน ๆ · เลือกเฉพาะส่วนที่น่าจะออกสอบ</em>
+  </div>
+  <div class="marks">
+    <span>⭐ เน้นหนัก มีโอกาสออกสอบสูง</span>
+    <span>⚠️ กับดักที่คนพลาดบ่อย</span>
+    <span>💡 ข้อสังเกตที่ช่วยให้เห็นภาพ</span>
+  </div>
+</header>
+
+<div class="topnote">
+  <b>โจทย์ที่ลากยาวทั้งภาค</b><br>
+  ⭐ <b>สำหรับคอมพิวเตอร์ ฟิล์ม X-ray ไม่ใช่รูป แต่เป็นตารางตัวเลข</b> ทุกอย่างที่ AI “เห็น” คือเลขคณิตบนตารางนั้น คำถามที่ลากยาวทั้งคาบจึงเป็น <b>ถ้าตารางเปลี่ยน เพราะเครื่องสแกนใหม่หรือการปรับ contrast ที่ต่างไป เลขคณิตก็เปลี่ยนตาม</b> แล้วโมเดลที่แม่นในโรงพยาบาลเรา จะยังแม่นที่อื่นหรือเปล่า
+</div>
+
+<h2 class="sec" id="s1"><span class="pill">ส่วนที่ 1</span> ภาพทางการแพทย์ในฐานะข้อมูล</h2>
+<p class="secintro">บทที่ 1–5 · รู้จักอาร์เรย์ก่อนรู้จักโมเดล — ⭐ “AI ล้มเหลว” จำนวนมาก จริง ๆ แล้วคือความล้มเหลวของการจัดการข้อมูล</p>
+
+<section class="ch" id="ch1" data-ch="1">
+  <h3>บทที่ 1 — ภาพคือตารางตัวเลข และแต่ละ modality ต่างกันอย่างไร</h3>
+  <div class="chbody">
+  <figure>
+    <div class="figtitle">หนึ่งแผ่นภาพ = ตารางค่าความสว่าง</div>
+    <div class="figsub">แพตช์ 5 × 5 · ค่าความเข้ม 0–255 · มืด = ค่าต่ำ · สว่าง = ค่าสูง</div>
+    <svg viewBox="0 0 640 224" role="img" aria-label="ตาราง 5 คูณ 5 ของค่าความเข้มพิกเซล">
+      <g transform="translate(0,2)">
+      <rect x="0" y="0" width="42" height="42" rx="3" fill="rgb(12,12,12)" stroke="var(--axis)" stroke-width="0.5"/>
+      <text x="21.0" y="25.5" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">12</text>
+      <rect x="44" y="0" width="42" height="42" rx="3" fill="rgb(30,30,30)" stroke="var(--axis)" stroke-width="0.5"/>
+      <text x="65.0" y="25.5" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">30</text>
+      <rect x="88" y="0" width="42" height="42" rx="3" fill="rgb(41,41,41)" stroke="var(--axis)" stroke-width="0.5"/>
+      <text x="109.0" y="25.5" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">41</text>
+      <rect x="132" y="0" width="42" height="42" rx="3" fill="rgb(35,35,35)" stroke="var(--axis)" stroke-width="0.5"/>
+      <text x="153.0" y="25.5" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">35</text>
+      <rect x="176" y="0" width="42" height="42" rx="3" fill="rgb(14,14,14)" stroke="var(--axis)" stroke-width="0.5"/>
+      <text x="197.0" y="25.5" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">14</text>
+      <rect x="0" y="44" width="42" height="42" rx="3" fill="rgb(28,28,28)" stroke="var(--axis)" stroke-width="0.5"/>
+      <text x="21.0" y="69.5" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">28</text>
+      <rect x="44" y="44" width="42" height="42" rx="3" fill="rgb(120,120,120)" stroke="var(--axis)" stroke-width="0.5"/>
+      <text x="65.0" y="69.5" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">120</text>
+      <rect x="88" y="44" width="42" height="42" rx="3" fill="rgb(180,180,180)" stroke="var(--axis)" stroke-width="0.5"/>
+      <text x="109.0" y="69.5" text-anchor="middle" font-size="13" font-weight="700" fill="#000">180</text>
+      <rect x="132" y="44" width="42" height="42" rx="3" fill="rgb(110,110,110)" stroke="var(--axis)" stroke-width="0.5"/>
+      <text x="153.0" y="69.5" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">110</text>
+      <rect x="176" y="44" width="42" height="42" rx="3" fill="rgb(25,25,25)" stroke="var(--axis)" stroke-width="0.5"/>
+      <text x="197.0" y="69.5" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">25</text>
+      <rect x="0" y="88" width="42" height="42" rx="3" fill="rgb(40,40,40)" stroke="var(--axis)" stroke-width="0.5"/>
+      <text x="21.0" y="113.5" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">40</text>
+      <rect x="44" y="88" width="42" height="42" rx="3" fill="rgb(190,190,190)" stroke="var(--axis)" stroke-width="0.5"/>
+      <text x="65.0" y="113.5" text-anchor="middle" font-size="13" font-weight="700" fill="#000">190</text>
+      <rect x="88" y="88" width="42" height="42" rx="3" fill="rgb(250,250,250)" stroke="var(--axis)" stroke-width="0.5"/>
+      <text x="109.0" y="113.5" text-anchor="middle" font-size="13" font-weight="700" fill="#000">250</text>
+      <rect x="132" y="88" width="42" height="42" rx="3" fill="rgb(185,185,185)" stroke="var(--axis)" stroke-width="0.5"/>
+      <text x="153.0" y="113.5" text-anchor="middle" font-size="13" font-weight="700" fill="#000">185</text>
+      <rect x="176" y="88" width="42" height="42" rx="3" fill="rgb(38,38,38)" stroke="var(--axis)" stroke-width="0.5"/>
+      <text x="197.0" y="113.5" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">38</text>
+      <rect x="0" y="132" width="42" height="42" rx="3" fill="rgb(26,26,26)" stroke="var(--axis)" stroke-width="0.5"/>
+      <text x="21.0" y="157.5" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">26</text>
+      <rect x="44" y="132" width="42" height="42" rx="3" fill="rgb(115,115,115)" stroke="var(--axis)" stroke-width="0.5"/>
+      <text x="65.0" y="157.5" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">115</text>
+      <rect x="88" y="132" width="42" height="42" rx="3" fill="rgb(175,175,175)" stroke="var(--axis)" stroke-width="0.5"/>
+      <text x="109.0" y="157.5" text-anchor="middle" font-size="13" font-weight="700" fill="#000">175</text>
+      <rect x="132" y="132" width="42" height="42" rx="3" fill="rgb(120,120,120)" stroke="var(--axis)" stroke-width="0.5"/>
+      <text x="153.0" y="157.5" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">120</text>
+      <rect x="176" y="132" width="42" height="42" rx="3" fill="rgb(30,30,30)" stroke="var(--axis)" stroke-width="0.5"/>
+      <text x="197.0" y="157.5" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">30</text>
+      <rect x="0" y="176" width="42" height="42" rx="3" fill="rgb(10,10,10)" stroke="var(--axis)" stroke-width="0.5"/>
+      <text x="21.0" y="201.5" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">10</text>
+      <rect x="44" y="176" width="42" height="42" rx="3" fill="rgb(28,28,28)" stroke="var(--axis)" stroke-width="0.5"/>
+      <text x="65.0" y="201.5" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">28</text>
+      <rect x="88" y="176" width="42" height="42" rx="3" fill="rgb(39,39,39)" stroke="var(--axis)" stroke-width="0.5"/>
+      <text x="109.0" y="201.5" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">39</text>
+      <rect x="132" y="176" width="42" height="42" rx="3" fill="rgb(31,31,31)" stroke="var(--axis)" stroke-width="0.5"/>
+      <text x="153.0" y="201.5" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">31</text>
+      <rect x="176" y="176" width="42" height="42" rx="3" fill="rgb(12,12,12)" stroke="var(--axis)" stroke-width="0.5"/>
+      <text x="197.0" y="201.5" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">12</text>
+      </g>
+      <text class="svgtxt b" x="248" y="34">⭐ แต่ละช่องคือ <tspan font-style="italic">pixel</tspan> (2 มิติ)</text>
+      <text class="svgtxt sm" x="248" y="54">หรือ <tspan font-style="italic">voxel</tspan> (3 มิติ เช่น CT)</text>
+      <text class="svgtxt b" x="248" y="86">ฟิล์ม X-ray ทรวงอกทั่วไป</text>
+      <text class="svgtxt sm" x="248" y="106">ราว <tspan font-weight="700">2000 × 2500 พิกเซล ≈ 5 ล้านตัวเลข</tspan></text>
+      <text class="svgtxt b" x="248" y="138">⚠️ แต่ใน lab วันนี้ เราย่อเหลือ</text>
+      <text class="svgtxt sm" x="248" y="158"><tspan font-weight="700">28 × 28 = 784 ตัวเลข</tspan> เท่านั้น</text>
+      <rect x="244" y="178" width="392" height="42" rx="9" fill="var(--starbg)" stroke="var(--star)"/>
+      <text class="svgtxt b" x="256" y="196">⭐ ถ้าตารางเปลี่ยน (เครื่องสแกนใหม่ contrast ต่างไป)</text>
+      <text class="svgtxt b" x="256" y="213">เลขคณิตก็เปลี่ยนตาม</text>
+    </svg>
+  </figure>
+
+  <p>ภาพจากคลินิกต่างกันดูเหมือนกันในสายตาเรา ⚠️ <b>แต่เป็นอาร์เรย์ที่ต่างกันมาก</b></p>
+  <div class="tw"><table>
+    <thead><tr><th>Modality</th><th>รูปร่างอาร์เรย์</th><th>ค่า</th><th>ตัวเลขหมายถึงอะไร</th></tr></thead>
+    <tbody>
+      <tr><td><b>X-ray ทรวงอก</b></td><td>H × W · 1 channel</td><td><b>12–16 bit</b></td><td>การลดทอนรังสีเอกซ์ (ภาพฉาย)</td></tr>
+      <tr><td><b>CT</b></td><td>slices × H × W</td><td><b>Hounsfield units</b></td><td><b>ความหนาแน่น — อากาศ −1000 · น้ำ 0 · กระดูก &gt; 1000</b></td></tr>
+      <tr><td><b>MRI</b></td><td>slices × H × W</td><td>หน่วยตามอำเภอใจ</td><td><b>สัญญาณขึ้นกับ sequence (T1, T2)</b></td></tr>
+      <tr><td><b>ภาพจอตา / ผิวหนัง</b></td><td>H × W × 3 (RGB)</td><td>8 bit · 0–255</td><td>สีของแสงที่สะท้อนกลับ</td></tr>
+      <tr><td><b>สไลด์พยาธิ</b></td><td>gigapixel · RGB</td><td>8 bit</td><td>เนื้อเยื่อที่ย้อมสี — ต้องตัดเป็น tile</td></tr>
+    </tbody>
+  </table></div>
+  <p>⭐ <b>Channel</b> — ภาพขาวดำ = 1 · ภาพสี = 3 (แดง เขียว น้ำเงิน) · ⭐ <b>Bit depth</b> — ภาพทางการแพทย์มักใช้ <b>12–16 bit คือ 4,096–65,536 ระดับเทา ซึ่งมากกว่าที่จอแสดงได้มาก</b></p>
+  <div class="key"><span class="lb">⭐ ทำไมเรื่องนี้สำคัญ</span>
+    <b>network ที่เทรนมาแล้วส่วนใหญ่คาดหวังภาพถ่าย 3 channel 8 bit</b> ⚠️ <b>การปรับมันให้รับ scan แบบ 1 channel 16 bit จึงเป็นขั้นตอนการออกแบบจริง ๆ</b> — และเราจะทำสิ่งนี้เองใน lab
+  </div>
+  </div>
+</section>
+
+<section class="ch" id="ch2" data-ch="2" data-lite="1">
+  <details class="chfold">
+    <summary><h3>บทที่ 2 — DICOM: พิกเซลบวกบริบทรอบตัวมัน</h3><span class="chip">ไม่เน้นสอบ</span></summary>
+    <div class="chbody">
+    <p>ภาพในโรงพยาบาลถูกเก็บและแลกเปลี่ยนในรูปแบบ <b>DICOM</b> (Digital Imaging and Communications in Medicine)</p>
+    <div class="tw"><table>
+      <thead><tr><th>ไฟล์ DICOM บรรจุอะไร</th><th>ผลที่ตามมาสำหรับงาน AI</th></tr></thead>
+      <tbody>
+        <tr><td>ตัวอาร์เรย์พิกเซลเอง</td><td><b>pixel spacing ทำให้วัดเป็นมิลลิเมตรได้ ไม่ใช่วัดเป็นพิกเซล</b></td></tr>
+        <tr><td><b>คนไข้</b> — ID, อายุ, เพศ (อ่อนไหว)</td><td>⚠️ <b>ต้องลบตัวระบุตัวตนใน header ก่อนใช้วิจัย และชื่ออาจถูก “เผา” ติดลงไปในพิกเซลด้วย</b></td></tr>
+        <tr><td><b>การตรวจ</b> — modality, อวัยวะ, วันที่, หน่วยที่ส่งตรวจ</td><td rowspan="2">⚠️ <b>แท็กเครื่องสแกนและไซต์เผยว่าภาพมาจากไหน ซึ่งเป็นแหล่งของ bias ที่ซ่อนอยู่</b> (ส่วนที่ 5)</td></tr>
+        <tr><td><b>การถ่าย</b> — ยี่ห้อเครื่อง, pixel spacing, ความหนา slice, kVp</td></tr>
+        <tr><td><b>คำใบ้การแสดงผล</b> — window center และ width ตั้งต้น</td><td>ใช้เป็นจุดเริ่มของการทำ windowing</td></tr>
+      </tbody>
+    </table></div>
+    <div class="key"><span class="lb">⭐ จุดสำคัญ</span>
+      <b>ชุดข้อมูลสาธารณะ (รวมถึงชุดใน lab วันนี้) มักเป็นไฟล์ PNG/JPEG ที่ถูก export ออกมา — พิกเซลรอด แต่บริบทถูกถอดทิ้งไปหมด</b> ⚠️ <b>ให้จำไว้ว่าอะไรหายไปบ้าง</b>
+    </div>
+    </div>
+  </details>
+</section>
+
+<section class="ch" id="ch3" data-ch="3">
+  <h3>บทที่ 3 — Windowing: HU, L และ W <span class="chip" style="border-color:var(--star);color:var(--star)">⭐ สูตรที่ต้องจำ</span></h3>
+  <div class="chbody">
+  <p>จอภาพแสดงระดับเทาได้ราว <b>256 ระดับ</b> แต่ CT มีราว <b>4,000 ระดับ</b> ⭐ <b>Windowing คือการยืดช่วง HU ที่เราเลือกไว้ช่วงหนึ่ง ให้เต็มหน้าจอ</b></p>
+
+<pre><code>display = clip( (HU − (L − W/2)) / W , 0, 1 ) × 255</code></pre>
+
+  <div class="tw"><table>
+    <thead><tr><th>สัญลักษณ์</th><th>คือ</th></tr></thead>
+    <tbody>
+      <tr><td><b>HU</b> (Hounsfield unit)</td><td><b>เลข CT ของแต่ละ voxel ซึ่งฟิสิกส์ตรึงค่าไว้แล้ว — อากาศ −1000 · น้ำ 0</b></td></tr>
+      <tr><td><b>L</b> (level / center)</td><td><b>จุดกึ่งกลางของทางลาดสีเทา</b></td></tr>
+      <tr><td><b>W</b> (width)</td><td><b>ทางลาดนั้นกว้างกี่ HU</b> ⭐ <b>W แคบ = contrast สูง</b></td></tr>
+    </tbody>
+  </table></div>
+  <p>⭐ <b>ทุกค่าที่ต่ำกว่า L − W/2 กลายเป็นดำสนิท และทุกค่าที่สูงกว่า L + W/2 กลายเป็นขาวสนิท</b></p>
+
+  <figure>
+    <div class="figtitle">ลองเลื่อน L กับ W ดูเอง</div>
+    <div class="figsub">แกนคือค่า HU · แถบคือสิ่งที่จอแสดง</div>
+    <div class="seg" role="group" aria-label="หน้าต่างสำเร็จรูป">
+      <button class="segbtn wbtn on" data-l="-600" data-w="1500">ปอด &nbsp;−600 / 1500</button>
+      <button class="segbtn wbtn" data-l="40" data-w="400">เนื้อเยื่ออ่อน &nbsp;40 / 400</button>
+      <button class="segbtn wbtn" data-l="40" data-w="80">สมอง &nbsp;40 / 80</button>
+      <button class="segbtn wbtn" data-l="500" data-w="2000">กระดูก &nbsp;500 / 2000</button>
+    </div>
+    <svg viewBox="0 0 700 236" role="img" aria-label="แผนภาพ windowing แสดงทางลาดสีเทาบนแกน Hounsfield unit">
+      <defs><linearGradient id="ramp" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="100" y2="0">
+        <stop offset="0" stop-color="#000"/><stop offset="1" stop-color="#fff"/>
+      </linearGradient></defs>
+      <text class="svgtxt b" x="0" y="16">สิ่งที่จอแสดง</text>
+      <rect id="wLo" x="60" y="26" width="100" height="40" fill="#000" stroke="var(--axis)"/>
+      <rect id="wMid" x="160" y="26" width="200" height="40" fill="url(#ramp)" stroke="var(--axis)"/>
+      <rect id="wHi" x="360" y="26" width="300" height="40" fill="#fff" stroke="var(--axis)"/>
+
+      <line id="wL1" x1="160" y1="20" x2="160" y2="78" stroke="var(--crit)" stroke-width="2.5"/>
+      <line id="wLc" x1="260" y1="20" x2="260" y2="78" stroke="var(--s1)" stroke-width="2.5" stroke-dasharray="4 3"/>
+      <line id="wL2" x1="360" y1="20" x2="360" y2="78" stroke="var(--crit)" stroke-width="2.5"/>
+      <text id="wT1" class="svgtxt sm" x="160" y="90" text-anchor="middle" fill="var(--crit)">L − W/2</text>
+      <text id="wTc" class="svgtxt sm" x="260" y="90" text-anchor="middle" fill="var(--s1)">L</text>
+      <text id="wT2" class="svgtxt sm" x="360" y="90" text-anchor="middle" fill="var(--crit)">L + W/2</text>
+      <text id="wV1" class="svgval" x="160" y="106" text-anchor="middle">—</text>
+      <text id="wVc" class="svgval" x="260" y="106" text-anchor="middle">—</text>
+      <text id="wV2" class="svgval" x="360" y="106" text-anchor="middle">—</text>
+      <text class="svgtxt sm" x="60" y="124" fill="var(--muted)">◀ ต่ำกว่านี้ → ดำสนิท</text>
+      <text class="svgtxt sm" x="660" y="124" text-anchor="end" fill="var(--muted)">สูงกว่านี้ → ขาวสนิท ▶</text>
+
+      <line x1="60" y1="140" x2="660" y2="140" stroke="var(--axis)" stroke-width="1.5"/>
+      <g stroke="var(--axis)">
+        <line x1="82" y1="140" x2="82" y2="146"/><line x1="193" y1="140" x2="193" y2="146"/>
+        <line x1="304" y1="140" x2="304" y2="146"/><line x1="416" y1="140" x2="416" y2="146"/>
+        <line x1="527" y1="140" x2="527" y2="146"/><line x1="638" y1="140" x2="638" y2="146"/>
+      </g>
+      <g class="svgtxt sm" text-anchor="middle">
+        <text x="82" y="160">−1000</text><text x="193" y="160">−500</text><text x="304" y="160">0</text>
+        <text x="416" y="160">500</text><text x="527" y="160">1000</text><text x="638" y="160">1500</text>
+      </g>
+      <text class="svgtxt sm" x="360" y="178" text-anchor="middle">HU (Hounsfield unit)</text>
+
+      <g>
+        <circle cx="82" cy="140" r="4.5" fill="var(--s2)"/><text class="svgtxt sm" x="82" y="200" text-anchor="middle">อากาศ</text><text class="svgtxt sm" x="82" y="214" text-anchor="middle">−1000</text>
+        <circle cx="149" cy="140" r="4.5" fill="var(--s2)"/><text class="svgtxt sm" x="149" y="200" text-anchor="middle">ปอด</text><text class="svgtxt sm" x="149" y="214" text-anchor="middle">−700</text>
+        <circle cx="282" cy="140" r="4.5" fill="var(--s2)"/><text class="svgtxt sm" x="282" y="200" text-anchor="middle">ไขมัน</text><text class="svgtxt sm" x="282" y="214" text-anchor="middle">−100</text>
+        <circle cx="304" cy="140" r="4.5" fill="var(--s2)"/><text class="svgtxt sm" x="330" y="228" text-anchor="middle">น้ำ 0 · เนื้อเยื่ออ่อน 40</text>
+        <circle cx="313" cy="140" r="4.5" fill="var(--s2)"/>
+        <circle cx="527" cy="140" r="4.5" fill="var(--s2)"/><text class="svgtxt sm" x="527" y="200" text-anchor="middle">กระดูก</text><text class="svgtxt sm" x="527" y="214" text-anchor="middle">1000</text>
+      </g>
+    </svg>
+
+    <div class="ctrls">
+      <label for="wl">L (center)</label>
+      <input id="wl" type="range" min="-800" max="1200" step="10" value="-600">
+      <output id="wlo">−600 HU</output>
+      <label for="ww">W (width)</label>
+      <input id="ww" type="range" min="50" max="3000" step="10" value="1500">
+      <output id="wwo">1500 HU</output>
+    </div>
+
+    <div class="tw" style="margin:0"><table id="wtab" style="font-size:14px">
+      <thead><tr><th>เนื้อเยื่อ</th><th class="num">HU</th><th class="num">display (0–255)</th><th>สิ่งที่จอแสดง</th></tr></thead>
+      <tbody></tbody>
+    </table></div>
+    <figcaption>⭐ <b>Windowing คือการตัดสินใจเรื่องการเตรียมข้อมูล</b> ⚠️ <b>โมเดลที่เทรนบนภาพ lung window อาจใช้ไม่ได้กับ soft-tissue window — ต้องใช้ค่าเดียวกันทั้งตอนเทรนและตอนทดสอบ</b></figcaption>
+  </figure>
+
+  <div class="tw"><table>
+    <thead><tr><th>หน้าต่าง</th><th class="num">Level L</th><th class="num">Width W</th><th>อะไรที่มองเห็นได้</th></tr></thead>
+    <tbody>
+      <tr><td><b>ปอด</b></td><td class="num">−600</td><td class="num">1500</td><td><b>ทางเดินหายใจ ก้อนในปอด เนื้อปอด</b> (เนื้อเยื่ออ่อนกลายเป็นขาว)</td></tr>
+      <tr><td><b>เนื้อเยื่ออ่อน</b></td><td class="num">40</td><td class="num">400</td><td>หลอดเลือดแดงใหญ่ กล้ามเนื้อ ตับ ต่อมน้ำเหลือง</td></tr>
+      <tr><td><b>สมอง</b></td><td class="num">40</td><td class="num">80</td><td><b>เนื้อสมองสีเทาเทียบสีขาว และเลือดออก</b> ⭐ W แคบมาก = contrast สูงมาก</td></tr>
+      <tr><td><b>กระดูก</b></td><td class="num">500</td><td class="num">2000</td><td>กระดูกหัก โครงสร้างกระดูก</td></tr>
+    </tbody>
+  </table></div>
+  </div>
+</section>
+
+<section class="ch" id="ch4" data-ch="4">
+  <h3>บทที่ 4 — ทำไมต้อง deep learning: ตัวแปรถูกเรียน ไม่ได้ถูกออกแบบด้วยมือ</h3>
+  <div class="chbody">
+  <p>ML แบบดั้งเดิม (ภาค 3) ต้องการตัวแปร ⚠️ <b>แต่ “ตัวแปร” ของฟิล์ม X-ray คืออะไร</b> ⭐ <b>Deep learning เรียนมันจากพิกเซลดิบ ทีละชั้น</b></p>
+  <figure>
+    <div class="figtitle">⭐ จากพิกเซลดิบ สู่ความน่าจะเป็นของโรค</div>
+    <svg viewBox="0 0 700 150" role="img" aria-label="ลำดับชั้นจากพิกเซล ขอบ พื้นผิว อวัยวะ ถึงความน่าจะเป็นของปอดบวม">
+      <g>
+        <rect x="0"   y="42" width="124" height="58" rx="10" fill="var(--seq1)" fill-opacity=".45" stroke="var(--axis)"/>
+        <rect x="144" y="42" width="124" height="58" rx="10" fill="var(--seq2)" fill-opacity=".45" stroke="var(--axis)"/>
+        <rect x="288" y="42" width="124" height="58" rx="10" fill="var(--seq3)" fill-opacity=".45" stroke="var(--axis)"/>
+        <rect x="432" y="42" width="124" height="58" rx="10" fill="var(--seq4)" fill-opacity=".45" stroke="var(--axis)"/>
+        <rect x="576" y="42" width="124" height="58" rx="10" fill="var(--good)" fill-opacity=".22" stroke="var(--good)" stroke-width="2"/>
+      </g>
+      <g class="svgtxt b" text-anchor="middle">
+        <text x="62" y="66">พิกเซล</text><text x="206" y="66">ชั้นต้น ๆ</text><text x="350" y="66">ชั้นกลาง</text>
+        <text x="494" y="66">ชั้นท้าย ๆ</text><text x="638" y="66">ผลลัพธ์</text>
+      </g>
+      <g class="svgtxt sm" text-anchor="middle">
+        <text x="62" y="86">ค่าความเข้มดิบ</text><text x="206" y="86">ขอบ เส้น</text><text x="350" y="86">พื้นผิว รูปร่าง</text>
+        <text x="494" y="86">ซี่โครง หัวใจ ฝ้าขาว</text><text x="638" y="86">P(ปอดบวม)</text>
+      </g>
+      <g stroke="var(--axis)" stroke-width="2"><path d="M128 71 L 140 71"/><path d="M272 71 L 284 71"/><path d="M416 71 L 428 71"/><path d="M560 71 L 572 71"/></g>
+      <text class="svgtxt b" x="0" y="20">ไม่มีใครออกแบบตัวแปรเหล่านี้ด้วยมือ — network เรียนมันเองทั้งหมด</text>
+      <text class="svgtxt sm" x="0" y="124" fill="var(--good)">✓ จุดแข็ง — ไม่ต้องออกแบบตัวแปรเอง และยิ่งข้อมูลมากยิ่งดีขึ้น · เป็นเทคนิคที่ดีที่สุดสำหรับการจำแนก การตรวจจับ และ segmentation</text>
+      <text class="svgtxt sm" x="0" y="144" fill="var(--crit)">⚠️ ต้นทุน — ต้องการภาพที่มี label จำนวนมากและ GPU · ตีความยาก และ <tspan font-weight="700">เรียนเบาะแสที่ผิดได้</tspan></text>
+    </svg>
+  </figure>
+  </div>
+</section>
+
+<section class="ch" id="ch5" data-ch="5">
+  <h3>บทที่ 5 — Quiz 1: อ่านอาร์เรย์ให้ออก</h3>
+  <div class="chbody">
+  <div class="quiz" data-quiz="1">
+    <div class="qhead"><span class="qt">Quiz 1</span><span class="chip">4 ข้อ</span></div>
+    <div class="qitem"><div class="qq"><span class="qn">1</span><span>ภาพจอตาสีขนาด 512 × 512 พิกเซล บรรจุตัวเลขกี่ตัว</span></div>
+      <button class="qreveal">ดูเฉลย</button><div class="qa" hidden><span class="ans">512 × 512 × 3 = 786,432 ตัว</span> — เพราะมี <b>สาม channel สี</b></div></div>
+    <div class="qitem"><div class="qq"><span class="qn">2</span><span>พิกเซล CT ค่า −850 HU บนหน้าต่างกระดูก (L = 500, W = 2000) จะแสดงเป็นดำ เทา หรือขาว</span></div>
+      <button class="qreveal">ดูเฉลย</button><div class="qa" hidden><span class="ans">ดำ</span> — ⭐ <b>หน้าต่างกระดูกเริ่มที่ 500 − 1000 = −500 HU อะไรที่ต่ำกว่านั้นถูก clip เป็น 0</b></div></div>
+    <div class="qitem"><div class="qq"><span class="qn">3</span><span>ชุดข้อมูลของเราถูก export จาก DICOM ไปเป็น PNG — บอกข้อมูลหนึ่งอย่างที่น่าจะหายไป</span></div>
+      <button class="qreveal">ดูเฉลย</button><div class="qa" hidden><span class="ans">pixel spacing · เครื่องสแกน · ค่า window · รหัสคนไข้ · วันที่</span> — ข้อใดข้อหนึ่งก็ได้</div></div>
+    <div class="qitem"><div class="qq"><span class="qn">4</span><span>ทำไมภาพ X-ray แบบ 1 channel จึงใส่เข้า network ที่สร้างมาสำหรับภาพถ่าย RGB ตรง ๆ ไม่ได้</span></div>
+      <button class="qreveal">ดูเฉลย</button><div class="qa" hidden><span class="ans">รูปร่างไม่ตรงกัน</span> — <b>ชั้นแรกคาดหวัง input 3 channel</b> ⭐ <b>เราต้องคัดลอก channel เทาสามครั้ง หรือเปลี่ยนชั้นแรกใหม่</b> (lab ทำอย่างหลัง)</div></div>
+  </div>
+  <div class="key"><span class="lb">⭐ สิ่งที่ต้องจำ</span>
+    <b>ก่อนจะมีโมเดลใด ๆ ให้รู้จักอาร์เรย์ของเราก่อน — รูปร่าง หน่วย การเตรียมข้อมูล และบริบทที่ถูกถอดออกไป</b> ⚠️ <b>“AI ล้มเหลว” จำนวนมาก จริง ๆ แล้วคือความล้มเหลวของการจัดการข้อมูล</b>
+  </div>
+  </div>
+</section>
+
+<h2 class="sec" id="s2"><span class="pill">ส่วนที่ 2</span> นิวรอนและ CNN เรียนรู้อย่างไร</h2>
+<p class="secintro">บทที่ 6–15 · จาก loss → backpropagation → update และจาก convolution → pooling → receptive field</p>
+
+<section class="ch" id="ch6" data-ch="6">
+  <h3>บทที่ 6 — นิวรอนหนึ่งตัว และเครือข่ายของมัน</h3>
+  <div class="chbody">
+  <figure>
+    <div class="figtitle">นิวรอนคือกฎให้คะแนนเล็ก ๆ — เหมือนคะแนนความเสี่ยงทางคลินิก</div>
+    <svg viewBox="0 0 700 166" role="img" aria-label="แผนภาพนิวรอน คูณน้ำหนัก บวกไบแอส ผ่าน ReLU">
+      <g class="svgtxt b">
+        <circle cx="30" cy="34" r="16" fill="var(--surface2)" stroke="var(--axis)"/><text x="30" y="39" text-anchor="middle">x₁</text>
+        <circle cx="30" cy="82" r="16" fill="var(--surface2)" stroke="var(--axis)"/><text x="30" y="87" text-anchor="middle">x₂</text>
+        <circle cx="30" cy="130" r="16" fill="var(--surface2)" stroke="var(--axis)"/><text x="30" y="135" text-anchor="middle">x₃</text>
+      </g>
+      <g stroke="var(--axis)" stroke-width="1.5" fill="none">
+        <path d="M48 34 L 158 76"/><path d="M48 82 L 158 82"/><path d="M48 130 L 158 88"/>
+      </g>
+      <g class="svgtxt sm">
+        <text x="92" y="46">w₁</text><text x="92" y="76">w₂</text><text x="92" y="120">w₃</text>
+      </g>
+      <circle cx="186" cy="82" r="28" fill="var(--s1)" fill-opacity=".18" stroke="var(--s1)" stroke-width="2"/>
+      <text class="svgtxt b" x="186" y="80" text-anchor="middle" font-size="16">Σ</text>
+      <text class="svgtxt sm" x="186" y="96" text-anchor="middle">+ b</text>
+      <path d="M216 82 L 250 82" stroke="var(--axis)" stroke-width="2"/><path d="M250 82 l -8 -4.5 v 9 z" fill="var(--axis)"/>
+      <rect x="254" y="60" width="86" height="44" rx="10" fill="var(--s3)" fill-opacity=".18" stroke="var(--s3)" stroke-width="2"/>
+      <text class="svgtxt b" x="297" y="88" text-anchor="middle">ReLU</text>
+      <path d="M344 82 L 378 82" stroke="var(--axis)" stroke-width="2"/><path d="M378 82 l -8 -4.5 v 9 z" fill="var(--axis)"/>
+      <circle cx="400" cy="82" r="16" fill="var(--good)" fill-opacity=".20" stroke="var(--good)" stroke-width="2"/>
+      <text class="svgtxt b" x="400" y="87" text-anchor="middle">y</text>
+
+      <rect x="440" y="16" width="260" height="56" rx="10" fill="var(--starbg)" stroke="var(--star)"/>
+      <text class="svgtxt b" x="452" y="38">y = ReLU(w₁x₁ + w₂x₂ + w₃x₃ + b)</text>
+      <text class="svgtxt sm" x="452" y="58">⭐ คูณ input ด้วยน้ำหนัก บวกกัน บวกไบแอส</text>
+
+      <rect x="440" y="84" width="260" height="76" rx="10" fill="var(--surface2)" stroke="var(--axis)"/>
+      <text class="svgtxt b" x="452" y="104">💡 เทียบกับคลินิก</text>
+      <text class="svgtxt sm" x="452" y="122">คะแนนความเสี่ยงอย่าง CHA₂DS₂-VASc</text>
+      <text class="svgtxt sm" x="452" y="138">บวกปัจจัยที่ถ่วงน้ำหนักไว้ นิวรอนก็เหมือนกัน</text>
+      <text class="svgtxt sm" x="452" y="154">⭐ แต่มัน <tspan font-weight="700">เรียนน้ำหนักเอาเองจากข้อมูล</tspan></text>
+    </svg>
+  </figure>
+  <p>⭐ <b>หนึ่ง layer = นิวรอนหลายตัวทำงานขนานกัน</b> · ⭐ <b>deep network = หลาย layer ซ้อนกัน โดยแต่ละชั้นต่อยอดจากชั้นก่อนหน้า</b> · และ ⭐ <b>ชั้นสุดท้ายใช้ softmax เปลี่ยนคะแนนให้เป็นความน่าจะเป็นที่รวมกันได้ 1</b></p>
+  </div>
+</section>
+
+<section class="ch" id="ch7" data-ch="7">
+  <h3>บทที่ 7 — ReLU และ softmax <span class="chip" style="border-color:var(--star);color:var(--star)">⭐ ตัวอย่างที่ต้องคำนวณได้</span></h3>
+  <div class="chbody">
+  <figure>
+    <div class="figtitle">ReLU อยู่ข้างในเครือข่าย · softmax อยู่ชั้นสุดท้าย</div>
+    <svg viewBox="0 0 700 212" role="img" aria-label="กราฟ ReLU และตัวอย่างการคำนวณ softmax">
+      <text class="svgtxt b" x="0" y="16">ReLU(z) = max(0, z)</text>
+      <g stroke="var(--grid)"><line x1="10" y1="150" x2="230" y2="150"/><line x1="120" y1="36" x2="120" y2="164"/></g>
+      <path d="M14 150 L 120 150 L 226 44" fill="none" stroke="var(--s1)" stroke-width="3"/>
+      <text class="svgtxt sm" x="56" y="168" text-anchor="middle">z ติดลบ → 0</text>
+      <text class="svgtxt sm" x="190" y="168" text-anchor="middle">z บวก → ผ่านไปเลย</text>
+      <text class="svgtxt sm" x="14" y="144">−2</text><text class="svgtxt sm" x="214" y="144">2</text>
+      <text class="svgtxt sm" x="0" y="190">⭐ ราคาถูก และความชันไม่จางหายเมื่อ z ใหญ่</text>
+      <text class="svgtxt sm" x="0" y="206">เครือข่ายลึกจึงเทรนได้เร็วกว่า</text>
+
+      <line x1="258" y1="8" x2="258" y2="206" stroke="var(--grid)"/>
+
+      <text class="svgtxt b" x="286" y="16">Softmax — คะแนน (logits) → ความน่าจะเป็น</text>
+      <g class="svgtxt">
+        <text x="286" y="46">ปกติ</text>
+        <rect x="396" y="32" width="80" height="18" rx="3" fill="var(--s1)" fill-opacity=".30" stroke="var(--s1)"/>
+        <text class="svgval" x="436" y="46" text-anchor="middle">2.0</text>
+        <text x="286" y="78">ปอดบวมจากแบคทีเรีย</text>
+        <rect x="396" y="64" width="40" height="18" rx="3" fill="var(--s1)" fill-opacity=".30" stroke="var(--s1)"/>
+        <text class="svgval" x="416" y="78" text-anchor="middle">1.0</text>
+        <text x="286" y="110">ปอดบวมจากไวรัส</text>
+        <rect x="396" y="96" width="8" height="18" rx="3" fill="var(--s1)" fill-opacity=".30" stroke="var(--s1)"/>
+        <text class="svgval" x="412" y="110">0.1</text>
+      </g>
+      <path d="M486 72 L 520 72" stroke="var(--axis)" stroke-width="2"/><path d="M520 72 l -8 -4.5 v 9 z" fill="var(--axis)"/>
+      <text class="svgtxt sm" x="503" y="62" text-anchor="middle">softmax</text>
+      <g>
+        <rect x="530" y="32" width="112" height="18" rx="3" fill="var(--good)" fill-opacity=".40" stroke="var(--good)"/>
+        <text class="svgval" x="650" y="46">0.66</text>
+        <rect x="530" y="64" width="41" height="18" rx="3" fill="var(--good)" fill-opacity=".40" stroke="var(--good)"/>
+        <text class="svgval" x="650" y="78">0.24</text>
+        <rect x="530" y="96" width="17" height="18" rx="3" fill="var(--good)" fill-opacity=".40" stroke="var(--good)"/>
+        <text class="svgval" x="650" y="110">0.10</text>
+      </g>
+      <text class="svgtxt b" x="650" y="132" text-anchor="end">รวม = 1.00</text>
+      <rect x="286" y="146" width="414" height="60" rx="10" fill="var(--starbg)" stroke="var(--star)"/>
+      <text class="svgtxt b" x="298" y="168">p(ปกติ) = e²·⁰ / (e²·⁰ + e¹·⁰ + e⁰·¹)</text>
+      <text class="svgtxt b" x="298" y="188">= 7.39 / (7.39 + 2.72 + 1.11) = 7.39 / 11.21 = 0.66</text>
+      <text class="svgtxt sm" x="298" y="202">⭐ คะแนนจริงอะไรก็ได้เข้าไป ออกมาเป็นเลขบวกที่รวมกันได้ 1 และคงลำดับเดิมไว้</text>
+    </svg>
+  </figure>
+  </div>
+</section>
+
+<section class="ch" id="ch8" data-ch="8">
+  <h3>บทที่ 8 — Loss: ตัวเลขตัวเดียวที่บอกว่า “เราผิดแค่ไหน”</h3>
+  <div class="chbody">
+  <p>สำหรับงานจำแนก เราใช้ <b>cross-entropy loss</b> — สำหรับภาพหนึ่งภาพที่มีคลาสจริง c และความน่าจะเป็นที่ทำนายได้ p<sub>c</sub></p>
+<pre><code>loss = − log p_c</code></pre>
+  <figure>
+    <div class="figtitle">⭐ ยิ่งมั่นใจและผิด ยิ่งถูกลงโทษหนัก</div>
+    <svg viewBox="0 0 700 180" role="img" aria-label="กราฟ cross entropy loss เทียบกับความน่าจะเป็นที่ทำนายถูก">
+      <g stroke="var(--grid)">
+        <line x1="60" y1="140" x2="420" y2="140"/><line x1="60" y1="100" x2="420" y2="100"/>
+        <line x1="60" y1="60" x2="420" y2="60"/><line x1="60" y1="20" x2="420" y2="20"/>
+      </g>
+      <g class="svgtxt sm" text-anchor="end"><text x="54" y="144">0</text><text x="54" y="104">1</text><text x="54" y="64">2</text><text x="54" y="24">3</text></g>
+      <text class="svgtxt sm" x="30" y="86" text-anchor="middle" transform="rotate(-90 30 86)">loss</text>
+      <path d="M78 20 L 96 48 L 114 68 L 150 92 L 186 108 L 222 118 L 258 126 L 294 131 L 330 135 L 366 138 L 402 140" fill="none" stroke="var(--s2)" stroke-width="2.5"/>
+      <circle cx="78" cy="20" r="5" fill="var(--crit)"/><text class="svgval" x="90" y="22" fill="var(--crit)">3.00</text>
+      <circle cx="258" cy="126" r="5" fill="var(--star)"/><text class="svgval" x="268" y="124">0.51</text>
+      <circle cx="402" cy="140" r="5" fill="var(--good)"/><text class="svgval" x="394" y="134" text-anchor="end" fill="var(--good)">0.05</text>
+      <g class="svgtxt sm" text-anchor="middle"><text x="78" y="158">0.05</text><text x="258" y="158">0.60</text><text x="402" y="158">0.95</text></g>
+      <text class="svgtxt sm" x="240" y="174" text-anchor="middle">P ที่โมเดลให้กับคลาสที่ถูกต้อง</text>
+
+      <rect x="440" y="10" width="260" height="42" rx="9" fill="var(--warnbg)" stroke="var(--crit)" stroke-width="2"/>
+      <text class="svgtxt b" x="452" y="30" fill="var(--crit)">มั่นใจ แต่ผิด → โทษหนักมาก</text>
+      <text class="svgtxt sm" x="452" y="46">P = 0.05 → loss 3.00</text>
+      <rect x="440" y="60" width="260" height="42" rx="9" fill="var(--surface2)" stroke="var(--axis)"/>
+      <text class="svgtxt b" x="452" y="80">ถูก แต่ไม่มั่นใจ → โทษปานกลาง</text>
+      <text class="svgtxt sm" x="452" y="96">P = 0.60 → loss 0.51</text>
+      <rect x="440" y="110" width="260" height="42" rx="9" fill="var(--good)" fill-opacity=".14" stroke="var(--good)"/>
+      <text class="svgtxt b" x="452" y="130">มั่นใจ และถูก → โทษน้อยนิด</text>
+      <text class="svgtxt sm" x="452" y="146">P = 0.95 → loss 0.05</text>
+    </svg>
+  </figure>
+  <div class="key"><span class="lb">⭐ สิ่งที่ต้องจำ</span>
+    <b>cross-entropy ลงโทษความผิดพลาดที่มั่นใจหนักที่สุด ซึ่งเข้ากับการแพทย์พอดี เพราะคำตอบที่ผิดอย่างมั่นใจคืออันตรายที่สุด</b>
+  </div>
+  <div class="warnbox"><span class="lb">⚠️ แยกให้ออก</span>
+    <b>loss คือสิ่งที่โมเดล optimize ส่วน sensitivity, specificity, AUC คือสิ่งที่แพทย์สนใจ</b> — <b>มันเกี่ยวข้องกัน แต่ไม่ใช่สิ่งเดียวกัน</b>
+  </div>
+  </div>
+</section>
+
+<section class="ch" id="ch9" data-ch="9">
+  <h3>บทที่ 9 — วงจรการเทรนและ backpropagation</h3>
+  <div class="chbody">
+  <figure>
+    <div class="figtitle">สี่จังหวะที่วนซ้ำจนกว่า loss จะต่ำพอ</div>
+    <svg viewBox="0 0 700 220" role="img" aria-label="วงจรการเทรนสี่ขั้น ทำนาย วัด loss backpropagate อัปเดตน้ำหนัก">
+      <g fill="none" stroke="var(--axis)" stroke-width="2">
+        <path d="M276 42 C 318 44, 344 62, 352 78"/>
+        <path d="M352 132 C 344 148, 318 166, 276 168"/>
+        <path d="M144 168 C 102 166, 76 148, 68 132"/>
+        <path d="M68 78 C 76 62, 102 44, 144 42"/>
+      </g>
+      <path d="M352 78 l 2 -9 l -7 4 z" fill="var(--axis)"/>
+      <path d="M276 168 l -6 -6 l -2 9 z" fill="var(--axis)"/>
+      <path d="M68 132 l 6 6 l 2 -9 z" fill="var(--axis)"/>
+      <path d="M144 42 l -8 4 l 7 5 z" fill="var(--axis)"/>
+      <rect x="150" y="18" width="120" height="46" rx="11" fill="var(--s1)" fill-opacity=".16" stroke="var(--s1)" stroke-width="2"/>
+      <text class="svgtxt b" x="210" y="38" text-anchor="middle">1 · ทำนาย</text>
+      <text class="svgtxt sm" x="210" y="56" text-anchor="middle">forward pass</text>
+      <rect x="300" y="82" width="120" height="46" rx="11" fill="var(--surface2)" stroke="var(--axis)"/>
+      <text class="svgtxt b" x="360" y="102" text-anchor="middle">2 · วัด loss</text>
+      <text class="svgtxt sm" x="360" y="120" text-anchor="middle">เทียบกับ label</text>
+      <rect x="150" y="146" width="120" height="46" rx="11" fill="var(--s4)" fill-opacity=".18" stroke="var(--s4)" stroke-width="2"/>
+      <text class="svgtxt b" x="210" y="166" text-anchor="middle">3 · Backpropagate</text>
+      <text class="svgtxt sm" x="210" y="184" text-anchor="middle">คำนวณ gradient</text>
+      <rect x="0" y="82" width="120" height="46" rx="11" fill="var(--surface2)" stroke="var(--axis)"/>
+      <text class="svgtxt b" x="60" y="102" text-anchor="middle">4 · อัปเดตน้ำหนัก</text>
+      <text class="svgtxt sm" x="60" y="120" text-anchor="middle">ก้าวลงเนิน</text>
+
+      <rect x="446" y="14" width="254" height="192" rx="11" fill="var(--starbg)" stroke="var(--star)"/>
+      <text class="svgtxt b" x="458" y="36">⭐ Backpropagation</text>
+      <text class="svgtxt sm" x="458" y="56">คำนวณให้ทุกน้ำหนักว่า “ถ้าขยับ</text>
+      <text class="svgtxt sm" x="458" y="72">น้ำหนักนี้ loss จะเปลี่ยนยังไง”</text>
+      <text class="svgtxt sm" x="458" y="88">นั่นคือ <tspan font-weight="700">gradient</tspan></text>
+      <text class="svgtxt b" x="458" y="116">⭐ Gradient descent</text>
+      <text class="svgtxt sm" x="458" y="138">w ← w − η · ∂loss/∂w</text>
+      <text class="svgtxt sm" x="458" y="160">โดย <tspan font-weight="700">η คือ learning rate</tspan> หรือขนาดก้าว</text>
+      <text class="svgtxt sm" x="458" y="192" fill="var(--muted)">PyTorch ทำแคลคูลัสให้อัตโนมัติ</text>
+    </svg>
+    <figcaption>💡 <b>เหมือนเดินลงเขาในหมอก</b> — เรามองไม่เห็นหุบเขา แต่รู้สึกความชันใต้เท้าได้ ⚠️ <b>ก้าวใหญ่ไปก็กระโดดข้าม ก้าวเล็กไปก็ไม่ถึงสักที</b></figcaption>
+  </figure>
+  </div>
+</section>
+
+<section class="ch" id="ch10" data-ch="10">
+  <h3>บทที่ 10 — Learning rate และปุ่มที่ต้องตั้งใน lab</h3>
+  <div class="chbody">
+  <figure>
+    <div class="figtitle">⭐ loss curve เดียวกัน จุดเริ่มเดียวกัน กฎเดียวกัน — เปลี่ยนแค่ η</div>
+    <svg viewBox="0 0 700 212" role="img" aria-label="สามกรณีของ learning rate เล็กเกินไป พอดี และใหญ่เกินไป">
+      <g transform="translate(0,26)">
+        <text class="svgtxt b" x="100" y="-10" text-anchor="middle" fill="var(--s1)">เล็กเกินไป (η = 0.05)</text>
+        <path d="M0.0 14.2 L3.7 23.2 L7.4 31.8 L11.1 40.2 L14.8 48.1 L18.5 55.8 L22.2 63.1 L25.9 70.1 L29.6 76.7 L33.3 83.0 L37.0 88.9 L40.7 94.5 L44.4 99.8 L48.1 104.7 L51.9 109.3 L55.6 113.5 L59.3 117.4 L63.0 121.0 L66.7 124.2 L70.4 127.1 L74.1 129.7 L77.8 131.9 L81.5 133.8 L85.2 135.3 L88.9 136.5 L92.6 137.3 L96.3 137.8 L100.0 138.0 L103.7 137.8 L107.4 137.3 L111.1 136.5 L114.8 135.3 L118.5 133.8 L122.2 131.9 L125.9 129.7 L129.6 127.1 L133.3 124.2 L137.0 121.0 L140.7 117.4 L144.4 113.5 L148.1 109.3 L151.9 104.7 L155.6 99.8 L159.3 94.5 L163.0 88.9 L166.7 83.0 L170.4 76.7 L174.1 70.1 L177.8 63.1 L181.5 55.8 L185.2 48.1 L188.9 40.2 L192.6 31.8 L196.3 23.2 L200.0 14.2" fill="none" stroke="var(--grid)" stroke-width="2"/>
+        <line x1="0" y1="138" x2="200" y2="138" stroke="var(--axis)"/>
+        <line x1="14.8" y1="48.1" x2="23.3" y2="65.2" stroke="var(--s1)" stroke-width="1.6" stroke-dasharray="3 2"/>
+        <line x1="23.3" y1="65.2" x2="31.0" y2="79.0" stroke="var(--s1)" stroke-width="1.6" stroke-dasharray="3 2"/>
+        <line x1="31.0" y1="79.0" x2="37.9" y2="90.2" stroke="var(--s1)" stroke-width="1.6" stroke-dasharray="3 2"/>
+        <line x1="37.9" y1="90.2" x2="44.1" y2="99.3" stroke="var(--s1)" stroke-width="1.6" stroke-dasharray="3 2"/>
+        <line x1="44.1" y1="99.3" x2="49.7" y2="106.7" stroke="var(--s1)" stroke-width="1.6" stroke-dasharray="3 2"/>
+        <line x1="49.7" y1="106.7" x2="54.7" y2="112.6" stroke="var(--s1)" stroke-width="1.6" stroke-dasharray="3 2"/>
+        <line x1="54.7" y1="112.6" x2="59.3" y2="117.4" stroke="var(--s1)" stroke-width="1.6" stroke-dasharray="3 2"/>
+        <line x1="59.3" y1="117.4" x2="63.3" y2="121.3" stroke="var(--s1)" stroke-width="1.6" stroke-dasharray="3 2"/>
+        <circle cx="14.8" cy="48.1" r="4.2" fill="var(--s1)" stroke="var(--ink)" stroke-width="1.5"/>
+        <circle cx="23.3" cy="65.2" r="3" fill="var(--s1)" />
+        <circle cx="31.0" cy="79.0" r="3" fill="var(--s1)" />
+        <circle cx="37.9" cy="90.2" r="3" fill="var(--s1)" />
+        <circle cx="44.1" cy="99.3" r="3" fill="var(--s1)" />
+        <circle cx="49.7" cy="106.7" r="3" fill="var(--s1)" />
+        <circle cx="54.7" cy="112.6" r="3" fill="var(--s1)" />
+        <circle cx="59.3" cy="117.4" r="3" fill="var(--s1)" />
+        <circle cx="63.3" cy="121.3" r="3" fill="var(--s1)" />
+        <text class="svgtxt sm" x="15" y="39" text-anchor="middle">เริ่ม</text>
+        <text class="svgtxt sm" x="100" y="156" text-anchor="middle">น้ำหนัก w</text>
+        <text class="svgtxt sm" x="100" y="172" text-anchor="middle" fill="var(--muted)">ช้า: ผ่าน 8 ก้าวแล้วยังไกล</text>
+      </g>
+      <g transform="translate(232,26)">
+        <text class="svgtxt b" x="100" y="-10" text-anchor="middle" fill="var(--good)">พอดี (η = 0.3)</text>
+        <path d="M0.0 14.2 L3.7 23.2 L7.4 31.8 L11.1 40.2 L14.8 48.1 L18.5 55.8 L22.2 63.1 L25.9 70.1 L29.6 76.7 L33.3 83.0 L37.0 88.9 L40.7 94.5 L44.4 99.8 L48.1 104.7 L51.9 109.3 L55.6 113.5 L59.3 117.4 L63.0 121.0 L66.7 124.2 L70.4 127.1 L74.1 129.7 L77.8 131.9 L81.5 133.8 L85.2 135.3 L88.9 136.5 L92.6 137.3 L96.3 137.8 L100.0 138.0 L103.7 137.8 L107.4 137.3 L111.1 136.5 L114.8 135.3 L118.5 133.8 L122.2 131.9 L125.9 129.7 L129.6 127.1 L133.3 124.2 L137.0 121.0 L140.7 117.4 L144.4 113.5 L148.1 109.3 L151.9 104.7 L155.6 99.8 L159.3 94.5 L163.0 88.9 L166.7 83.0 L170.4 76.7 L174.1 70.1 L177.8 63.1 L181.5 55.8 L185.2 48.1 L188.9 40.2 L192.6 31.8 L196.3 23.2 L200.0 14.2" fill="none" stroke="var(--grid)" stroke-width="2"/>
+        <line x1="0" y1="138" x2="200" y2="138" stroke="var(--axis)"/>
+        <line x1="14.8" y1="48.1" x2="65.9" y2="123.6" stroke="var(--good)" stroke-width="1.6" stroke-dasharray="3 2"/>
+        <line x1="65.9" y1="123.6" x2="86.4" y2="135.7" stroke="var(--good)" stroke-width="1.6" stroke-dasharray="3 2"/>
+        <line x1="86.4" y1="135.7" x2="94.5" y2="137.6" stroke="var(--good)" stroke-width="1.6" stroke-dasharray="3 2"/>
+        <line x1="94.5" y1="137.6" x2="97.8" y2="137.9" stroke="var(--good)" stroke-width="1.6" stroke-dasharray="3 2"/>
+        <line x1="97.8" y1="137.9" x2="99.1" y2="138.0" stroke="var(--good)" stroke-width="1.6" stroke-dasharray="3 2"/>
+        <line x1="99.1" y1="138.0" x2="99.7" y2="138.0" stroke="var(--good)" stroke-width="1.6" stroke-dasharray="3 2"/>
+        <line x1="99.7" y1="138.0" x2="99.9" y2="138.0" stroke="var(--good)" stroke-width="1.6" stroke-dasharray="3 2"/>
+        <line x1="99.9" y1="138.0" x2="99.9" y2="138.0" stroke="var(--good)" stroke-width="1.6" stroke-dasharray="3 2"/>
+        <circle cx="14.8" cy="48.1" r="4.2" fill="var(--good)" stroke="var(--ink)" stroke-width="1.5"/>
+        <circle cx="65.9" cy="123.6" r="3" fill="var(--good)" />
+        <circle cx="86.4" cy="135.7" r="3" fill="var(--good)" />
+        <circle cx="94.5" cy="137.6" r="3" fill="var(--good)" />
+        <circle cx="97.8" cy="137.9" r="3" fill="var(--good)" />
+        <circle cx="99.1" cy="138.0" r="3" fill="var(--good)" />
+        <circle cx="99.7" cy="138.0" r="3" fill="var(--good)" />
+        <circle cx="99.9" cy="138.0" r="3" fill="var(--good)" />
+        <circle cx="99.9" cy="138.0" r="3" fill="var(--good)" />
+        <text class="svgtxt sm" x="15" y="39" text-anchor="middle">เริ่ม</text>
+        <text class="svgtxt sm" x="100" y="156" text-anchor="middle">น้ำหนัก w</text>
+        <text class="svgtxt sm" x="100" y="172" text-anchor="middle" fill="var(--muted)">ถึงจุดต่ำสุดเร็ว</text>
+      </g>
+      <g transform="translate(464,26)">
+        <text class="svgtxt b" x="100" y="-10" text-anchor="middle" fill="var(--s2)">ใหญ่เกินไป (η = 1.05)</text>
+        <path d="M0.0 14.2 L3.7 23.2 L7.4 31.8 L11.1 40.2 L14.8 48.1 L18.5 55.8 L22.2 63.1 L25.9 70.1 L29.6 76.7 L33.3 83.0 L37.0 88.9 L40.7 94.5 L44.4 99.8 L48.1 104.7 L51.9 109.3 L55.6 113.5 L59.3 117.4 L63.0 121.0 L66.7 124.2 L70.4 127.1 L74.1 129.7 L77.8 131.9 L81.5 133.8 L85.2 135.3 L88.9 136.5 L92.6 137.3 L96.3 137.8 L100.0 138.0 L103.7 137.8 L107.4 137.3 L111.1 136.5 L114.8 135.3 L118.5 133.8 L122.2 131.9 L125.9 129.7 L129.6 127.1 L133.3 124.2 L137.0 121.0 L140.7 117.4 L144.4 113.5 L148.1 109.3 L151.9 104.7 L155.6 99.8 L159.3 94.5 L163.0 88.9 L166.7 83.0 L170.4 76.7 L174.1 70.1 L177.8 63.1 L181.5 55.8 L185.2 48.1 L188.9 40.2 L192.6 31.8 L196.3 23.2 L200.0 14.2" fill="none" stroke="var(--grid)" stroke-width="2"/>
+        <line x1="0" y1="138" x2="200" y2="138" stroke="var(--axis)"/>
+        <line x1="14.8" y1="48.1" x2="193.7" y2="29.3" stroke="var(--s2)" stroke-width="1.6" stroke-dasharray="3 2"/>
+        <line x1="193.7" y1="29.3" x2="-3.1" y2="14.0" stroke="var(--s2)" stroke-width="1.6" stroke-dasharray="3 2"/>
+        <line x1="-3.1" y1="14.0" x2="213.4" y2="14.0" stroke="var(--s2)" stroke-width="1.6" stroke-dasharray="3 2"/>
+        <line x1="213.4" y1="14.0" x2="-24.7" y2="14.0" stroke="var(--s2)" stroke-width="1.6" stroke-dasharray="3 2"/>
+        <line x1="-24.7" y1="14.0" x2="225.9" y2="14.0" stroke="var(--s2)" stroke-width="1.6" stroke-dasharray="3 2"/>
+        <line x1="225.9" y1="14.0" x2="-25.9" y2="14.0" stroke="var(--s2)" stroke-width="1.6" stroke-dasharray="3 2"/>
+        <line x1="-25.9" y1="14.0" x2="225.9" y2="14.0" stroke="var(--s2)" stroke-width="1.6" stroke-dasharray="3 2"/>
+        <line x1="225.9" y1="14.0" x2="-25.9" y2="14.0" stroke="var(--s2)" stroke-width="1.6" stroke-dasharray="3 2"/>
+        <circle cx="14.8" cy="48.1" r="4.2" fill="var(--s2)" stroke="var(--ink)" stroke-width="1.5"/>
+        <circle cx="193.7" cy="29.3" r="3" fill="var(--s2)" />
+        <circle cx="-3.1" cy="14.0" r="3" fill="var(--s2)" />
+        <circle cx="213.4" cy="14.0" r="3" fill="var(--s2)" />
+        <circle cx="-24.7" cy="14.0" r="3" fill="var(--s2)" />
+        <circle cx="225.9" cy="14.0" r="3" fill="var(--s2)" />
+        <circle cx="-25.9" cy="14.0" r="3" fill="var(--s2)" />
+        <circle cx="225.9" cy="14.0" r="3" fill="var(--s2)" />
+        <circle cx="-25.9" cy="14.0" r="3" fill="var(--s2)" />
+        <text class="svgtxt sm" x="15" y="39" text-anchor="middle">เริ่ม</text>
+        <text class="svgtxt sm" x="100" y="156" text-anchor="middle">น้ำหนัก w</text>
+        <text class="svgtxt sm" x="100" y="172" text-anchor="middle" fill="var(--muted)">กระโดดข้าม เด้ง แล้วระเบิด</text>
+      </g>
+    </svg>
+    <figcaption>⭐ <b>ความชันบอกว่าทางลงอยู่ไหน ส่วน η บอกว่าก้าวไกลแค่ไหน</b> · 💡 ใกล้จุดต่ำสุดความชันจะเล็กลง ก้าวจึงหดลงเองอัตโนมัติ · ⚠️ <b>ใน lab: loss ลงช้าเกินไป → เพิ่ม η · loss กระโดดหรือกลายเป็น nan → ลด η</b></figcaption>
+  </figure>
+
+  <div class="tw"><table>
+    <thead><tr><th>ปุ่ม</th><th>ความหมาย (ค่าใน lab)</th><th>อาการเมื่อตั้งผิด</th></tr></thead>
+    <tbody>
+      <tr><td><b>Learning rate</b></td><td>ขนาดก้าวของการอัปเดตแต่ละครั้ง <b>(10⁻³)</b></td><td>⚠️ <b>สูงไป: loss กระโดดไปมา · ต่ำไป: ช้ามาก</b></td></tr>
+      <tr><td><b>Batch size</b></td><td>จำนวนภาพต่อหนึ่งการอัปเดต <b>(64)</b></td><td>ใหญ่ไป: GPU หน่วยความจำไม่พอ</td></tr>
+      <tr><td><b>Epoch</b></td><td>การวนผ่านชุดเทรนครบหนึ่งรอบ <b>(3)</b></td><td>⚠️ <b>น้อยไป: underfit · มากไป: overfit</b></td></tr>
+      <tr><td><b>Optimizer</b></td><td>กฎของการอัปเดต <b>(Adam)</b></td><td>SGD ธรรมดาอาจต้องจูนมากกว่า</td></tr>
+      <tr><td><b>Image size</b></td><td>ความละเอียดของ input <b>(28 × 28)</b></td><td>⚠️ <b>เล็กไป: รายละเอียดเล็ก ๆ หายไป</b></td></tr>
+    </tbody>
+  </table></div>
+  <div class="key"><span class="lb">⭐ ประเด็นที่ไม่ใช่เรื่องเทคนิค</span>
+    <b>สิ่งเหล่านี้คือการเลือกในการออกแบบ ไม่ใช่ข้อเท็จจริง</b> ⚠️ <b>ค่า accuracy ที่รายงานขึ้นกับมันเสมอ</b> ⭐ <b>ซึ่งเป็นเหตุผลที่บทความที่ดี (และรายงาน lab ที่ดี) ต้องระบุมันให้ชัด</b>
+  </div>
+  </div>
+</section>
+
+<section class="ch" id="ch11" data-ch="11">
+  <h3>บทที่ 11 — Overfitting ในเครือข่ายลึก: สามแนวป้องกันที่เราใช้</h3>
+  <div class="chbody">
+  <p>ทบทวนจากภาค 3 — <b>overfitting = เก่งกับคนไข้ในชุดเทรน แต่แย่กับคนไข้ใหม่</b> ⚠️ <b>ด้วยน้ำหนักหลายล้านตัว CNN จำฟิล์มทุกใบในชุดเทรนได้ เราจึงต้องสร้างแนวป้องกันไว้</b></p>
+  <figure>
+    <div class="figtitle">⭐ สามแนวป้องกันที่ใช้ใน lab</div>
+    <svg viewBox="0 0 700 196" role="img" aria-label="สามแนวป้องกัน early stopping dropout และ data augmentation">
+      <rect x="0" y="22" width="220" height="150" rx="12" fill="var(--surface2)" stroke="var(--axis)"/>
+      <text class="svgtxt b" x="14" y="16">1 · Early stopping</text>
+      <g stroke="var(--grid)"><line x1="26" y1="132" x2="206" y2="132"/></g>
+      <path d="M26 56 L 62 86 L 98 106 L 134 116 L 170 122 L 206 126" fill="none" stroke="var(--s1)" stroke-width="2"/>
+      <path d="M26 62 L 62 92 L 98 100 L 134 112 L 170 124 L 206 130" fill="none" stroke="var(--s2)" stroke-width="2"/>
+      <circle cx="98" cy="100" r="5" fill="var(--good)" stroke="var(--surface)" stroke-width="2"/>
+      <line x1="98" y1="44" x2="98" y2="132" stroke="var(--good)" stroke-width="1.5" stroke-dasharray="4 3"/>
+      <text class="svgtxt sm" x="104" y="52" fill="var(--good)">เก็บน้ำหนักตรงนี้</text>
+      <text class="svgtxt sm" x="210" y="126" fill="var(--s1)">train</text>
+      <text class="svgtxt sm" x="210" y="136" fill="var(--s2)">val</text>
+      <text class="svgtxt sm" x="116" y="146" text-anchor="middle">epoch</text>
+      <text class="svgtxt sm" x="14" y="162">ดู validation loss ทุก epoch เก็บน้ำหนักที่ดีที่สุด</text>
+      <text class="svgtxt sm" x="14" y="166"> </text>
+
+      <rect x="240" y="22" width="200" height="150" rx="12" fill="var(--surface2)" stroke="var(--axis)"/>
+      <text class="svgtxt b" x="254" y="16">2 · Dropout</text>
+      <g>
+        <circle cx="282" cy="56" r="9" fill="var(--s1)" fill-opacity=".4" stroke="var(--s1)"/>
+        <circle cx="282" cy="92" r="9" fill="none" stroke="var(--crit)" stroke-width="2"/>
+        <circle cx="282" cy="128" r="9" fill="var(--s1)" fill-opacity=".4" stroke="var(--s1)"/>
+        <circle cx="340" cy="74" r="9" fill="none" stroke="var(--crit)" stroke-width="2"/>
+        <circle cx="340" cy="110" r="9" fill="var(--s1)" fill-opacity=".4" stroke="var(--s1)"/>
+        <circle cx="398" cy="92" r="9" fill="var(--s1)" fill-opacity=".4" stroke="var(--s1)"/>
+        <g stroke="var(--crit)" stroke-width="2">
+          <path d="M276 86 l 12 12 M288 86 l -12 12"/><path d="M334 68 l 12 12 M346 68 l -12 12"/>
+        </g>
+      </g>
+      <text class="svgtxt sm" x="254" y="152">สุ่มปิดนิวรอนบางส่วนทุกขั้นการเทรน (เช่น 50%)</text>
+      <text class="svgtxt sm" x="254" y="166">⭐ ตอนทดสอบใช้ทุกนิวรอน</text>
+
+      <rect x="460" y="22" width="240" height="150" rx="12" fill="var(--surface2)" stroke="var(--axis)"/>
+      <text class="svgtxt b" x="474" y="16">3 · Data augmentation</text>
+      <g>
+        <rect x="482" y="38" width="48" height="48" rx="4" fill="var(--seq3)" fill-opacity=".45" stroke="var(--axis)"/>
+        <text class="svgtxt sm" x="506" y="98" text-anchor="middle">ต้นฉบับ</text>
+        <rect x="548" y="38" width="48" height="48" rx="4" fill="var(--seq3)" fill-opacity=".45" stroke="var(--axis)" transform="rotate(10 572 62)"/>
+        <text class="svgtxt sm" x="572" y="98" text-anchor="middle">หมุน 10°</text>
+        <rect x="616" y="34" width="56" height="56" rx="4" fill="var(--seq3)" fill-opacity=".45" stroke="var(--axis)"/>
+        <text class="svgtxt sm" x="644" y="98" text-anchor="middle">ซูม + เลื่อน</text>
+        <rect x="482" y="108" width="48" height="36" rx="4" fill="var(--seq5)" fill-opacity=".6" stroke="var(--axis)"/>
+        <text class="svgtxt sm" x="506" y="156" text-anchor="middle">ความสว่าง</text>
+      </g>
+      <text class="svgtxt sm" x="548" y="124">แสดงสำเนาที่เปลี่ยนไปเล็กน้อยแต่สมจริง</text>
+      <text class="svgtxt sm" x="548" y="140">ของภาพแต่ละใบทุก epoch</text>
+      <text class="svgtxt sm" x="548" y="156">⭐ ได้ “คนไข้ใหม่” มาฟรี ๆ</text>
+    </svg>
+  </figure>
+  <div class="key"><span class="lb">⭐ กฎที่ไม่เปลี่ยนจากภาค 3</span>
+    <b>จูนบน validation และเปิดชุดทดสอบครั้งเดียว ตอนจบ</b>
+  </div>
+  </div>
+</section>
+
+<section class="ch" id="ch12" data-ch="12">
+  <h3>บทที่ 12 — Convolution: ฟิลเตอร์เล็ก ๆ ที่เลื่อนไปทั่วภาพ</h3>
+  <div class="chbody">
+  <figure>
+    <div class="figtitle">⭐ ฟิลเตอร์ 3 × 3 ตัวนี้ตอบสนองต่อขอบแนวตั้ง (ซ้ายมืด ขวาสว่าง)</div>
+    <div class="figsub">เช่นขอบของเงาหัวใจบนฟิล์ม</div>
+    <svg viewBox="0 0 700 196" role="img" aria-label="แผนภาพ convolution ฟิลเตอร์ 3x3 เลื่อนบน input 6x6 ได้ feature map 4x4">
+      <g>
+        <rect x="6" y="40" width="108" height="108" rx="5" fill="var(--seq2)" fill-opacity=".25" stroke="var(--axis)"/>
+        <g stroke="var(--axis)" stroke-width="0.6" opacity=".6">
+          <line x1="24" y1="40" x2="24" y2="148"/><line x1="42" y1="40" x2="42" y2="148"/><line x1="60" y1="40" x2="60" y2="148"/>
+          <line x1="78" y1="40" x2="78" y2="148"/><line x1="96" y1="40" x2="96" y2="148"/>
+          <line x1="6" y1="58" x2="114" y2="58"/><line x1="6" y1="76" x2="114" y2="76"/><line x1="6" y1="94" x2="114" y2="94"/>
+          <line x1="6" y1="112" x2="114" y2="112"/><line x1="6" y1="130" x2="114" y2="130"/>
+        </g>
+        <rect x="24" y="58" width="54" height="54" fill="var(--s1)" fill-opacity=".30" stroke="var(--s1)" stroke-width="2.5"/>
+        <text class="svgtxt sm" x="60" y="166" text-anchor="middle">input 6 × 6</text>
+      </g>
+      <text class="svgtxt b" x="128" y="100" font-size="18">∗</text>
+      <g transform="translate(150,58)">
+        <rect x="0" y="0" width="96" height="54" rx="4" fill="var(--surface2)" stroke="var(--axis)"/>
+        <g class="svgtxt b" text-anchor="middle" font-size="13">
+          <text x="16" y="17">-1</text><text x="48" y="17">0</text><text x="80" y="17">1</text>
+          <text x="16" y="35">-1</text><text x="48" y="35">0</text><text x="80" y="35">1</text>
+          <text x="16" y="52">-1</text><text x="48" y="52">0</text><text x="80" y="52">1</text>
+        </g>
+        <g stroke="var(--axis)" stroke-width="0.6"><line x1="32" y1="0" x2="32" y2="54"/><line x1="64" y1="0" x2="64" y2="54"/><line x1="0" y1="18" x2="96" y2="18"/><line x1="0" y1="36" x2="96" y2="36"/></g>
+        <text class="svgtxt sm" x="48" y="72" text-anchor="middle">ฟิลเตอร์ 3 × 3</text>
+      </g>
+      <text class="svgtxt b" x="262" y="100" font-size="18">=</text>
+      <g>
+        <rect x="286" y="58" width="72" height="72" rx="5" fill="var(--s3)" fill-opacity=".25" stroke="var(--s3)" stroke-width="2"/>
+        <g stroke="var(--axis)" stroke-width="0.6" opacity=".6">
+          <line x1="304" y1="58" x2="304" y2="130"/><line x1="322" y1="58" x2="322" y2="130"/><line x1="340" y1="58" x2="340" y2="130"/>
+          <line x1="286" y1="76" x2="358" y2="76"/><line x1="286" y1="94" x2="358" y2="94"/><line x1="286" y1="112" x2="358" y2="112"/>
+        </g>
+        <rect x="286" y="58" width="18" height="18" fill="var(--s3)" fill-opacity=".7"/>
+        <text class="svgtxt sm" x="322" y="148" text-anchor="middle">feature map 4 × 4</text>
+      </g>
+      <text class="svgtxt b" x="382" y="36">⭐ ทุกตำแหน่ง: คูณแพตช์ 3 × 3 กับฟิลเตอร์ แล้วบวกกัน → ได้หนึ่งตัวเลข</text>
+      <text class="svgtxt sm" x="382" y="60">เลื่อนไปทั่วภาพ → ได้ feature map ที่ตอบว่า “รูปแบบนี้อยู่ตรงไหน”</text>
+      <text class="svgtxt sm" x="382" y="82">⭐ หนึ่ง layer เรียนฟิลเตอร์หลายตัว (เช่น 64 ตัว)</text>
+      <text class="svgtxt sm" x="382" y="100">และค่าในฟิลเตอร์ก็คือ <tspan font-weight="700">น้ำหนักที่ถูกเรียน</tspan></text>
+      <rect x="378" y="116" width="322" height="60" rx="10" fill="var(--starbg)" stroke="var(--star)"/>
+      <text class="svgtxt b" x="390" y="138">⭐ ทำไมมันเหมาะกับภาพ — <tspan font-style="italic">weight sharing</tspan></text>
+      <text class="svgtxt sm" x="390" y="158">ฟิลเตอร์ตัวเดียวกันถูกใช้ซ้ำทุกตำแหน่ง</text>
+      <text class="svgtxt sm" x="390" y="172">รูปแบบที่เรียนจากปอดซ้าย จึงถูกจดจำที่ปอดขวาด้วย</text>
+    </svg>
+  </figure>
+  </div>
+</section>
+
+<section class="ch" id="ch13" data-ch="13">
+  <h3>บทที่ 13 — Max pooling: เก็บแต่การตอบสนองที่แรงที่สุด</h3>
+  <div class="chbody">
+  <figure>
+    <div class="figtitle">⭐ แบ่ง feature map เป็นบล็อก 2 × 2 แล้วเก็บเฉพาะตัวที่มากที่สุด</div>
+    <svg viewBox="0 0 700 180" role="img" aria-label="ตัวอย่าง max pooling จาก 4x4 เป็น 2x2">
+      <g>
+        <rect x="6" y="30" width="132" height="132" rx="5" fill="var(--surface2)" stroke="var(--axis)"/>
+        <g stroke="var(--axis)" stroke-width="0.8"><line x1="39" y1="30" x2="39" y2="162"/><line x1="72" y1="30" x2="72" y2="162"/><line x1="105" y1="30" x2="105" y2="162"/>
+          <line x1="6" y1="63" x2="138" y2="63"/><line x1="6" y1="96" x2="138" y2="96"/><line x1="6" y1="129" x2="138" y2="129"/></g>
+        <rect x="6" y="30" width="66" height="66" fill="var(--s1)" fill-opacity=".12"/>
+        <rect x="72" y="30" width="66" height="66" fill="var(--s2)" fill-opacity=".12"/>
+        <rect x="6" y="96" width="66" height="66" fill="var(--s3)" fill-opacity=".12"/>
+        <rect x="72" y="96" width="66" height="66" fill="var(--s4)" fill-opacity=".12"/>
+        <g stroke="var(--ink)" stroke-width="1.5" fill="none" opacity=".35">
+          <rect x="6" y="30" width="66" height="66"/><rect x="72" y="30" width="66" height="66"/>
+          <rect x="6" y="96" width="66" height="66"/><rect x="72" y="96" width="66" height="66"/>
+        </g>
+        <g class="svgtxt b" text-anchor="middle" font-size="14">
+          <text x="22" y="52">1</text><text x="55" y="52">3</text><text x="88" y="52">2</text><text x="121" y="52">0</text>
+          <text x="22" y="85">5</text><text x="55" y="85" fill="var(--s1)" font-size="16">6</text><text x="88" y="85">1</text><text x="121" y="85" fill="var(--s2)" font-size="16">4</text>
+          <text x="22" y="118">0</text><text x="55" y="118" fill="var(--s3)" font-size="16">2</text><text x="88" y="118">7</text><text x="121" y="118">3</text>
+          <text x="22" y="151">1</text><text x="55" y="151">1</text><text x="88" y="151">5</text><text x="121" y="151" fill="var(--s4)" font-size="16">8</text>
+        </g>
+        <text class="svgtxt sm" x="72" y="178" text-anchor="middle">feature map 4 × 4</text>
+      </g>
+      <path d="M152 96 L 206 96" stroke="var(--axis)" stroke-width="2"/><path d="M206 96 l -8 -4.5 v 9 z" fill="var(--axis)"/>
+      <text class="svgtxt sm" x="179" y="88" text-anchor="middle">max ของ</text>
+      <text class="svgtxt sm" x="179" y="112" text-anchor="middle">แต่ละบล็อก</text>
+      <g>
+        <rect x="220" y="63" width="66" height="66" rx="5" fill="var(--surface2)" stroke="var(--axis)"/>
+        <g stroke="var(--axis)" stroke-width="0.8"><line x1="253" y1="63" x2="253" y2="129"/><line x1="220" y1="96" x2="286" y2="96"/></g>
+        <g class="svgtxt b" text-anchor="middle" font-size="16">
+          <text x="236" y="86" fill="var(--s1)">6</text><text x="269" y="86" fill="var(--s2)">4</text>
+          <text x="236" y="119" fill="var(--s3)">2</text><text x="269" y="119" fill="var(--s4)">8</text>
+        </g>
+        <text class="svgtxt sm" x="253" y="146" text-anchor="middle">pooled 2 × 2</text>
+      </g>
+      <text class="svgtxt sm" x="312" y="34">⭐ แมปหดลงครึ่งหนึ่งในแต่ละทิศ (4 × 4 → 2 × 2 · 224 → 112) — คำนวณน้อยลง</text>
+      <text class="svgtxt sm" x="312" y="56">⭐ ไม่มีน้ำหนักให้เรียน pooling เป็นกฎตายตัว</text>
+      <text class="svgtxt sm" x="312" y="78">⭐ ถ้ารูปแบบเลื่อนไปหนึ่งพิกเซล ค่ามากที่สุดมักยังเท่าเดิม</text>
+      <text class="svgtxt sm" x="312" y="96">= ทนต่อการจัดท่าคนไข้ที่ต่างกันเล็กน้อย</text>
+      <text class="svgtxt sm" x="312" y="118">💡 average pooling เก็บค่าเฉลี่ยแทน และ ResNet จบด้วย global average pool</text>
+      <rect x="308" y="132" width="392" height="42" rx="9" fill="var(--starbg)" stroke="var(--star)"/>
+      <text class="svgtxt b" x="320" y="152">⭐ Pooling ถามว่า “รูปแบบนี้อยู่ในบริเวณเล็ก ๆ นี้ไหม”</text>
+      <text class="svgtxt b" x="320" y="168">แล้วลืมไปว่ามันอยู่ตรงไหนพอดี</text>
+    </svg>
+  </figure>
+  </div>
+</section>
+
+<section class="ch" id="ch14" data-ch="14">
+  <h3>บทที่ 14 — Receptive field: หนึ่งหน่วยมองเห็นภาพได้กว้างแค่ไหน</h3>
+  <div class="chbody">
+  <div class="key"><span class="lb">⭐ นิยาม</span>
+    <b>receptive field ของหนึ่งหน่วย = พิกเซลใน input ทั้งหมดที่เปลี่ยนค่าของมันได้</b>
+  </div>
+  <figure>
+    <div class="figtitle">ResNet-18 บนฟิล์มทรวงอก 224 พิกเซล — ยิ่งลึก ยิ่งเห็นกว้าง</div>
+    <svg viewBox="0 0 700 180" role="img" aria-label="การเติบโตของ receptive field ใน ResNet-18">
+      <g>
+        <rect x="20" y="28" width="7" height="7" rx="1" fill="var(--s1)" stroke="var(--s1)"/>
+        <rect x="20" y="52" width="43" height="43" rx="2" fill="var(--s1)" fill-opacity=".45" stroke="var(--s1)"/>
+      </g>
+      <g>
+        <rect x="90" y="28" width="99" height="99" rx="3" fill="var(--s2)" fill-opacity=".35" stroke="var(--s2)"/>
+      </g>
+      <g>
+        <rect x="216" y="28" width="211" height="140" rx="4" fill="var(--s4)" fill-opacity=".22" stroke="var(--s4)"/>
+      </g>
+      <text class="svgtxt sm" x="23" y="22">conv1: 7 px</text>
+      <text class="svgtxt sm" x="20" y="112">block 1: 43 px</text>
+      <text class="svgtxt sm" x="20" y="128">เห็นซี่โครงไม่กี่ซี่</text>
+      <text class="svgtxt sm" x="90" y="22">block 2: 99 px</text>
+      <text class="svgtxt sm" x="90" y="146">ราวหนึ่งข้างปอด</text>
+      <text class="svgtxt sm" x="216" y="22">block 3: 211 px · block 4: ทั้งภาพ</text>
+      <text class="svgtxt b" x="440" y="46">⭐ การซ้อน convolution 3 × 3</text>
+      <text class="svgtxt sm" x="440" y="66">ขยาย receptive field ช้า ๆ (3 → 5 → 7)</text>
+      <text class="svgtxt b" x="440" y="94">⭐ แต่ pooling และ stride-2</text>
+      <text class="svgtxt sm" x="440" y="114">ทำให้มันโตเร็วมาก</text>
+      <text class="svgtxt sm" x="216" y="162">พอจะตัดสินว่า “ปอดบวม” ได้</text>
+      <rect x="436" y="128" width="264" height="44" rx="9" fill="var(--warnbg)" stroke="var(--crit)"/>
+      <text class="svgtxt sm" x="446" y="146" fill="var(--crit)">⚠️ รอยโรคที่ใหญ่กว่า receptive field ต้องใช้ชั้นลึก</text>
+      <text class="svgtxt sm" x="446" y="164" fill="var(--crit)">และก้อนเล็ก 2 มม. หายได้ถ้าย่อภาพมากเกินไป</text>
+    </svg>
+  </figure>
+  </div>
+</section>
+
+<section class="ch" id="ch15" data-ch="15">
+  <h3>บทที่ 15 — ต่อกันทั้งหมด: จากพิกเซลสู่การวินิจฉัย</h3>
+  <div class="chbody">
+  <figure>
+    <div class="figtitle">⭐ ภาพเล็กลงเรื่อย ๆ แต่ลึกขึ้นเรื่อย ๆ</div>
+    <svg viewBox="0 0 700 170" role="img" aria-label="โครงสร้าง CNN จาก 224 คูณ 224 ถึงชั้น dense และ softmax">
+      <g>
+        <rect x="0"   y="46" width="92" height="64" rx="8" fill="var(--seq1)" fill-opacity=".45" stroke="var(--axis)"/>
+        <rect x="104" y="50" width="92" height="56" rx="8" fill="var(--seq2)" fill-opacity=".45" stroke="var(--axis)"/>
+        <rect x="208" y="56" width="76" height="44" rx="8" fill="var(--seq2)" fill-opacity=".30" stroke="var(--axis)"/>
+        <rect x="296" y="54" width="92" height="48" rx="8" fill="var(--seq3)" fill-opacity=".45" stroke="var(--axis)"/>
+        <rect x="400" y="60" width="64" height="36" rx="8" fill="var(--seq3)" fill-opacity=".30" stroke="var(--axis)"/>
+        <rect x="476" y="58" width="92" height="40" rx="8" fill="var(--seq4)" fill-opacity=".45" stroke="var(--axis)"/>
+        <rect x="580" y="52" width="120" height="52" rx="8" fill="var(--good)" fill-opacity=".22" stroke="var(--good)" stroke-width="2"/>
+      </g>
+      <g class="svgtxt b" text-anchor="middle">
+        <text x="46" y="72">X-ray</text><text x="150" y="74">Conv + ReLU</text><text x="246" y="76">Pool</text>
+        <text x="342" y="74">Conv + ReLU</text><text x="432" y="78">Pool</text><text x="522" y="76">บล็อกที่ลึกกว่า</text>
+        <text x="640" y="74">Dense + softmax</text>
+      </g>
+      <g class="svgtxt sm" text-anchor="middle">
+        <text x="46" y="90">224×224×1</text><text x="150" y="92">64 maps</text><text x="246" y="92">112×112</text>
+        <text x="342" y="92">128 maps</text><text x="432" y="92">56×56</text><text x="522" y="92">…</text>
+        <text x="640" y="92">P(ปอดบวม)</text>
+      </g>
+      <g stroke="var(--axis)" stroke-width="1.5">
+        <path d="M94 78 L 102 78"/><path d="M198 78 L 206 78"/><path d="M286 78 L 294 78"/>
+        <path d="M390 78 L 398 78"/><path d="M466 78 L 474 78"/><path d="M570 78 L 578 78"/>
+      </g>
+      <text class="svgtxt b" x="0" y="26">⭐ Conv + ReLU หารูปแบบ · Pool ย่อแมปลงครึ่งหนึ่ง · Dense + softmax ให้ความน่าจะเป็นของแต่ละคลาส</text>
+      <rect x="0" y="124" width="700" height="44" rx="10" fill="var(--starbg)" stroke="var(--star)"/>
+      <text class="svgtxt b" x="12" y="144">⭐ CNN คือกองของตัวตรวจจับรูปแบบ ที่ค่อย ๆ แลก “ที่ไหน” กับ “อะไร”</text>
+      <text class="svgtxt sm" x="12" y="162">ชั้นต้นเก็บตำแหน่งไว้ · ชั้นท้ายเก็บความหมายไว้ · 💡 ฟิลเตอร์ 3 × 3 บน 64 maps = 3·3·64 = 576 น้ำหนัก ใช้ได้ทุกตำแหน่ง ขณะที่ชั้น dense บนภาพ 224 × 224 ต้องใช้ราว 50,000 น้ำหนักต่อหนึ่งนิวรอน</text>
+    </svg>
+  </figure>
+  </div>
+</section>
+
+<h2 class="sec" id="s3"><span class="pill">ส่วนที่ 3</span> สถาปัตยกรรม Transfer Learning และการเทรนที่ดี</h2>
+<p class="secintro">บทที่ 16–23 · ⭐ กับชุดข้อมูลทางการแพทย์ที่เล็ก การออกแบบการเทรนสำคัญกว่าการเลือกสถาปัตยกรรมที่หรูที่สุด</p>
+
+<section class="ch" id="ch16" data-ch="16" data-lite="1">
+  <details class="chfold">
+    <summary><h3>บทที่ 16 — ปี 2012 และ AlexNet</h3><span class="chip">ไม่เน้นสอบ</span></summary>
+    <div class="chbody">
+    <figure>
+      <div class="figtitle">ImageNet 2012 — ภาพ 1.2 ล้านใบ 1,000 คลาส</div>
+      <svg viewBox="0 0 700 120" role="img" aria-label="top-5 error ลดจาก 26.2 เป็น 15.3 เปอร์เซ็นต์">
+        <g stroke="var(--grid)"><line x1="160" y1="16" x2="160" y2="92"/><line x1="296" y1="16" x2="296" y2="92"/><line x1="432" y1="16" x2="432" y2="92"/><line x1="568" y1="16" x2="568" y2="92"/></g>
+        <text class="svgtxt" x="152" y="42" text-anchor="end">ก่อนหน้า</text>
+        <rect x="160" y="26" width="356" height="24" rx="4" fill="var(--grid)"/>
+        <text class="svgval" x="524" y="44">26.2%</text>
+        <text class="svgtxt" x="152" y="80" text-anchor="end">AlexNet 2012</text>
+        <rect x="160" y="64" width="208" height="24" rx="4" fill="var(--s1)"/>
+        <text class="svgval" x="376" y="82">15.3%</text>
+        <g class="svgtxt sm" text-anchor="middle"><text x="160" y="108">0</text><text x="296" y="108">10%</text><text x="432" y="108">20%</text><text x="568" y="108">30%</text></g>
+        <text class="svgtxt sm" x="364" y="16" text-anchor="middle">top-5 error</text>
+      </svg>
+    </figure>
+    <div class="tw"><table>
+      <thead><tr><th>อะไรใหม่</th><th>ทำไมวงการแพทย์สนใจ</th></tr></thead>
+      <tbody>
+        <tr><td>5 conv layer + 3 dense layer · ราว <b>60 ล้านน้ำหนัก</b></td><td><b>แสดงว่าตัวแปรที่ถูกเรียนชนะตัวแปรที่คนออกแบบมาหลายสิบปี</b></td></tr>
+        <tr><td><b>ReLU</b> — เทรนเร็วกว่าฟังก์ชันรูปตัว S แบบเก่า</td><td>ภายในห้าปี CNN โผล่ในเกือบทุกสาขาย่อยของภาพทางการแพทย์</td></tr>
+        <tr><td>เทรนบน GPU ทำให้ขนาดนี้เป็นไปได้ · <b>dropout และ augmentation กัน overfit</b></td><td>⭐ <b>น้ำหนักที่เทรนบน ImageNet กลายเป็นจุดเริ่มต้นมาตรฐาน</b></td></tr>
+      </tbody>
+    </table></div>
+    <div class="key"><span class="lb">⭐ บทเรียน</span>
+      <b>สูตรสำเร็จไม่ใช่เทคนิคเดียว แต่เป็นสามอย่างพร้อมกัน — ข้อมูลที่มี label จำนวนมาก + กำลังคำนวณ + สถาปัตยกรรมที่ลึก</b> ⚠️ <b>ภาพทางการแพทย์มักขาดอย่างแรก ซึ่งเป็นเหตุผลที่ transfer learning สำคัญ</b>
+    </div>
+    </div>
+  </details>
+</section>
+
+<section class="ch" id="ch17" data-ch="17">
+  <h3>บทที่ 17 — ResNet และ skip connection</h3>
+  <div class="chbody">
+  <p>⚠️ <b>การเติมชั้นเข้าไปเฉย ๆ กลับทำให้เครือข่ายแย่ลง เพราะสัญญาณการเรียนรู้จางหายไประหว่างเดินทางย้อนผ่านหลายชั้น</b></p>
+  <figure>
+    <div class="figtitle">⭐ Residual block — input กระโดดข้ามสองชั้น แล้วถูกบวกกลับเข้าไป</div>
+    <svg viewBox="0 0 700 220" role="img" aria-label="residual block output เท่ากับ x บวก F ของ x">
+      <g>
+        <circle cx="150" cy="22" r="14" fill="var(--surface2)" stroke="var(--axis)"/>
+        <text class="svgtxt b" x="150" y="27" text-anchor="middle">x</text>
+        <path d="M150 38 L 150 56" stroke="var(--axis)" stroke-width="2"/>
+        <rect x="76" y="56" width="148" height="34" rx="9" fill="var(--s1)" fill-opacity=".16" stroke="var(--s1)"/>
+        <text class="svgtxt b" x="150" y="78" text-anchor="middle">3×3 conv + ReLU</text>
+        <path d="M150 90 L 150 108" stroke="var(--axis)" stroke-width="2"/>
+        <rect x="76" y="108" width="148" height="34" rx="9" fill="var(--s1)" fill-opacity=".16" stroke="var(--s1)"/>
+        <text class="svgtxt b" x="150" y="130" text-anchor="middle">3×3 conv</text>
+        <path d="M150 142 L 150 158" stroke="var(--axis)" stroke-width="2"/>
+        <circle cx="150" cy="170" r="14" fill="var(--good)" fill-opacity=".22" stroke="var(--good)" stroke-width="2"/>
+        <text class="svgtxt b" x="150" y="176" text-anchor="middle" font-size="16">+</text>
+        <path d="M150 184 L 150 198" stroke="var(--axis)" stroke-width="2"/>
+        <text class="svgtxt b" x="150" y="214" text-anchor="middle">ReLU → output</text>
+        <path d="M164 22 C 250 22, 250 170, 166 170" fill="none" stroke="var(--s2)" stroke-width="2.5"/>
+        <path d="M166 170 l 8 -4.5 v 9 z" fill="var(--s2)"/>
+        <text class="svgtxt b" x="258" y="96" fill="var(--s2)">skip: identity x</text>
+        <text class="svgtxt sm" x="52" y="100" text-anchor="end">F(x)</text>
+      </g>
+      <rect x="386" y="16" width="314" height="66" rx="10" fill="var(--starbg)" stroke="var(--star)"/>
+      <text class="svgtxt b" x="398" y="40" font-size="15">output = x + F(x)</text>
+      <text class="svgtxt sm" x="398" y="60">⭐ บล็อกนี้เรียนแค่ “ส่วนแก้ไข” F(x)</text>
+      <text class="svgtxt sm" x="398" y="76">จึงทำให้มัน “ไม่ทำอะไรเลย” ได้ง่าย ถ้าชั้นนั้นไม่จำเป็น</text>
+      <rect x="386" y="94" width="314" height="52" rx="10" fill="var(--surface2)" stroke="var(--axis)"/>
+      <text class="svgtxt b" x="398" y="116">⭐ ทำให้เครือข่าย 152 ชั้นเป็นไปได้</text>
+      <text class="svgtxt sm" x="398" y="136">และชนะ ImageNet ปี 2015</text>
+      <rect x="386" y="158" width="314" height="52" rx="10" fill="var(--s1)" fill-opacity=".12" stroke="var(--s1)" stroke-width="2"/>
+      <text class="svgtxt b" x="398" y="180">⭐ backbone ของ lab วันนี้: ResNet-18</text>
+      <text class="svgtxt sm" x="398" y="200">18 ชั้น · ราว 11 ล้านน้ำหนัก · เล็ก เร็ว และแข็งแรง</text>
+    </svg>
+  </figure>
+  </div>
+</section>
+
+<section class="ch" id="ch18" data-ch="18">
+  <h3>บทที่ 18 — Transfer learning: ยืมสายตามาก่อน แล้วค่อยฝึกเฉพาะทาง <span class="chip" style="border-color:var(--star);color:var(--star)">⭐ หัวใจของคาบ</span></h3>
+  <div class="chbody">
+  <p>⚠️ <b>ชุดข้อมูลทางการแพทย์เล็ก — หลักร้อยถึงไม่กี่พันภาพที่มี label</b> ⭐ <b>Transfer learning เริ่มจากเครือข่ายที่เทรนบนภาพถ่ายทั่วไปหลายล้านใบมาแล้ว แล้วค่อยปรับให้เข้ากับงานของเรา</b></p>
+
+  <figure>
+    <div class="figtitle">⭐ อะไรถูกใช้ร่วม และอะไรถูกเปลี่ยน</div>
+    <svg viewBox="0 0 700 234" role="img" aria-label="แผนภาพ transfer learning backbone ใช้ร่วม head ถูกเปลี่ยน">
+      <rect x="0" y="40" width="112" height="76" rx="10" fill="var(--surface2)" stroke="var(--axis)"/>
+      <text class="svgtxt b" x="56" y="22" text-anchor="middle">ขั้นที่ 1 · pretrain</text>
+      <text class="svgtxt sm" x="56" y="68" text-anchor="middle">ภาพถ่ายทั่วไป</text>
+      <text class="svgtxt b" x="56" y="90" text-anchor="middle">1.2 ล้านใบ</text>
+      <rect x="0" y="136" width="112" height="76" rx="10" fill="var(--s1)" fill-opacity=".14" stroke="var(--s1)" stroke-width="2"/>
+      <text class="svgtxt b" x="56" y="230" text-anchor="middle">ขั้นที่ 2 · งานของเรา</text>
+      <text class="svgtxt sm" x="56" y="166" text-anchor="middle">ฟิล์มทรวงอก</text>
+      <text class="svgtxt b" x="56" y="188" text-anchor="middle">~5,000 ใบ</text>
+
+      <rect x="132" y="40" width="330" height="172" rx="12" fill="var(--seq2)" fill-opacity=".18" stroke="var(--s1)" stroke-width="2"/>
+      <text class="svgtxt b" x="297" y="22" text-anchor="middle">Feature extractor (backbone) — ⭐ ใช้ร่วมกันได้กับภาพทุกชนิด</text>
+      <g>
+        <rect x="146" y="70" width="52" height="112" rx="6" fill="var(--seq1)" fill-opacity=".5" stroke="var(--axis)"/>
+        <rect x="206" y="80" width="52" height="92" rx="6" fill="var(--seq2)" fill-opacity=".5" stroke="var(--axis)"/>
+        <rect x="266" y="88" width="52" height="76" rx="6" fill="var(--seq3)" fill-opacity=".5" stroke="var(--axis)"/>
+        <rect x="326" y="96" width="52" height="60" rx="6" fill="var(--seq4)" fill-opacity=".5" stroke="var(--axis)"/>
+        <rect x="386" y="104" width="62" height="44" rx="6" fill="var(--s3)" fill-opacity=".35" stroke="var(--s3)" stroke-width="2"/>
+      </g>
+      <g class="svgtxt sm" text-anchor="middle">
+        <text x="172" y="196">conv1</text><text x="172" y="208">ขอบ</text>
+        <text x="232" y="196">block 1–2</text><text x="232" y="208">พื้นผิว</text>
+        <text x="292" y="196">block 3</text><text x="292" y="208">ชิ้นส่วน</text>
+        <text x="352" y="196">block 4</text>
+        <text x="417" y="196">embedding</text><text x="417" y="208">512 ตัวเลข</text>
+      </g>
+      <text class="svgtxt sm" x="297" y="60" text-anchor="middle" fill="var(--muted)">ทั่วไป ────────────────→ เฉพาะทาง</text>
+
+      <path d="M466 118 L 488 118" stroke="var(--axis)" stroke-width="2"/><path d="M488 118 l -8 -4.5 v 9 z" fill="var(--axis)"/>
+      <rect x="492" y="40" width="208" height="76" rx="10" fill="var(--grid)" stroke="var(--axis)" stroke-dasharray="5 4"/>
+      <text class="svgtxt b" x="596" y="22" text-anchor="middle">Head — ⚠️ ถูกเปลี่ยนทุกงานใหม่</text>
+      <text class="svgtxt sm" x="596" y="66" text-anchor="middle">head เดิม: 1,000 คลาส</text>
+      <text class="svgtxt sm" x="596" y="86" text-anchor="middle">cat 0.91 · dog 0.05 · car …</text>
+      <text class="svgtxt sm" x="596" y="104" text-anchor="middle" fill="var(--crit)">⚠️ ทิ้งทั้งหมด</text>
+      <rect x="492" y="136" width="208" height="76" rx="10" fill="var(--good)" fill-opacity=".18" stroke="var(--good)" stroke-width="2"/>
+      <text class="svgtxt b" x="596" y="166" text-anchor="middle">head ใหม่: 2 คลาส</text>
+      <text class="svgtxt sm" x="596" y="188" text-anchor="middle">ปกติ 0.07 · ปอดบวม 0.93</text>
+      <text class="svgtxt sm" x="596" y="206" text-anchor="middle" fill="var(--good)">✓ สร้างใหม่</text>
+    </svg>
+    <figcaption>⭐ <b>Embedding = 512 ตัวเลขที่ backbone คายออกมา คือคำบรรยายภาพแบบกระชับ</b> · ⭐ <b>Lab 4 เปลี่ยน <code>fc</code> จาก 1,000 → 2 และเปลี่ยน <code>conv1</code> จาก 3 → 1 channel</b></figcaption>
+  </figure>
+
+  <div class="key"><span class="lb">⭐ เคสจริง: transfer learning บนฟิล์มทรวงอกเด็ก</span>
+    มีการ fine-tune CNN ที่ pretrain บน ImageNet มาก่อน แล้วใช้กับ <b>ฟิล์มทรวงอกเด็กจากกว่างโจวราว 5,800 ใบ ได้ accuracy ราว 93% สำหรับปอดบวมเทียบปกติบนชุดทดสอบที่กันไว้</b> ⭐ <b>และชุดฟิล์มนี้เองคือที่มาของ PneumoniaMNIST ซึ่งเป็นชุดข้อมูลใน lab วันนี้</b>
+  </div>
+  <div class="tip"><span class="lb">💡 เทียบกับการเรียนแพทย์</span>
+    <b>แพทย์ใช้ทุนรังสีรู้กายวิภาคมาจากตอนเรียนแพทย์แล้ว การเรียนเฉพาะทางแค่สอนสาขาใหม่</b> — <b>การ pretrain ก็คือ “โรงเรียนแพทย์” ของเครือข่าย</b>
+  </div>
+  </div>
+</section>
+
+<section class="ch" id="ch19" data-ch="19">
+  <h3>บทที่ 19 — Feature extraction เทียบกับ fine-tuning</h3>
+  <div class="chbody">
+  <div class="tw"><table>
+    <thead><tr><th></th><th>Feature extraction</th><th>Fine-tuning</th></tr></thead>
+    <tbody>
+      <tr><td><b>อะไรถูกเทรน</b></td><td><b>เฉพาะชั้นสุดท้ายที่สร้างใหม่ · backbone ถูกแช่แข็ง</b></td><td><b>ชั้นสุดท้ายใหม่ บวกกับบางส่วนหรือทั้งหมดของ backbone</b></td></tr>
+      <tr><td><b>Learning rate</b></td><td>ปกติ เช่น 10⁻³</td><td><b>เล็กสำหรับ backbone เช่น 10⁻⁴–10⁻⁵</b></td></tr>
+      <tr><td><b>ข้อมูลที่ต้องใช้</b></td><td><b>น้อยมาก (หลักร้อย)</b></td><td>มากกว่า (หลักพัน)</td></tr>
+      <tr><td><b>ความเร็ว</b></td><td>เร็ว ถูก</td><td>ช้ากว่า ต้องใช้ GPU</td></tr>
+      <tr><td><b>ความเสี่ยง</b></td><td>⚠️ <b>Underfit ถ้าภาพต่างจากภาพถ่ายทั่วไปมาก</b></td><td>⚠️ <b>Overfit หรือ “ลืม” ถ้าข้อมูลน้อยเกินไป</b></td></tr>
+    </tbody>
+  </table></div>
+  <div class="key"><span class="lb">⭐ กฎคร่าว ๆ</span>
+    <b>ข้อมูลยิ่งน้อยและยิ่งหน้าตาเหมือนภาพถ่ายทั่วไป ก็ยิ่งแช่แข็งมาก</b> ⚠️ <b>แต่ฟิล์ม X-ray เป็นภาพเทาและหน้าตาไม่เหมือนรูปหมาเลย การ fine-tune บ้างจึงมักช่วย</b> 💡 lab เทรนทุกชั้น (full fine-tuning) ด้วย Adam ที่ 10⁻³ — ลองแช่แข็งดูเป็นการทดลองได้
+  </div>
+  </div>
+</section>
+
+<section class="ch" id="ch20" data-ch="20">
+  <h3>บทที่ 20 — Data augmentation: ความหลากหลายที่สมจริงแบบได้มาฟรี</h3>
+  <div class="chbody">
+  <p>⭐ <b>Augmentation คือการเปลี่ยนภาพชุดเทรนแบบสุ่มโดยไม่เปลี่ยน label ในทุก epoch เพื่อให้โมเดลเห็นตัวอย่าง “ใหม่”</b></p>
+  <div class="cards">
+    <div class="card" style="border-left:4px solid var(--good)"><h4>✓ มักปลอดภัยกับฟิล์มทรวงอก</h4><p><b>หมุนเล็กน้อย (±10°) และเลื่อน</b> — เพราะการจัดท่าคนไข้ต่างกันจริง · <b>ซูมหรือ crop เล็กน้อย</b> · <b>เปลี่ยนความสว่างและ contrast</b> — เพราะการตั้งค่าเครื่องต่างกันจริง</p></div>
+    <div class="card" style="border-left:4px solid var(--crit)"><h4>⚠️ ต้องคิดสองรอบ</h4><p><b>พลิกซ้ายขวา</b> — ⚠️ <b>ย้ายหัวใจไปอยู่ข้างขวา ซึ่งเป็นไปไม่ได้ทางกายวิภาค</b> · <b>หมุนมาก ๆ หรือบิดเบือนหนัก ๆ</b> · ⚠️ <b>เปลี่ยนสีบนภาพผิวหนัง ซึ่งสีคือตัววินิจฉัย</b></p></div>
+  </div>
+  <div class="key"><span class="lb">⭐ บททดสอบทางคลินิก</span>
+    ถามว่า <b><i>“ภาพของคนไข้จริงหน้าตาแบบนี้ได้ไหม”</i></b> — <b>ถ้าได้ augmentation นั้นกำลังสอนความหลากหลายที่มีประโยชน์ ถ้าไม่ได้ มันอาจสอนสิ่งที่ผิดให้โมเดล</b> ⚠️ <b>และทำ augmentation กับชุดเทรนเท่านั้น</b>
+  </div>
+  </div>
+</section>
+
+<section class="ch" id="ch21" data-ch="21">
+  <h3>บทที่ 21 — Class imbalance: เมื่อโรคหายาก (หรือพบบ่อยเกินไป)</h3>
+  <div class="chbody">
+  <figure>
+    <div class="figtitle">⭐ ในชุดเทรนของ PneumoniaMNIST ราวสามในสี่เป็นภาพปอดบวม</div>
+    <svg viewBox="0 0 700 150" role="img" aria-label="สัดส่วนภาพปอดบวม 75 เปอร์เซ็นต์ และ baseline accuracy ที่ตามมา">
+      <rect x="0" y="26" width="450" height="34" rx="6" fill="var(--s2)" fill-opacity=".55" stroke="var(--s2)"/>
+      <rect x="450" y="26" width="150" height="34" rx="6" fill="var(--s1)" fill-opacity=".45" stroke="var(--s1)"/>
+      <text class="svgtxt b" x="225" y="48" text-anchor="middle">ปอดบวม ~75%</text>
+      <text class="svgtxt b" x="525" y="48" text-anchor="middle">ปกติ ~25%</text>
+      <text class="svgtxt b" x="0" y="18">สัดส่วนในชุดเทรน</text>
+      <line x1="450" y1="20" x2="450" y2="78" stroke="var(--crit)" stroke-width="2" stroke-dasharray="4 3"/>
+      <text class="svgtxt b" x="0" y="96" fill="var(--crit)">⚠️ โมเดลที่ตอบ “ปอดบวม” ทุกภาพ ได้ accuracy ราว 75% ทันที — โดยไม่รู้อะไรเลย</text>
+      <rect x="0" y="108" width="700" height="38" rx="9" fill="var(--starbg)" stroke="var(--star)"/>
+      <text class="svgtxt b" x="12" y="132">⭐ โยงกลับภาค 3 — accuracy มีความหมายก็ต่อเมื่อวางไว้ข้าง ๆ อัตราฐาน (base rate) เท่านั้น</text>
+    </svg>
+  </figure>
+  <div class="tw"><table>
+    <thead><tr><th>วิธีรับมือ</th><th>ทำอะไร</th></tr></thead>
+    <tbody>
+      <tr><td><b>Weighted loss</b></td><td><b>ทำให้ความผิดพลาดกับคลาสที่หายากมีราคาแพงขึ้น</b> — <code>CrossEntropyLoss(weight=...)</code></td></tr>
+      <tr><td><b>Resampling</b></td><td><b>สุ่มคลาสหายากเกินจริง (หรือสุ่มคลาสที่พบบ่อยให้น้อยลง) ในแต่ละ batch</b></td></tr>
+      <tr><td><b>เลือก threshold</b></td><td>⭐ <b>เลือกจุดตัดบนข้อมูล validation ให้ได้ sensitivity ที่เราต้องการ</b></td></tr>
+      <tr><td><b>รายงานตัววัดที่เปิดโปงความไม่สมดุล</b></td><td>⭐ <b>sensitivity, specificity, PPV, ROC AUC, PR AUC</b></td></tr>
+    </tbody>
+  </table></div>
+  </div>
+</section>
+
+<section class="ch" id="ch22" data-ch="22">
+  <h3>บทที่ 22 — แบ่งข้อมูลตามคนไข้ <span class="chip" style="border-color:var(--crit);color:var(--crit)">⚠️ ความผิดพลาดเงียบที่พบบ่อยที่สุด</span></h3>
+  <div class="chbody">
+  <p>⭐ <b>คนไข้คนเดียวมักมีภาพหลายใบ</b> — ฟิล์มติดตามผล ตาสองข้าง CT หลาย slice หรือ tile พยาธิหลายชิ้น</p>
+  <figure>
+    <div class="figtitle">⭐ แบ่งตามภาพ เทียบกับ แบ่งตามคนไข้</div>
+    <svg viewBox="0 0 700 180" role="img" aria-label="เทียบการแบ่งข้อมูลตามภาพกับตามคนไข้">
+      <text class="svgtxt b" x="0" y="18" fill="var(--crit)">⚠️ แบ่งตามภาพ</text>
+      <rect x="0" y="28" width="200" height="44" rx="9" fill="var(--s1)" fill-opacity=".16" stroke="var(--s1)"/>
+      <text class="svgtxt sm" x="100" y="46" text-anchor="middle">ชุดเทรน</text>
+      <text class="svgtxt b" x="100" y="64" text-anchor="middle">P1, P2, P3</text>
+      <rect x="212" y="28" width="150" height="44" rx="9" fill="var(--crit)" fill-opacity=".16" stroke="var(--crit)" stroke-width="2"/>
+      <text class="svgtxt sm" x="287" y="46" text-anchor="middle">ชุดทดสอบ</text>
+      <text class="svgtxt b" x="287" y="64" text-anchor="middle" fill="var(--crit)">P1, P4</text>
+      <text class="svgtxt sm" x="374" y="54" fill="var(--crit)">⚠️ P1 อยู่ทั้งสองฝั่ง</text>
+
+      <text class="svgtxt b" x="0" y="106" fill="var(--good)">✓ แบ่งตามคนไข้</text>
+      <rect x="0" y="116" width="200" height="44" rx="9" fill="var(--s1)" fill-opacity=".16" stroke="var(--s1)"/>
+      <text class="svgtxt sm" x="100" y="134" text-anchor="middle">ชุดเทรน</text>
+      <text class="svgtxt b" x="100" y="152" text-anchor="middle">P1, P2, P3</text>
+      <rect x="212" y="116" width="150" height="44" rx="9" fill="var(--good)" fill-opacity=".18" stroke="var(--good)" stroke-width="2"/>
+      <text class="svgtxt sm" x="287" y="134" text-anchor="middle">ชุดทดสอบ</text>
+      <text class="svgtxt b" x="287" y="152" text-anchor="middle" fill="var(--good)">P4, P5</text>
+      <text class="svgtxt sm" x="374" y="142" fill="var(--good)">✓ ไม่มีใครซ้ำ</text>
+
+      <rect x="500" y="22" width="200" height="140" rx="11" fill="var(--warnbg)" stroke="var(--crit)" stroke-width="2"/>
+      <text class="svgtxt b" x="512" y="46" fill="var(--crit)">⚠️ เกิดอะไรขึ้น</text>
+      <text class="svgtxt sm" x="512" y="68">โมเดลจำ <tspan font-weight="700">ตัวคนไข้</tspan> ได้</text>
+      <text class="svgtxt sm" x="512" y="86">จากอุปกรณ์ฝัง กายวิภาค</text>
+      <text class="svgtxt sm" x="512" y="104">หรือท่าทางการถ่าย</text>
+      <text class="svgtxt sm" x="512" y="124">แทนที่จะจำ <tspan font-weight="700">ตัวโรค</tspan></text>
+      <text class="svgtxt sm" x="512" y="148" fill="var(--crit)">→ คะแนนทดสอบพองเกินจริง</text>
+    </svg>
+  </figure>
+  <div class="key"><span class="lb">⭐ กฎ</span>
+    <b>แบ่งตามคนไข้ก่อนเสมอ</b> เช่นใช้ <code>GroupShuffleSplit</code> ของ scikit-learn ⭐ <b>และถ้าทำได้ ให้เก็บชุดทดสอบจากภายนอกไว้ด้วย — จากโรงพยาบาลอื่นหรือช่วงเวลาอื่น</b> ⚠️ <b>ให้ถามคำถามนี้กับทุกบทความที่เราอ่าน</b>
+  </div>
+  </div>
+</section>
+
+<section class="ch" id="ch23" data-ch="23">
+  <h3>บทที่ 23 — Quiz 2: ออกแบบการเทรน</h3>
+  <div class="chbody">
+  <p>โรงพยาบาลแห่งหนึ่งมี <b>ฟิล์มเข่า 800 ใบ จากคนไข้ 300 คน</b> (ข้อเข่าเสื่อม ใช่/ไม่ใช่ · บวก 20%) นักศึกษาเสนอแผนข้างล่าง ⭐ <b>เราจะแก้อะไร</b></p>
+  <div class="quiz" data-quiz="2">
+    <div class="qhead"><span class="qt">Quiz 2</span><span class="chip">4 ข้อ</span></div>
+    <div class="qitem"><div class="qq"><span class="qn">1</span><span>สุ่มแบ่งภาพ 800 ใบเป็น 80/20 เป็นชุดเทรนกับชุดทดสอบ</span></div>
+      <button class="qreveal">ดูเฉลย</button><div class="qa" hidden>⚠️ <span class="ans">แบ่งตามคนไข้ (300 กลุ่ม)</span> และ <b>กันชุด validation ไว้ต่างหากด้วย</b></div></div>
+    <div class="qitem"><div class="qq"><span class="qn">2</span><span>เทรน ResNet-50 จากศูนย์ 200 epoch</span></div>
+      <button class="qreveal">ดูเฉลย</button><div class="qa" hidden><span class="ans">ใช้ transfer learning</span> — <b>เริ่มจากน้ำหนัก ImageNet · แช่แข็งชั้นส่วนใหญ่ก่อน · และใช้ early stopping</b></div></div>
+    <div class="qitem"><div class="qq"><span class="qn">3</span><span>Augment ด้วยการพลิกแนวตั้งและ color jitter แรง ๆ</span></div>
+      <button class="qreveal">ดูเฉลย</button><div class="qa" hidden><span class="ans">ใช้ augmentation ที่เป็นไปได้จริง</span> — <b>หมุนเล็กน้อย เลื่อน เปลี่ยนความสว่าง</b> ⚠️ <b>ไม่ใช่เข่ากลับหัว และ color jitter ไม่มีความหมายบนฟิล์มขาวดำ</b></div></div>
+    <div class="qitem"><div class="qq"><span class="qn">4</span><span>รายงาน accuracy บนชุดทดสอบ หลังเลือกผลที่ดีที่สุดจากการรัน 30 ครั้งบนชุดทดสอบนั้น</span></div>
+      <button class="qreveal">ดูเฉลย</button><div class="qa" hidden><span class="ans">จูนบน validation และทดสอบครั้งเดียว</span> — <b>รายงาน sensitivity, specificity และ AUC</b> ⚠️ <b>เพราะที่ความชุก 20% คะแนน accuracy 80% คือ baseline ของการ “ตอบไม่ทุกภาพ” อยู่แล้ว</b></div></div>
+  </div>
+  <div class="key"><span class="lb">⭐ สิ่งที่ต้องจำ</span>
+    <b>กับชุดข้อมูลทางการแพทย์ที่เล็ก การออกแบบการเทรน (การแบ่ง การ pretrain การ augment และการประเมิน) สำคัญกว่าการเลือกสถาปัตยกรรมที่หรูที่สุด</b>
+  </div>
+  </div>
+</section>
+
+<h2 class="sec" id="s4"><span class="pill">ส่วนที่ 4</span> เกินกว่าการจำแนก: Segmentation และการติด Label</h2>
+<p class="secintro">บทที่ 24–29 · ⭐ คำถามทางคลินิกเลือกงาน · งานเลือกชนิดของ label · และ label เลือกตัววัด</p>
+
+<section class="ch" id="ch24" data-ch="24">
+  <h3>บทที่ 24 — สามงานหลักของภาพ</h3>
+  <div class="chbody">
+  <figure>
+    <div class="figtitle">⭐ backbone เดียวกัน เปลี่ยนแค่ head — สิ่งที่ต่างกันจริงคือภาระการติด label</div>
+    <svg viewBox="0 0 700 186" role="img" aria-label="เทียบ classification detection และ segmentation">
+      <g>
+        <rect x="0" y="34" width="220" height="104" rx="12" fill="var(--s1)" fill-opacity=".10" stroke="var(--s1)" stroke-width="2"/>
+        <rect x="18" y="52" width="68" height="68" rx="4" fill="var(--seq2)" fill-opacity=".45" stroke="var(--axis)"/>
+        <text class="svgtxt b" x="52" y="92" text-anchor="middle" font-size="11">X-ray</text>
+        <text class="svgtxt b" x="12" y="26">Classification</text>
+        <text class="svgtxt sm" x="100" y="70">หนึ่ง label ต่อหนึ่งภาพ</text>
+        <text class="svgtxt b" x="100" y="92">“ปอดบวม: ใช่”</text>
+        <text class="svgtxt sm" x="100" y="112" fill="var(--good)">ต้นทุน label: ต่ำ</text>
+      </g>
+      <g>
+        <rect x="240" y="34" width="220" height="104" rx="12" fill="var(--s2)" fill-opacity=".10" stroke="var(--s2)" stroke-width="2"/>
+        <rect x="258" y="52" width="68" height="68" rx="4" fill="var(--seq2)" fill-opacity=".45" stroke="var(--axis)"/>
+        <g fill="none" stroke="var(--s2)" stroke-width="2">
+          <rect x="266" y="60" width="20" height="18"/><rect x="296" y="76" width="18" height="20"/><rect x="272" y="94" width="22" height="18"/>
+        </g>
+        <text class="svgtxt b" x="252" y="26">Detection</text>
+        <text class="svgtxt sm" x="340" y="70">กรอบ + label ต่อหนึ่งวัตถุ</text>
+        <text class="svgtxt b" x="340" y="92">“ก้อนที่ (x, y, w, h)”</text>
+        <text class="svgtxt sm" x="340" y="112" fill="var(--star)">ต้นทุน label: ปานกลาง</text>
+      </g>
+      <g>
+        <rect x="480" y="34" width="220" height="104" rx="12" fill="var(--s3)" fill-opacity=".10" stroke="var(--s3)" stroke-width="2"/>
+        <rect x="498" y="52" width="68" height="68" rx="4" fill="var(--seq2)" fill-opacity=".45" stroke="var(--axis)"/>
+        <path d="M506 100 C 516 74, 538 70, 552 86 C 560 96, 552 112, 532 114 C 516 115, 508 110, 506 100 Z" fill="var(--s3)" fill-opacity=".75" stroke="var(--s3)" stroke-width="1.5"/>
+        <text class="svgtxt b" x="492" y="26">Segmentation</text>
+        <text class="svgtxt sm" x="580" y="70">หนึ่ง label ต่อ <tspan font-weight="700">ทุกพิกเซล</tspan></text>
+        <text class="svgtxt b" x="580" y="92">“พิกเซลพวกนี้คือเนื้องอก”</text>
+        <text class="svgtxt sm" x="580" y="112" fill="var(--crit)">⚠️ ต้นทุน label: สูง</text>
+      </g>
+      <rect x="0" y="150" width="700" height="34" rx="9" fill="var(--starbg)" stroke="var(--star)"/>
+      <text class="svgtxt b" x="350" y="171" text-anchor="middle">⭐ จับคู่งานกับคำถาม — วางแผนฉายรังสีต้องการเส้นขอบที่แม่น (segmentation) · การคัดแยกต้องการแค่ “ปกติ/ผิดปกติ” (classification)</text>
+    </svg>
+  </figure>
+  <div class="tw"><table>
+    <thead><tr><th>งาน</th><th>คำถามทางคลินิก</th><th>Label ที่ต้องใช้</th><th>ต้นทุน label</th></tr></thead>
+    <tbody>
+      <tr><td><b>Classification</b></td><td>มีโรคไหม ส่งต่อหรือไม่</td><td>แท็กเดียวต่อภาพ (มักดึงมาจากรายงาน)</td><td><b>ต่ำ</b></td></tr>
+      <tr><td><b>Detection</b></td><td>รอยโรคอยู่ตรงไหน มีกี่จุด</td><td>กรอบล้อม (bounding box)</td><td>ปานกลาง</td></tr>
+      <tr><td><b>Segmentation</b></td><td><b>ใหญ่แค่ไหน รูปร่างอย่างไร โตขึ้นไหม</b></td><td><b>mask ระดับพิกเซล (เส้นขอบ)</b></td><td>⚠️ <b>สูง</b></td></tr>
+    </tbody>
+  </table></div>
+  <p>💡 Detection เป็นหัวข้อของสัปดาห์หน้า (YOLO)</p>
+  </div>
+</section>
+
+<section class="ch" id="ch25" data-ch="25">
+  <h3>บทที่ 25 — U-Net: ม้างานของ segmentation ทางการแพทย์</h3>
+  <div class="chbody">
+  <figure>
+    <div class="figtitle">⭐ encoder ย่อลงเพื่อหา “อะไร” · decoder ขยายกลับเพื่อบอก “ตรงไหน”</div>
+    <svg viewBox="0 0 700 208" role="img" aria-label="โครงสร้าง U-Net encoder decoder พร้อม skip connection">
+      <g>
+        <rect x="40" y="26" width="34" height="100" rx="5" fill="var(--seq2)" fill-opacity=".5" stroke="var(--axis)"/>
+        <rect x="96" y="46" width="34" height="76" rx="5" fill="var(--seq3)" fill-opacity=".5" stroke="var(--axis)"/>
+        <rect x="152" y="66" width="34" height="52" rx="5" fill="var(--seq4)" fill-opacity=".5" stroke="var(--axis)"/>
+        <rect x="208" y="86" width="52" height="30" rx="5" fill="var(--s4)" fill-opacity=".45" stroke="var(--s4)" stroke-width="2"/>
+        <rect x="282" y="66" width="34" height="52" rx="5" fill="var(--seq4)" fill-opacity=".5" stroke="var(--axis)"/>
+        <rect x="338" y="46" width="34" height="76" rx="5" fill="var(--seq3)" fill-opacity=".5" stroke="var(--axis)"/>
+        <rect x="394" y="26" width="34" height="100" rx="5" fill="var(--seq2)" fill-opacity=".5" stroke="var(--axis)"/>
+      </g>
+      <g class="svgtxt sm" text-anchor="middle">
+        <text x="57" y="140">256²</text><text x="113" y="140">128²</text><text x="169" y="140">64²</text>
+        <text x="234" y="130">32²</text><text x="299" y="140">64²</text><text x="355" y="140">128²</text><text x="411" y="140">256²</text>
+      </g>
+      <text class="svgtxt b" x="100" y="160" text-anchor="middle">encoder — ย่อลง</text>
+      <text class="svgtxt b" x="234" y="148" text-anchor="middle" fill="var(--s4)">bottleneck</text>
+      <text class="svgtxt b" x="368" y="160" text-anchor="middle">decoder — ขยายกลับ</text>
+      <g fill="none" stroke="var(--s2)" stroke-width="2" stroke-dasharray="5 3">
+        <path d="M74 40 L 394 40"/><path d="M130 58 L 338 58"/><path d="M186 78 L 282 78"/>
+      </g>
+      <g fill="var(--s2)"><path d="M394 40 l -8 -4 v 8 z"/><path d="M338 58 l -8 -4 v 8 z"/><path d="M282 78 l -8 -4 v 8 z"/></g>
+      <text class="svgtxt b" x="234" y="20" text-anchor="middle" fill="var(--s2)">⭐ skip connections</text>
+      <rect x="452" y="26" width="248" height="100" rx="11" fill="var(--surface2)" stroke="var(--axis)"/>
+      <text class="svgtxt sm" x="464" y="48">⭐ <tspan font-weight="700">Encoder</tspan> คือ CNN ที่ย่อภาพและเรียนว่า “มีอะไร”</text>
+      <text class="svgtxt sm" x="464" y="70">⭐ <tspan font-weight="700">Decoder</tspan> ขยายกลับเป็นขนาดเต็ม เพื่อบอก “ตรงไหน”</text>
+      <text class="svgtxt sm" x="464" y="86">ทีละพิกเซล</text>
+      <text class="svgtxt sm" x="464" y="108">⭐ <tspan font-weight="700">Skip</tspan> คัดลอกรายละเอียดละเอียดจาก encoder ไป decoder</text>
+      <text class="svgtxt sm" x="464" y="122">เส้นขอบจึงยังคมอยู่</text>
+      <text class="svgtxt b" x="452" y="160">⭐ ผลลัพธ์คือ mask ที่มีขนาดเท่ากับภาพ input</text>
+      <rect x="0" y="174" width="700" height="32" rx="9" fill="var(--starbg)" stroke="var(--star)"/>
+      <text class="svgtxt b" x="12" y="194">⭐ เคสจริง: U-Net (2015) ออกแบบมาสำหรับภาพกล้องจุลทรรศน์ที่มี annotation แค่ไม่กี่สิบภาพ โดยใช้ elastic-deformation augmentation หนัก ๆ แล้วชนะ ISBI 2015 ขาดลอย</text>
+    </svg>
+  </figure>
+  <p>💡 ปัจจุบันรุ่นต่าง ๆ ของมันถูกใช้ segment อวัยวะ เนื้องอก และหลอดเลือด ทั้งใน CT, MRI และอัลตราซาวด์</p>
+  </div>
+</section>
+
+<section class="ch" id="ch26" data-ch="26">
+  <h3>บทที่ 26 — วัดความซ้อนทับ: Dice และ IoU <span class="chip" style="border-color:var(--star);color:var(--star)">⭐ สูตรที่ต้องคำนวณได้</span></h3>
+  <div class="chbody">
+<pre><code>Dice = 2|A ∩ B| / (|A| + |B|)        IoU = |A ∩ B| / |A ∪ B|
+A = mask ของผู้เชี่ยวชาญ   ·   B = mask ของโมเดล</code></pre>
+
+  <figure>
+    <div class="figtitle">ลองเลื่อนความซ้อนทับดูเอง</div>
+    <div class="figsub">ตัวอย่างจากสไลด์ — เนื้องอกที่ผู้เชี่ยวชาญวาด = 100 พิกเซล · โมเดลวาด = 80 พิกเซล</div>
+    <div style="display:grid; gap:16px; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); align-items:center">
+      <svg viewBox="0 0 320 170" style="max-width:340px" role="img" aria-label="วงกลมสองวงซ้อนทับกัน แสดง mask ของผู้เชี่ยวชาญและของโมเดล">
+        <circle id="dcA" cx="120" cy="86" r="36" fill="var(--s1)" fill-opacity=".30" stroke="var(--s1)" stroke-width="2"/>
+        <circle id="dcB" cx="200" cy="86" r="32" fill="var(--s2)" fill-opacity=".30" stroke="var(--s2)" stroke-width="2"/>
+        <text id="dcLA" class="svgtxt b" x="120" y="34" text-anchor="middle" fill="var(--s1)">A = 100</text>
+        <text id="dcLB" class="svgtxt b" x="200" y="150" text-anchor="middle" fill="var(--s2)">B = 80</text>
+        <text class="svgtxt sm" x="120" y="166" text-anchor="middle">ผู้เชี่ยวชาญ</text>
+        <text class="svgtxt sm" x="200" y="20" text-anchor="middle">โมเดล</text>
+        <text id="dcOv" class="svgval" x="160" y="90" text-anchor="middle">A∩B = 60</text>
+      </svg>
+      <div>
+        <div class="ctrls" style="margin:0 0 12px">
+          <label for="dov">ความซ้อนทับ</label>
+          <input id="dov" type="range" min="0" max="80" step="1" value="60">
+          <output id="dovo">60 พิกเซล</output>
+        </div>
+        <div class="tw" style="margin:0"><table style="font-size:14.5px">
+          <tbody>
+            <tr><td><b>Dice</b> = 2·|A∩B| / (|A|+|B|)</td><td class="num" id="dDice" style="font-weight:700;font-size:17px;color:var(--s1)">0.67</td></tr>
+            <tr><td><b>IoU</b> = |A∩B| / |A∪B|</td><td class="num" id="dIoU" style="font-weight:700;font-size:17px;color:var(--s2)">0.50</td></tr>
+            <tr><td>|A ∪ B| = 100 + 80 − |A∩B|</td><td class="num" id="dUni" style="font-weight:700">120</td></tr>
+            <tr><td>ตรวจเอกลักษณ์ <b>Dice = 2·IoU/(1+IoU)</b></td><td class="num" id="dChk" style="font-weight:700;color:var(--good)">0.67</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+    </div>
+    <figcaption>⭐ <b>ทั้งคู่มีค่า 0 (ไม่ซ้อนกันเลย) ถึง 1 (ตรงกันเป๊ะ)</b> · ⭐ <b>Dice คือ F1 score ที่คำนวณบนพิกเซล ส่วน IoU เข้มงวดกว่า</b> และทั้งสองผูกกันด้วย <b>Dice = 2·IoU/(1+IoU)</b> เสมอ</figcaption>
+  </figure>
+
+  <div class="warnbox"><span class="lb">⚠️ ทำไมไม่ใช้ pixel accuracy</span>
+    <b>เนื้องอกที่กินพื้นที่ 1% ของภาพ ทำให้ mask ว่างเปล่าได้ accuracy 99%</b>
+  </div>
+  <div class="key"><span class="lb">⭐ ตัวอย่างที่ต้องคำนวณได้</span>
+    ผู้เชี่ยวชาญวาด 100 พิกเซล · โมเดลวาด 80 พิกเซล · ซ้อนทับ 60 พิกเซล →
+    <b>Dice = 2 · 60 / (100 + 80) = 0.67</b> และ <b>IoU = 60 / (100 + 80 − 60) = 0.50</b>
+  </div>
+  </div>
+</section>
+
+<section class="ch" id="ch27" data-ch="27" data-lite="1">
+  <details class="chfold">
+    <summary><h3>บทที่ 27 — เลือกตัววัดให้ตรงกับเป้าหมายทางคลินิก</h3><span class="chip">ไม่เน้นสอบ</span></summary>
+    <div class="chbody">
+    <p>คะแนนความซ้อนทับเป็นแค่จุดเริ่ม ไม่ใช่เรื่องทั้งหมด</p>
+    <div class="tw"><table>
+      <thead><tr><th>สถานการณ์</th><th>ต้องดูหรือเพิ่มอะไร</th></tr></thead>
+      <tbody>
+        <tr><td><b>โครงสร้างเล็กมาก</b> (รอยโรค หลอดเลือด)</td><td>⚠️ <b>ผิดพลาดพิกเซลเดียวเปลี่ยน Dice ได้มาก — ให้รายงานการตรวจพบรายรอยโรคด้วย</b></td></tr>
+        <tr><td><b>เส้นขอบสำคัญ</b> (ขอบเขตการฉายรังสี)</td><td><b>เพิ่มตัววัดระยะทาง เช่น Hausdorff distance เป็นมิลลิเมตร</b></td></tr>
+        <tr><td><b>การนับรอยโรค</b> (การแพร่กระจาย)</td><td>⚠️ <b>Dice สูงได้ ทั้งที่รอยโรคเล็ก ๆ หายไปหมด</b></td></tr>
+        <tr><td><b>ภาพที่ไม่มีโรค</b></td><td>⚠️ <b>Dice ไม่นิยามเมื่อ mask ทั้งสองว่าง ต้องตัดสินใจว่าจะให้คะแนนอย่างไร</b></td></tr>
+      </tbody>
+    </table></div>
+    <div class="key"><span class="lb">⭐ สิ่งที่ต้องจำ</span>
+      <b>“Dice = 0.85” ฟังดูดี แต่แพทย์ควรถามต่อว่า เฉลี่ยจากอะไร · รอยโรคไหนที่หลุดไป · และเส้นขอบเพี้ยนไปกี่มิลลิเมตร</b>
+    </div>
+    </div>
+  </details>
+</section>
+
+<section class="ch" id="ch28" data-ch="28">
+  <h3>บทที่ 28 — Label มาจากไหน และคุณภาพของมัน</h3>
+  <div class="chbody">
+  <div class="tw"><table>
+    <thead><tr><th>เครื่องมือ</th><th>จุดเด่น</th><th>ใช้ตอนไหน</th></tr></thead>
+    <tbody>
+      <tr><td><b>LabelMe</b></td><td>เล็ก ทำงานออฟไลน์บนเดสก์ท็อป · polygon และ point · ออกเป็น JSON</td><td>นักวิจัยคนเดียววาดเส้นขอบรอยโรคบนแล็ปท็อป</td></tr>
+      <tr><td><b>CVAT</b></td><td><b>บนเว็บ · ทำงานเป็นทีม มอบหมายงาน มีขั้นตอนตรวจทาน และมี AI ช่วยติด label · รองรับกรอบ mask และวิดีโอ</b></td><td>โครงการติด label ที่มีผู้อ่านหลายคนและมีผู้ตรวจทาน</td></tr>
+    </tbody>
+  </table></div>
+  <p>💡 โปรแกรมดูภาพเฉพาะทางการแพทย์ (เช่น 3D Slicer) จัดการ DICOM volume ได้ตรง ๆ · ⚠️ <b>label ระดับภาพมักถูกขุดมาจากรายงานรังสีด้วยกฎทางข้อความ ซึ่งถูกแต่มีสัญญาณรบกวน</b> · ⭐ <b>และการติด label ต้องทำบนภาพที่ลบตัวระบุตัวตนแล้ว ในโครงสร้างพื้นฐานที่ได้รับอนุมัติ ตาม PDPA</b></p>
+  <div class="key"><span class="lb">⭐ ความจริงเรื่องงบ</span>
+    <b>เวลาของผู้เชี่ยวชาญคือคอขวด — ให้ติด label กับข้อมูลที่ถูกต้อง (หลากหลาย ยาก เป็นตัวแทน) ไม่ใช่ติด label กับข้อมูลที่มากที่สุด</b>
+  </div>
+
+  <h4 style="font-size:16px;margin:24px 0 10px">คุณภาพของ label และความสอดคล้องระหว่างผู้อ่าน</h4>
+  <p>⚠️ <b>รังสีแพทย์ผู้เชี่ยวชาญสองคนมักเห็นไม่ตรงกัน — “ความจริงพื้นฐาน” จึงไม่แน่นอนในตัวมันเอง</b></p>
+  <ul class="bul">
+    <li>⭐ <b>เขียนแนวทางการติด label พร้อมภาพตัวอย่างและเคสก้ำกึ่ง</b> เช่น “น้ำในเยื่อหุ้มปอดนิดเดียวนับเป็นบวกไหม”</li>
+    <li>⭐ <b>ให้ผู้อ่านสองคนขึ้นไปติด label กับข้อมูลส่วนหนึ่ง แล้วตัดสินข้อขัดแย้งด้วยฉันทามติหรือผู้อ่านอาวุโส</b></li>
+    <li>⭐ <b>วัดความสอดคล้องด้วย Cohen’s kappa</b> (สองผู้อ่าน · ข้อมูลเป็นหมวด) <b>หรือ Dice ระหว่าง mask ของทั้งคู่</b></li>
+  </ul>
+<pre><code>κ = (p_o − p_e) / (1 − p_e)
+p_o = ความสอดคล้องที่สังเกตได้   ·   p_e = ความสอดคล้องที่คาดว่าจะเกิดจากความบังเอิญ</code></pre>
+
+  <figure>
+    <div class="figtitle">⭐ การอ่านค่า kappa ที่ใช้กันทั่วไป</div>
+    <svg viewBox="0 0 700 92" role="img" aria-label="แถบการตีความค่า kappa">
+      <rect x="0"   y="24" width="130" height="34" rx="6" fill="var(--crit)" fill-opacity=".30" stroke="var(--axis)"/>
+      <rect x="134" y="24" width="130" height="34" rx="6" fill="var(--serious)" fill-opacity=".35" stroke="var(--axis)"/>
+      <rect x="268" y="24" width="130" height="34" rx="6" fill="var(--warn)" fill-opacity=".35" stroke="var(--axis)"/>
+      <rect x="402" y="24" width="130" height="34" rx="6" fill="var(--good)" fill-opacity=".25" stroke="var(--axis)"/>
+      <rect x="536" y="24" width="164" height="34" rx="6" fill="var(--good)" fill-opacity=".45" stroke="var(--axis)"/>
+      <g class="svgtxt b" text-anchor="middle">
+        <text x="65" y="46">เล็กน้อย</text><text x="199" y="46">พอใช้</text><text x="333" y="46">ปานกลาง</text>
+        <text x="467" y="46">มาก</text><text x="618" y="46">เกือบสมบูรณ์</text>
+      </g>
+      <g class="svgtxt sm" text-anchor="middle">
+        <text x="65" y="76">&lt; 0.20</text><text x="199" y="76">0.21–0.40</text><text x="333" y="76">0.41–0.60</text>
+        <text x="467" y="76">0.61–0.80</text><text x="618" y="76">&gt; 0.80</text>
+      </g>
+      <text class="svgtxt b" x="0" y="16">κ</text>
+    </svg>
+  </figure>
+
+  <div class="key"><span class="lb">⭐ จุดสำคัญ</span>
+    <b>โมเดลไม่มีทางดีกว่า label ที่ใช้ตัดสินมันได้อย่างน่าเชื่อถือ</b> ⚠️ <b>ถ้าผู้อ่านเห็นตรงกันแค่ระดับปานกลาง “ความผิดพลาด” ของโมเดลส่วนหนึ่งอาจเป็นสัญญาณรบกวนใน label เอง</b>
+  </div>
+  </div>
+</section>
+
+<section class="ch" id="ch29" data-ch="29">
+  <h3>บทที่ 29 — Quiz 3: เลือกงานและตัววัด</h3>
+  <div class="chbody">
+  <div class="quiz" data-quiz="3">
+    <div class="qhead"><span class="qt">Quiz 3</span><span class="chip">4 ข้อ</span></div>
+    <div class="qitem"><div class="qq"><span class="qn">1</span><span>ตีธงฟิล์มทรวงอกที่ต้องให้รังสีแพทย์อ่านด่วน</span></div>
+      <button class="qreveal">ดูเฉลย</button><div class="qa" hidden><span class="ans">Classification</span> — <b>ใช้ sensitivity ที่ specificity ค่าหนึ่งที่ตรึงไว้ หรือ ROC AUC</b> ⚠️ เพราะการพลาดเคสด่วนมีราคาแพง</div></div>
+    <div class="qitem"><div class="qq"><span class="qn">2</span><span>วัดปริมาตรเนื้องอกสมองก่อนและหลังให้เคมีบำบัด</span></div>
+      <button class="qreveal">ดูเฉลย</button><div class="qa" hidden><span class="ans">Segmentation</span> — <b>ใช้ Dice บวกกับความคลาดของปริมาตรเป็นมิลลิลิตร และระยะทางของเส้นขอบเป็นมิลลิเมตร</b></div></div>
+    <div class="qitem"><div class="qq"><span class="qn">3</span><span>นับและระบุตำแหน่งติ่งเนื้อทุกจุดในเฟรมการส่องกล้องลำไส้</span></div>
+      <button class="qreveal">ดูเฉลย</button><div class="qa" hidden><span class="ans">Detection</span> — <b>ใช้ sensitivity รายติ่งเนื้อ หรือ mAP</b> (สัปดาห์หน้า)</div></div>
+    <div class="qitem"><div class="qq"><span class="qn">4</span><span>พยาธิแพทย์สองคนให้เกรดสไลด์ชุดเดียวกัน 200 แผ่น พวกเขาสอดคล้องกันแค่ไหน</span></div>
+      <button class="qreveal">ดูเฉลย</button><div class="qa" hidden>⚠️ <span class="ans">นี่ไม่ใช่งานของโมเดล</span> — เป็นเรื่อง <b>ความสอดคล้องระหว่างผู้อ่าน ใช้ Cohen’s kappa</b> (หรือ weighted kappa ถ้าเกรดมีลำดับ)</div></div>
+  </div>
+  <div class="key"><span class="lb">⭐ สิ่งที่ต้องจำ</span>
+    <b>คำถามทางคลินิกเลือกงาน · งานเลือกชนิดของ label และตัววัด</b> ⭐ <b>ตัดสินทั้งสามอย่างให้ครบก่อนที่ใครจะเริ่มติด label</b>
+  </div>
+  </div>
+</section>
+
+<h2 class="sec" id="s5"><span class="pill">ส่วนที่ 5</span> ความสำเร็จจริง ทางลัด และการอธิบายโมเดล</h2>
+<p class="secintro">บทที่ 30–36 · ⭐ คะแนนภายในที่สูงซ่อนทางลัดได้ และมีแต่การตรวจสอบจากภายนอกเท่านั้นที่เปิดโปงมันได้</p>
+
+<section class="ch" id="ch30" data-ch="30" data-lite="1">
+  <details class="chfold">
+    <summary><h3>บทที่ 30 — เคสสำเร็จ: การคัดกรองจอตาเสื่อมจากเบาหวาน</h3><span class="chip">ไม่เน้นสอบ</span></summary>
+    <div class="chbody">
+    <div class="key"><span class="lb">⭐ เคสจริง: Gulshan และคณะ, JAMA 2016</span>
+      CNN ถูกเทรนบน <b>ภาพถ่ายจอตาราว 128,000 ใบ แต่ละใบถูกให้เกรด 3–7 ครั้งโดยคณะจักษุแพทย์และแพทย์ประจำบ้านอาวุโส 54 คน</b> ⭐ <b>บนชุดตรวจสอบอิสระสองชุด (EyePACS-1 และ Messidor-2) มันตรวจจอตาเสื่อมระดับที่ต้องส่งต่อได้ที่ ROC AUC ราว 0.99</b>
+    </div>
+    <div class="tw"><table>
+      <thead><tr><th>ทำไมมันสำเร็จ</th><th>สิ่งที่มันยังแสดงไม่ได้</th></tr></thead>
+      <tbody>
+        <tr><td><b>ชุดข้อมูลใหญ่ ให้เกรดอย่างระมัดระวัง และมีผู้อ่านหลายคนต่อหนึ่งภาพ</b></td><td>⚠️ <b>ประสิทธิภาพในโลกจริงที่คลินิกซึ่งกล้องคุณภาพต่ำกว่า</b></td></tr>
+        <tr><td><b>คำถามคัดกรองที่ชัดเจนและนิยามไว้ดี</b></td><td>⚠️ <b>ผลต่อคนไข้และต่อกระบวนการทำงาน</b></td></tr>
+        <tr><td><b>ตรวจสอบบนข้อมูลที่โมเดลไม่เคยเห็น</b></td><td>⭐ <b>สิ่งเหล่านี้ต้องการการศึกษาแบบไปข้างหน้า — คะแนนจากภาพไม่ใช่ประโยชน์ทางคลินิก</b></td></tr>
+      </tbody>
+    </table></div>
+    <p>💡 <b>ความเชื่อมโยงกับไทย</b> — ระบบคล้ายกันถูกนำไปทดสอบแบบไปข้างหน้าในเวลาจริงที่หลายไซต์ของโครงการคัดกรองระดับชาติของไทย ⭐ <b>ซึ่งแสดงว่าระยะทางระหว่าง AUC ที่สูง กับบริการที่ใช้งานได้จริงนั้นยาวแค่ไหน</b></p>
+    </div>
+  </details>
+</section>
+
+<section class="ch" id="ch31" data-ch="31" data-lite="1">
+  <details class="chfold">
+    <summary><h3>บทที่ 31 — เคสสำเร็จ: มะเร็งผิวหนังจากภาพถ่าย และ CheXNet</h3><span class="chip">ไม่เน้นสอบ</span></summary>
+    <div class="chbody">
+    <div class="key"><span class="lb">⭐ เคสจริง: Esteva และคณะ, Nature 2017</span>
+      Inception v3 ที่ pretrain บน ImageNet ถูก fine-tune บน <b>ภาพผิวหนังทางคลินิก 129,450 ใบ ครอบคลุม 2,032 โรค</b> ⭐ <b>บนภาพทดสอบที่ยืนยันด้วยการตัดชิ้นเนื้อ มันทำได้เท่ากับแพทย์ผิวหนังที่ได้รับการรับรอง 21 คน ในการแยกรอยโรคร้ายจากไม่ร้าย</b>
+    </div>
+    <p>⭐ <b>เป็นตัวอย่างชัดเจนของ transfer learning — backbone ตัวเดียวกับที่จำหมาและรถยนต์ได้ เรียนรอยโรคผิวหนังได้</b> ⚠️ <b>แต่การเปรียบเทียบทำบนภาพที่คัดมาแล้ว ไม่ใช่ภาพรก ๆ ที่แอปบนมือถือได้รับจริง</b> ⚠️ <b>และข้อมูลเทรนส่วนใหญ่มาจากผิวสีอ่อน ประสิทธิภาพบนผิวสีเข้มจึงยังไม่ถูกพิสูจน์</b></p>
+    <div class="key"><span class="lb">⭐ เคสจริง: CheXNet (2017, preprint)</span>
+      DenseNet 121 ชั้นถูกเทรนบน <b>ChestX-ray14 — ฟิล์มทรวงอกด้านหน้ากว่า 100,000 ใบ พร้อม label 14 โรคที่ขุดมาจากรายงานรังสี</b> ⭐ <b>บนชุดทดสอบ 420 ภาพที่รังสีแพทย์ติด label คะแนน F1 ของปอดบวมถูกรายงานว่าสูงกว่าค่าเฉลี่ยของรังสีแพทย์สี่คน</b>
+    </div>
+    <p>⚠️ <b>ข้อควรระวัง</b> — <b>label ที่ใช้เทรนถูกสกัดจากรายงานด้วยกฎทางข้อความ จึงมีสัญญาณรบกวน</b> · <b>เป็น preprint และเป็นข้อมูลจากสถาบันเดียว</b> · ⚠️ <b>และ “ปอดบวม” บนฟิล์มนั้นยากแม้สำหรับผู้เชี่ยวชาญ</b></p>
+    <div class="key"><span class="lb">⭐ คำถามที่ต้องถามกับทุกคำกล่าวอ้างว่า “ระดับผู้เชี่ยวชาญ”</span>
+      <b>บนคนไข้กลุ่มไหน กล้องแบบไหน โรงพยาบาลไหน</b> — <b>“ระดับแพทย์ผิวหนัง” บนชุดทดสอบหนึ่งชุด ไม่ใช่ “ระดับแพทย์ผิวหนัง” ในทุกที่</b>
+    </div>
+    </div>
+  </details>
+</section>
+
+<section class="ch" id="ch32" data-ch="32">
+  <h3>บทที่ 32 — เมื่อโมเดลเรียนรู้โรงพยาบาล ไม่ใช่โรค <span class="chip" style="border-color:var(--crit);color:var(--crit)">⚠️ เคสที่ต้องจำ</span></h3>
+  <div class="chbody">
+  <div class="key"><span class="lb">⭐ เคสจริง: Zech และคณะ, PLOS Medicine 2018</span>
+    CNN ทำนายปอดบวมถูกเทรนบนฟิล์มจาก <b>NIH, Mount Sinai และ Indiana University</b> ⚠️ <b>ประสิทธิภาพบนโรงพยาบาลที่ไม่เคยเห็นตอนเทรน ต่ำลงอย่างมีนัยสำคัญใน 3 จาก 5 การเปรียบเทียบ</b> ⚠️ <b>และ CNN ยังระบุได้ด้วยความแม่นเกือบสมบูรณ์ว่าฟิล์มมาจากโรงพยาบาลไหน — กระทั่งแผนกไหน</b>
+  </div>
+  <figure>
+    <div class="figtitle">⚠️ ไซต์คือตัวกวน (confounder)</div>
+    <svg viewBox="0 0 700 180" role="img" aria-label="แผนภาพ confounder โรงพยาบาลเชื่อมกับทั้งสไตล์ภาพและอัตราปอดบวม">
+      <rect x="250" y="14" width="200" height="44" rx="11" fill="var(--crit)" fill-opacity=".16" stroke="var(--crit)" stroke-width="2"/>
+      <text class="svgtxt b" x="350" y="34" text-anchor="middle" fill="var(--crit)">โรงพยาบาล / เครื่องสแกน</text>
+      <text class="svgtxt sm" x="350" y="50" text-anchor="middle">= ตัวกวน</text>
+      <path d="M290 60 L 180 104" stroke="var(--axis)" stroke-width="2"/><path d="M180 104 l 9 -2 l -4 -7 z" fill="var(--axis)"/>
+      <path d="M410 60 L 520 104" stroke="var(--axis)" stroke-width="2"/><path d="M520 104 l -9 -2 l 4 -7 z" fill="var(--axis)"/>
+      <rect x="60" y="110" width="200" height="44" rx="11" fill="var(--surface2)" stroke="var(--axis)"/>
+      <text class="svgtxt b" x="160" y="130" text-anchor="middle">สไตล์ของภาพ</text>
+      <text class="svgtxt sm" x="160" y="146" text-anchor="middle">เครื่องหมายข้อความ · ฟิล์มเคลื่อนที่</text>
+      <rect x="440" y="110" width="200" height="44" rx="11" fill="var(--surface2)" stroke="var(--axis)"/>
+      <text class="svgtxt b" x="540" y="130" text-anchor="middle">อัตราปอดบวม</text>
+      <text class="svgtxt sm" x="540" y="146" text-anchor="middle">ความชุกต่างกันในแต่ละไซต์</text>
+      <path d="M264 132 L 436 132" stroke="var(--crit)" stroke-width="2.5" stroke-dasharray="6 4"/>
+      <text class="svgtxt b" x="350" y="124" text-anchor="middle" fill="var(--crit)">ความสัมพันธ์ลวง</text>
+      <text class="svgtxt sm" x="350" y="174" text-anchor="middle">⚠️ โมเดลหาทางลัดราคาถูก — จำไซต์ให้ได้ก่อน แล้วใช้อัตราฐานของไซต์นั้นตอบ</text>
+    </svg>
+  </figure>
+  <div class="warnbox"><span class="lb">⭐ บทเรียน</span>
+    <b>ชุดทดสอบภายในมีตัวกวนตัวเดียวกันอยู่ด้วย มันจึงเปิดโปงปัญหานี้ไม่ได้</b> ⭐ <b>มีแต่การตรวจสอบจากภายนอกเท่านั้นที่ทำได้</b>
+  </div>
+  </div>
+</section>
+
+<section class="ch" id="ch33" data-ch="33">
+  <h3>บทที่ 33 — Shortcut learning ในโมเดลภาพโควิด-19</h3>
+  <div class="chbody">
+  <div class="key"><span class="lb">⭐ นิยาม</span>
+    <b>Shortcut learning คือการที่โมเดลแก้โจทย์ benchmark ได้ด้วยเบาะแสง่าย ๆ ที่ใช้ไม่ได้ในโลกจริง</b>
+  </div>
+  <div class="key"><span class="lb">⭐ เคสจริง: DeGrave, Janizek และ Lee, Nat. Mach. Intell. 2021</span>
+    ⚠️ <b>ชุดข้อมูลภาพโควิดยุคแรกหลายชุดเอาภาพผู้ติดเชื้อจากแหล่งหนึ่ง มารวมกับภาพผู้ไม่ติดเชื้อจากอีกแหล่งหนึ่ง</b> ⭐ <b>โมเดลได้ accuracy ภายในสูง แต่วิธีการอธิบายโมเดลแสดงว่ามันพึ่งเครื่องหมายข้อความ สัญลักษณ์บอกข้าง และท่าทางคนไข้ที่ขอบภาพ แทนที่จะพึ่งสิ่งที่เห็นในปอด</b> ⚠️ <b>ประสิทธิภาพตกฮวบเมื่อเจอข้อมูลจากแหล่งใหม่</b>
+  </div>
+  <div class="cards">
+    <div class="card" style="border-left:4px solid var(--crit)"><h4>⚠️ ทางลัดอื่นที่รู้จักกันดี</h4><p><b>สายระบายทรวงอกในภาพ “ลมรั่วในช่องเยื่อหุ้มปอด”</b> — เพราะสายระบายคือ <i>การรักษา</i> · <b>ไม้บรรทัดที่วางข้างรอยโรคผิวหนังที่น่าสงสัย</b></p></div>
+    <div class="card" style="border-left:4px solid var(--good)"><h4>✓ แนวป้องกัน</h4><p>⭐ <b>เก็บเคสและกลุ่มควบคุมจากไซต์เดียวกัน</b> · <b>ครอปหรือปิดบังเครื่องหมายข้อความ</b> · ⭐ <b>ทดสอบจากภายนอก</b> · <b>และตรวจดูว่าโมเดลใช้อะไรอยู่</b></p></div>
+  </div>
+  </div>
+</section>
+
+<section class="ch" id="ch34" data-ch="34">
+  <h3>บทที่ 34 — Grad-CAM: โมเดลมองตรงไหน</h3>
+  <div class="chbody">
+  <figure>
+    <div class="figtitle">สี่ขั้นของ Grad-CAM</div>
+    <svg viewBox="0 0 700 150" role="img" aria-label="สี่ขั้นของ Grad-CAM">
+      <g>
+        <rect x="0"   y="40" width="158" height="54" rx="10" fill="var(--surface2)" stroke="var(--axis)"/>
+        <rect x="178" y="40" width="158" height="54" rx="10" fill="var(--seq2)" fill-opacity=".35" stroke="var(--axis)"/>
+        <rect x="356" y="40" width="158" height="54" rx="10" fill="var(--seq3)" fill-opacity=".35" stroke="var(--axis)"/>
+        <rect x="534" y="40" width="166" height="54" rx="10" fill="var(--s2)" fill-opacity=".30" stroke="var(--s2)" stroke-width="2"/>
+      </g>
+      <g class="svgtxt b" text-anchor="middle">
+        <text x="79" y="62">1 · X-ray → CNN</text><text x="257" y="62">2 · feature maps</text>
+        <text x="435" y="62">3 · ถ่วงน้ำหนักด้วย gradient</text><text x="617" y="62">4 · heat map ทับภาพ</text>
+      </g>
+      <g class="svgtxt sm" text-anchor="middle">
+        <text x="79" y="82">forward pass</text><text x="257" y="82">ของ conv ชั้นสุดท้าย</text>
+        <text x="435" y="82">บวกกัน แล้วเก็บเฉพาะค่าบวก</text><text x="617" y="82">ขยายเป็นขนาดภาพ</text>
+      </g>
+      <g stroke="var(--axis)" stroke-width="2"><path d="M160 67 L 174 67"/><path d="M338 67 L 352 67"/><path d="M516 67 L 530 67"/></g>
+      <text class="svgtxt b" x="0" y="22">💡 gradient บอกว่าแต่ละ feature map มีผลต่อคะแนนของคลาส “ปอดบวม” มากแค่ไหน</text>
+      <rect x="0" y="108" width="700" height="38" rx="9" fill="var(--starbg)" stroke="var(--star)"/>
+      <text class="svgtxt b" x="12" y="132">⭐ ใช้มันเป็นเครื่องมือตรวจสอบ — ถ้า heat map ไปสว่างที่เครื่องหมายข้อความของโรงพยาบาลหรือที่สายระบาย แปลว่าเราเจอทางลัดแล้ว</text>
+    </svg>
+  </figure>
+  <div class="key"><span class="lb">⭐ อ่าน heat map จริงอย่างไร</span>
+    จากตัวอย่างในสไลด์ (ResNet-18 ปรับตาม Lab 4 · fine-tune บน PneumoniaMNIST ที่ 224 × 224 · 2 epoch · test ROC AUC = 0.985) — <b>ภาพปอดบวมจริงสามใบ ความร้อนตกลงบนเนื้อปอด ซึ่งดูสมเหตุสมผล</b> ⚠️ <b>แต่เด็กปกติสองคนที่โมเดลเตือนผิดด้วย P ≥ 0.96 มีแผนที่หนึ่งใบที่ไปสว่างที่คอ ซึ่งอยู่นอกปอด — นั่นคือสัญญาณให้ไปตรวจสอบ</b> 💡 <b>และรูปร่างที่เป็นบล็อก ๆ เกิดเพราะแผนที่ถูกคำนวณบนกริด 7 × 7 แล้วค่อยขยาย</b>
+  </div>
+  <p>⚠️ <b>“มั่นใจแต่ผิด” ยังเกิดขึ้นได้เสมอ</b></p>
+  </div>
+</section>
+
+<section class="ch" id="ch35" data-ch="35">
+  <h3>บทที่ 35 — ขีดจำกัดของ heat map</h3>
+  <div class="chbody">
+  <div class="key"><span class="lb">⭐ เคสจริง: Saporta และคณะ, Nat. Mach. Intell. 2022</span>
+    <b>มีการเทียบวิธี saliency เจ็ดวิธี (รวม Grad-CAM) บนฟิล์มทรวงอก กับเส้นขอบที่รังสีแพทย์วาดไว้สำหรับพยาธิสภาพ 10 ชนิด</b> ⚠️ <b>ทุกวิธีระบุตำแหน่งพยาธิสภาพได้แย่กว่าเกณฑ์ของมนุษย์</b> ⭐ <b>โดย Grad-CAM มักดีที่สุดในกลุ่ม และช่องว่างกว้างที่สุดกับรอยโรคที่เล็กและรูปร่างซับซ้อน</b>
+  </div>
+  <ul class="bul">
+    <li>⚠️ <b>แผนที่ Grad-CAM หยาบ เพราะ conv ชั้นสุดท้ายอาจมีขนาดแค่ 7 × 7</b></li>
+    <li>⚠️ <b>แผนที่ที่ดูสมเหตุสมผล ไม่ได้พิสูจน์ว่าเหตุผลของโมเดลถูกต้อง — มันปลอบใจเราผิด ๆ ได้</b></li>
+    <li>⚠️ <b>แผนที่บอก <i>ที่ไหน</i> ไม่เคยบอก <i>ทำไม</i> — รอยโรคสองชนิดที่ต่างกันมากสว่างที่เดียวกันได้</b></li>
+  </ul>
+  <div class="key"><span class="lb">⭐ สิ่งที่ต้องจำ</span>
+    <b>ใช้ heat map เพื่อหาปัญหา ไม่ใช่เพื่อพิสูจน์ความถูกต้อง</b> ⭐ <b>ความไว้ใจมาจากการตรวจสอบจากภายนอก การวิเคราะห์กลุ่มย่อย และการประเมินทางคลินิกแบบไปข้างหน้า</b>
+  </div>
+  </div>
+</section>
+
+<section class="ch" id="ch36" data-ch="36">
+  <h3>บทที่ 36 — สรุปปิดคาบ</h3>
+  <div class="chbody">
+  <div class="tw"><table>
+    <thead><tr><th class="num">#</th><th>สาระ</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td>⭐ <b>ภาพคืออาร์เรย์ — ต้องรู้รูปร่าง หน่วย การทำ windowing และบริบท DICOM ที่เราถอดทิ้งไป</b></td></tr>
+      <tr><td class="num">2</td><td>⭐ <b>เครือข่ายเรียนด้วย loss → backpropagation → update และต้องเฝ้าดู validation เพื่อกัน overfit</b></td></tr>
+      <tr><td class="num">3</td><td>⭐ <b>CNN ใช้ฟิลเตอร์เล็ก ๆ ซ้ำทุกตำแหน่ง · pooling แลก “ที่ไหน” กับ “อะไร” · และ skip connection ของ ResNet ทำให้ลึกได้</b></td></tr>
+      <tr><td class="num">4</td><td>⭐ <b>Transfer learning + augmentation ที่เป็นไปได้จริง + การแบ่งตามคนไข้ ทำให้ชุดข้อมูลทางการแพทย์ที่เล็กใช้งานได้</b></td></tr>
+      <tr><td class="num">5</td><td>⭐ <b>เลือกงาน (จำแนก / ตรวจจับ / segment) และตัววัด (AUC, Dice, kappa) จากคำถามทางคลินิก</b></td></tr>
+      <tr><td class="num">6</td><td>⭐ <b>Label คือการตัดสินของมนุษย์ — แนวทางการติด label และความสอดคล้องระหว่างผู้อ่านเป็นเพดานของทุกอย่าง</b></td></tr>
+      <tr><td class="num">7</td><td>⚠️ <b>คะแนนภายในที่สูงซ่อนทางลัดได้ มีแต่การตรวจสอบจากภายนอกที่เปิดโปงมันได้ และ heat map ช่วยตรวจสอบแต่ไม่ได้พิสูจน์</b></td></tr>
+    </tbody>
+  </table></div>
+  <div class="tip"><span class="lb">💡 คำถามทิ้งท้าย</span>
+    นึกถึงงานด้านภาพหนึ่งอย่างในหน่วยงานของเราเอง — <b>label จะเป็นอะไร · ใครจะเป็นคนวาด · และโมเดลอาจหา “ทางลัด” อะไรเจอได้บ้างในภาพของโรงพยาบาลเรา</b>
+  </div>
+  </div>
+</section>
+
+<h2 class="sec" id="s6"><span class="pill">ส่วนที่ 6</span> Lab 4: จำแนกปอดบวมด้วย Transfer Learning</h2>
+<p class="secintro">บทที่ 37–39 · ResNet-18 บน PneumoniaMNIST — ปรับ เทรน ตรวจ แล้วเลือก threshold</p>
+
+<section class="ch" id="ch37" data-ch="37" data-lite="1">
+  <details class="chfold">
+    <summary><h3>บทที่ 37 — ภาพรวม Lab 4, ชุดข้อมูล และ Exercise 1</h3><span class="chip">ขั้นตอน lab</span></summary>
+    <div class="chbody">
+    <p>notebook ชื่อ <code>lab04_medical_image_classification.ipynb</code> บน Google Colab ⭐ <b>ราว 90 นาที เป็นงานเดี่ยว</b></p>
+    <div class="warnbox"><span class="lb">⚠️ เปิด GPU ก่อนเป็นอย่างแรก</span>
+      <b>Runtime → Change runtime type → T4 GPU → Save ก่อนรันเซลล์ใด ๆ</b> (การเปลี่ยนจะรีสตาร์ท notebook) 💡 ไม่มี GPU ก็ยังรันบน CPU ได้ แค่ช้ากว่าหลายนาที
+    </div>
+    <div class="flow">
+      <span class="nd">Setup + ข้อมูล</span><span class="ar">→</span><span class="nd">Ex. 1 ปรับ ResNet-18</span><span class="ar">→</span>
+      <span class="nd">เทรน 3 epoch</span><span class="ar">→</span><span class="nd">Ex. 2 confusion matrix</span><span class="ar">→</span>
+      <span class="nd">แกลเลอรีความผิดพลาด</span><span class="ar">→</span><span class="nd">Ex. 3 threshold</span><span class="ar">→</span>
+      <span class="nd">Part B: label + mask</span>
+    </div>
+
+    <h4 style="font-size:16px;margin:22px 0 10px">ชุดข้อมูล PneumoniaMNIST</h4>
+    <div class="tw"><table>
+      <tbody>
+        <tr><td><b>ที่มา</b></td><td>ส่วนหนึ่งของ <b>MedMNIST v2</b> ชุดข้อมูลชีวการแพทย์ที่ทำให้เป็นมาตรฐานและเบา ติดตั้งด้วย pip</td></tr>
+        <tr><td><b>ภาพ</b></td><td>⭐ <b>ฟิล์มทรวงอกเด็ก · label 0 = ปกติ, 1 = ปอดบวม · ขาวดำ 28 × 28 พิกเซล</b></td></tr>
+        <tr><td><b>ขนาด</b></td><td><b>ราว 5,900 ภาพที่มี label แบ่งเป็น train, validation และ test (624 ภาพ กันไว้ประเมินครั้งสุดท้าย)</b></td></tr>
+        <tr><td><b>ความไม่สมดุล</b></td><td>⚠️ <b>ราวสามในสี่ของภาพชุดเทรนเป็นปอดบวม — ตอบ “ปอดบวม” ทุกครั้งก็ถูกราว 75% แล้ว</b></td></tr>
+      </tbody>
+    </table></div>
+    <div class="key"><span class="lb">⭐ ดูก่อนเทรน</span>
+      ที่ 28 × 28 (ซึ่งทำเพื่อการสอน ไม่ใช่เพื่อการวินิจฉัย) <b>เรายังเห็นปอดบวมอยู่ไหม และรายละเอียดอะไรหายไปเทียบกับฟิล์มจริง</b>
+    </div>
+
+    <h4 style="font-size:16px;margin:22px 0 10px">Exercise 1 — ปรับ ResNet-18 ที่ pretrain มาแล้ว</h4>
+    <p>⭐ <b>เติมตัวเลขสองช่อง — ฟิล์มขาวดำมีกี่ channel และโมเดลตอบได้กี่คำตอบ</b></p>
+<pre><code>IN_CHANNELS = ...    # TODO: channel ของ X-ray (สี = 3, ขาวดำ = ?)
+N_CLASSES   = ...    # TODO: คำตอบที่เป็นไปได้ (ปกติ / ปอดบวม)
+old_w = net.conv1.weight.data.clone()
+net.conv1 = nn.Conv2d(IN_CHANNELS, 64, kernel_size=7, stride=2, padding=3, bias=False)
+if IN_CHANNELS == 1:
+    net.conv1.weight.data = old_w.sum(dim=1, keepdim=True)
+net.fc = nn.Linear(net.fc.in_features, N_CLASSES)</code></pre>
+    <p>⭐ <b><code>conv1</code> ตัวใหม่ยังเก็บฟิลเตอร์ที่ pretrain ไว้ ด้วยการบวกฟิลเตอร์ RGB เข้าด้วยกัน และชั้นกลางทั้งหมดยังเก็บสิ่งที่เรียนจาก ImageNet ไว้</b> · จากนั้นรันเซลล์เทรนที่ให้มา — <b>Adam · learning rate 10⁻³ · cross-entropy · 3 epoch</b> ราว 1 นาทีบน GPU หรือ 3–5 นาทีบน CPU โดย <b>ทุกชั้นถูกอัปเดต (full fine-tuning)</b></p>
+    <p>⚠️ <b>อ่าน <code>train_acc</code> เทียบกับ <code>val_acc</code> — ช่องว่างที่กว้างแปลว่า overfit</b></p>
+    </div>
+  </details>
+</section>
+
+<section class="ch" id="ch38" data-ch="38">
+  <h3>บทที่ 38 — Exercise 2–3: confusion matrix, ความผิดพลาด และ threshold</h3>
+  <div class="chbody">
+  <p>เซลล์ทำนายจะคำนวณ P(ปอดบวม) ให้ภาพทดสอบทั้ง <b>624 ภาพ</b> และทำนายว่าเป็นปอดบวมเมื่อ <b>P ≥ 0.5</b> ⭐ <b>Exercise 2 คือเขียนสองสูตรสุดท้ายด้วย tp, tn, fp, fn (ปอดบวม = ผลบวก)</b></p>
+  <figure>
+    <div class="figtitle">⭐ ตาราง 2 × 2 ของ lab นี้ และสองสูตรที่ต้องเติม</div>
+    <svg viewBox="0 0 700 180" role="img" aria-label="confusion matrix ของ lab โดยปอดบวมเป็นผลบวก">
+      <text class="svgtxt b" x="248" y="22" text-anchor="middle">ทำนายว่าปกติ</text>
+      <text class="svgtxt b" x="398" y="22" text-anchor="middle">ทำนายว่าปอดบวม</text>
+      <text class="svgtxt b" x="160" y="62" text-anchor="end">จริง: ปกติ</text>
+      <text class="svgtxt b" x="160" y="134" text-anchor="end">จริง: ปอดบวม</text>
+      <rect x="172" y="32" width="152" height="60" rx="10" fill="var(--good)" fill-opacity=".16" stroke="var(--good)"/>
+      <text class="svgtxt b" x="248" y="68" text-anchor="middle" font-size="16">TN</text>
+      <rect x="330" y="32" width="152" height="60" rx="10" fill="var(--warn)" fill-opacity=".22" stroke="var(--warn)" stroke-width="2"/>
+      <text class="svgtxt b" x="406" y="62" text-anchor="middle" font-size="16">FP</text>
+      <text class="svgtxt sm" x="406" y="80" text-anchor="middle">⚠️ เตือนผิด</text>
+      <rect x="172" y="104" width="152" height="60" rx="10" fill="var(--crit)" fill-opacity=".16" stroke="var(--crit)" stroke-width="2"/>
+      <text class="svgtxt b" x="248" y="134" text-anchor="middle" font-size="16" fill="var(--crit)">FN</text>
+      <text class="svgtxt sm" x="248" y="152" text-anchor="middle">⚠️ เคสที่พลาด</text>
+      <rect x="330" y="104" width="152" height="60" rx="10" fill="var(--good)" fill-opacity=".16" stroke="var(--good)"/>
+      <text class="svgtxt b" x="406" y="140" text-anchor="middle" font-size="16">TP</text>
+      <rect x="500" y="32" width="200" height="60" rx="10" fill="var(--surface2)" stroke="var(--axis)"/>
+      <text class="svgtxt b" x="514" y="56">sensitivity = TP / (TP + FN)</text>
+      <text class="svgtxt sm" x="514" y="78">ในเด็กที่เป็นปอดบวม เราจับได้กี่คน</text>
+      <rect x="500" y="104" width="200" height="60" rx="10" fill="var(--surface2)" stroke="var(--axis)"/>
+      <text class="svgtxt b" x="514" y="128">specificity = TN / (TN + FP)</text>
+      <text class="svgtxt sm" x="514" y="150">ในเด็กปกติ เราปล่อยผ่านได้กี่คน</text>
+    </svg>
+  </figure>
+  <div class="warnbox"><span class="lb">⚠️ รูปแบบผลที่มักเจอใน lab นี้</span>
+    <b>accuracy บนชุดทดสอบมักต่ำกว่า <code>val_acc</code> อย่างชัดเจน เพราะคนไข้ชุดทดสอบต่างจากชุดเทรนและมีคนปกติมากกว่า — เหมือนย้ายไปอีกโรงพยาบาล</b> · ⚠️ <b>และมักได้ sensitivity สูงมากแต่ specificity ต่ำกว่า เพราะโมเดลเรียกปอดบวมเกินจริง ส่วนหนึ่งเพราะภาพชุดเทรนส่วนใหญ่เป็นปอดบวม</b>
+  </div>
+
+  <h4 style="font-size:16px;margin:22px 0 10px">ดูที่ภาพที่ผิด ไม่ใช่ดูแต่ตัวเลข</h4>
+  <p>แกลเลอรีความผิดพลาดแสดง <b>ปอดบวมที่ถูกพลาดอย่างมั่นใจที่สุด (false negative) และการเตือนผิดที่มั่นใจที่สุด (false positive)</b> พร้อม P(ปอดบวม) ของแต่ละภาพ เทียบกับภาพที่ทายถูก</p>
+  <ul class="bul">
+    <li>⭐ <b>แพทย์ควรรู้ว่าโมเดลทายผิดกับเคสแบบไหน ไม่ใช่รู้แค่ว่าผิดกี่เคส</b></li>
+    <li>💡 สาเหตุที่เป็นไปได้ — <b>คุณภาพภาพ การจัดท่าคนไข้ รอยโรคที่ไม่ชัด และความละเอียดที่ต่ำมากแค่ 28 × 28</b></li>
+    <li>⚠️ <b>ความน่าจะเป็นไม่ใช่ความแน่นอน — คำตอบที่ผิดอย่างมั่นใจคืออันตรายที่สุด</b></li>
+  </ul>
+
+  <h4 style="font-size:16px;margin:22px 0 10px">Exercise 3 — เลือก threshold</h4>
+  <figure>
+    <div class="figtitle">⭐ ทิศทางที่ต้องจำ</div>
+    <svg viewBox="0 0 700 132" role="img" aria-label="ผลของการลดและเพิ่ม threshold ต่อ sensitivity และ specificity">
+      <rect x="0" y="22" width="336" height="88" rx="12" fill="var(--s1)" fill-opacity=".10" stroke="var(--s1)" stroke-width="2"/>
+      <text class="svgtxt b" x="18" y="46">↓ threshold ต่ำลง (เช่น 0.3)</text>
+      <text class="svgtxt sm" x="18" y="68">เรียกภาพว่าปอดบวมมากขึ้น</text>
+      <text class="svgtxt b" x="18" y="92" fill="var(--good)">sensitivity ขึ้น · <tspan fill="var(--crit)">specificity ลง</tspan></text>
+      <rect x="364" y="22" width="336" height="88" rx="12" fill="var(--s2)" fill-opacity=".10" stroke="var(--s2)" stroke-width="2"/>
+      <text class="svgtxt b" x="382" y="46">↑ threshold สูงขึ้น (เช่น 0.9)</text>
+      <text class="svgtxt sm" x="382" y="68">เรียกภาพว่าปอดบวมน้อยลง</text>
+      <text class="svgtxt b" x="382" y="92" fill="var(--crit)">sensitivity ลง · <tspan fill="var(--good)">specificity ขึ้น</tspan></text>
+      <text class="svgtxt b" x="350" y="16" text-anchor="middle">โมเดลให้ความน่าจะเป็น — ⭐ เราเป็นคนเลือกจุดตัด ตามเป้าหมายทางคลินิก</text>
+      <text class="svgtxt sm" x="350" y="128" text-anchor="middle">⭐ ROC AUC สรุปทุก threshold ไว้พร้อมกัน (1.0 = แยกได้สมบูรณ์ · 0.5 = โยนหัวก้อย)</text>
+    </svg>
+  </figure>
+  <p>💡 เซลล์ที่ให้มาจะพิมพ์ตารางสำหรับ threshold <b>0.1, 0.3, 0.5, 0.7, 0.8, 0.9, 0.95</b> พร้อมวาดเส้นโค้ง ROC และค่า AUC</p>
+
+  <div class="tw"><table>
+    <thead><tr><th>คำถามเขียนตอบ</th><th>สิ่งที่ต้องตอบ</th></tr></thead>
+    <tbody>
+      <tr><td><b>ข้อ 1</b></td><td>จากตารางของเรา — <b>(ก) เด็กที่เป็นปอดบวมถูกพลาดไปกี่คน (ข) เด็กปกติถูกเตือนผิดกี่คน (ค) แต่ละคนจะเจออะไรในทางปฏิบัติจริง และความผิดพลาดแบบไหนร้ายแรงกว่า เพราะอะไร</b></td></tr>
+      <tr><td><b>ข้อ 2</b></td><td>เทียบภาพที่ผิดกับภาพที่ถูก — <b>อะไรน่าจะเป็นสาเหตุของความผิดพลาด และเราจะเชื่อค่า 0.95 มากกว่า 0.55 ไหม เพราะอะไร</b></td></tr>
+      <tr><td><b>ข้อ 3</b></td><td>⭐ <b>ถ้าใช้คัดแยกฟิล์มทรวงอกเด็กว่าใครควรถูกอ่านก่อน จะเลือก threshold ไหนจากตาราง และเพราะอะไร · คำตอบจะเปลี่ยนไหมถ้าโมเดลถูกใช้เพื่อตัดปอดบวมออกโดยไม่มีแพทย์อ่านภาพเลย</b></td></tr>
+    </tbody>
+  </table></div>
+  </div>
+</section>
+
+<section class="ch" id="ch39" data-ch="39">
+  <h3>บทที่ 39 — Part B, กับดักของ lab และงานที่ต้องส่ง</h3>
+  <div class="chbody">
+  <p>⭐ <b>Classification ต้องการ label ระดับภาพ ส่วน detection และ segmentation ต้องการ label ระดับพื้นที่ คือกรอบหรือ mask ที่แม่นยำ</b> ⚠️ <b>และการวาด mask เป็นงานของผู้เชี่ยวชาญที่ช้า (มักเป็นรังสีแพทย์) ชุดข้อมูล segmentation จึงเล็กและแพง</b></p>
+  <div class="warnbox"><span class="lb">⚠️ เดโม mask ด้วย Otsu threshold</span>
+    เซลล์เดโมใช้ <b>Otsu threshold เลือกจุดตัดความสว่างให้อัตโนมัติ</b> แล้วแสดงฟิล์ม · mask (<code>img &gt; thr</code>) · และภาพซ้อน ⚠️ <b>mask นี้เลือกโครงสร้างที่ทึบ (กระดูกสันหลัง หัวใจ เนื้อเยื่ออ่อน กระดูก) ส่วนปอดที่มีอากาศยังดำอยู่</b> ⭐ <b>ความสว่างไม่ใช่กายวิภาค</b> — การตรวจจับที่เรียนรู้จริงจะมาใน Lab 5
+  </div>
+  <p><b>คำถามเขียนตอบข้อ 4</b> — โรงพยาบาลหนึ่งอยากได้ AI ที่วาดเส้นขอบบริเวณ consolidation บนฟิล์มทรวงอก ⭐ <b>ต้องใช้ label แบบไหน ใครควรเป็นคนวาด และจะเกิดปัญหาอะไรถ้าผู้ติด label เห็นไม่ตรงกัน</b></p>
+
+  <h4 style="font-size:16px;margin:24px 0 10px">กับดักของ lab และแนวคิดในคาบที่มันโยงถึง</h4>
+  <div class="tw"><table>
+    <thead><tr><th>⚠️ กับดักใน lab</th><th>แนวคิดในคาบ</th></tr></thead>
+    <tbody>
+      <tr><td>⚠️ <b>ลืมตั้ง GPU runtime — เทรนช้ามาก</b></td><td>กำลังคำนวณคือหนึ่งในสามส่วนผสม (AlexNet)</td></tr>
+      <tr><td>⚠️ <b>accuracy สูงแต่ specificity ต่ำ</b></td><td><b>Class imbalance — ปอดบวมราว 75% ให้ตรวจอัตราฐานก่อน</b></td></tr>
+      <tr><td>⚠️ <b>accuracy ของชุดทดสอบต่ำกว่า <code>val_acc</code> มาก</b></td><td><b>Distribution shift · การตรวจสอบจากภายนอก</b></td></tr>
+      <tr><td>⚠️ <b>ยึด 0.5 ว่าเป็น “ค่า” threshold</b></td><td><b>threshold ตามเป้าหมายทางคลินิก</b></td></tr>
+      <tr><td>⚠️ <b>จูน epoch หรือ learning rate จากผลของชุดทดสอบ</b></td><td><b>ทดสอบครั้งเดียว · จูนบน validation</b></td></tr>
+      <tr><td>⚠️ <b>ทำ augmentation กับชุด validation หรือชุดทดสอบ</b></td><td><b>augment เฉพาะชุดเทรน</b></td></tr>
+      <tr><td>⚠️ <b>อ่าน Otsu mask ว่าเป็น “ปอด”</b></td><td><b>Segmentation ต้องการ mask ที่ผู้เชี่ยวชาญวาด</b></td></tr>
+      <tr><td>⚠️ <b>เชื่อว่าผลที่ 28 × 28 ย้ายไปใช้กับฟิล์มจริงได้</b></td><td><b>ความละเอียด · บริบท DICOM · การตรวจสอบจากภายนอก</b></td></tr>
+    </tbody>
+  </table></div>
+  <div class="key"><span class="lb">⭐ และข้อที่ต้องจำเพิ่ม</span>
+    <b>PneumoniaMNIST มาจากแหล่งเด็กแหล่งเดียว</b> ⚠️ <b>AUC ที่สูงตรงนี้ยังไม่บอกอะไรเลยเกี่ยวกับผู้ใหญ่หรือโรงพยาบาลอื่น</b> (ย้อนกลับไปที่ Zech และคณะ บทที่ 32)
+  </div>
+
+  <div class="key"><span class="lb">⭐ งานที่ต้องส่ง (งานเดี่ยว)</span>
+    <b>notebook ที่รันจากบนลงล่าง แสดง confusion matrix, sensitivity และ specificity, ภาพที่จำแนกผิด และตาราง threshold</b> · <b>พร้อมคำตอบของคำถามเขียนตอบข้อ 1–4 ในเซลล์คำตอบ</b> 💡 ทางเลือกคือชื่อ leaderboard และคะแนนที่ดีที่สุด (ตัววัดคือ ROC AUC · ไฟล์มีคอลัมน์ <code>id</code> และ <code>prob</code>)
+  </div>
+  <p style="color:var(--muted);font-size:14px"><i>สัปดาห์หน้า: จากภาพนิ่งสู่วิดีโอ — การตรวจจับวัตถุด้วย YOLO</i></p>
+  </div>
+</section>
+
+<h2 class="sec" id="s7"><span class="pill">ปิดท้าย</span> ถ้ามองย้อนทั้งภาคพร้อมกัน</h2>
+<section class="ch" id="ch40" data-ch="0">
+  <div class="chbody">
+  <p>ภาคนี้เดินจาก <b>อาร์เรย์ → เครือข่าย → การเทรนที่ดี → งานที่เกินกว่าการจำแนก → ความจริงในโลกจริง</b> และมีเส้นด้ายสองเส้นร้อยมันไว้</p>
+
+  <figure>
+    <div class="figtitle">⭐ เส้นด้ายที่หนึ่ง — CNN ค่อย ๆ แลก “ที่ไหน” กับ “อะไร”</div>
+    <svg viewBox="0 0 700 92" role="img" aria-label="แผนภาพการแลกตำแหน่งกับความหมายในชั้นของ CNN">
+      <defs><linearGradient id="tradeg" x1="0" x2="1">
+        <stop offset="0" stop-color="var(--s1)" stop-opacity=".45"/>
+        <stop offset="1" stop-color="var(--s2)" stop-opacity=".45"/>
+      </linearGradient></defs>
+      <rect x="0" y="30" width="700" height="34" rx="10" fill="url(#tradeg)" stroke="var(--axis)"/>
+      <text class="svgtxt b" x="16" y="52">ชั้นต้น — เก็บ “ที่ไหน”</text>
+      <text class="svgtxt b" x="684" y="52" text-anchor="end">ชั้นท้าย — เก็บ “อะไร”</text>
+      <text class="svgtxt sm" x="350" y="20" text-anchor="middle">convolution → pooling → receptive field ที่กว้างขึ้น</text>
+      <text class="svgtxt sm" x="350" y="84" text-anchor="middle">⚠️ รอยโรคเล็ก ๆ จึงหายได้ถ้าย่อภาพมากเกินไป และรอยโรคใหญ่ต้องการชั้นที่ลึกพอ</text>
+    </svg>
+  </figure>
+
+  <p>เส้นด้ายที่สองคือสิ่งที่ตัดสินว่าโมเดลใช้ได้จริงหรือไม่ และมันไม่ได้อยู่ที่สถาปัตยกรรมเลย — ⭐ <b>มันอยู่ที่การออกแบบการเทรนและการประเมิน</b> การแบ่งตามคนไข้ การ pretrain การ augment อย่างที่เป็นไปได้จริง การเลือกตัววัดให้ตรงคำถามทางคลินิก และการตรวจสอบจากภายนอก</p>
+
+  <div class="cards">
+    <div class="card" style="border-left:4px solid var(--s1)"><h4>รู้จักอาร์เรย์ก่อน</h4><p><b>รูปร่าง หน่วย windowing และบริบท DICOM ที่ถูกถอดทิ้ง</b> ⚠️ “AI ล้มเหลว” จำนวนมากคือความล้มเหลวของการจัดการข้อมูล</p></div>
+    <div class="card" style="border-left:4px solid var(--s2)"><h4>Label คือเพดาน</h4><p><b>โมเดลไม่มีทางดีกว่า label ที่ใช้ตัดสินมันได้</b> — แนวทางการติด label และ kappa เป็นตัวกำหนดเพดานนั้น</p></div>
+    <div class="card" style="border-left:4px solid var(--crit)"><h4>คะแนนภายในหลอกได้</h4><p>⚠️ <b>โมเดลเรียนโรงพยาบาลแทนโรคได้ · เรียนเครื่องหมายข้อความแทนปอดได้</b> ⭐ มีแต่การตรวจสอบจากภายนอกที่เปิดโปงมัน</p></div>
+  </div>
+
+  <div class="key"><span class="lb">⭐ ประโยคที่ปิดทั้งคาบ</span>
+    <b>ใช้ heat map เพื่อหาปัญหา ไม่ใช่เพื่อพิสูจน์ความถูกต้อง — ความไว้ใจมาจากการตรวจสอบจากภายนอก การวิเคราะห์กลุ่มย่อย และการประเมินทางคลินิกแบบไปข้างหน้า</b>
+  </div>
+  </div>
+</section>
+
+<div class="sheetfoot">
+  ชีตอ่านนี้เรียบเรียงจากสไลด์ของอาจารย์ผู้สอนเพื่อใช้ทบทวนก่อนสอบ โดยเลือกเฉพาะส่วนที่น่าจะออกสอบ — เครื่องหมาย ⭐ ⚠️ 💡 เป็นการทำเครื่องหมายเพื่อช่วยจำ ไม่ใช่ส่วนหนึ่งของเอกสารต้นฉบับ · ภาพประกอบทั้งหมดวาดขึ้นใหม่จากเนื้อหา · แผนภาพ windowing และ Dice/IoU คำนวณสดจากสูตรในสไลด์
+</div>
+</main>
+</div>
+<button class="backtop" id="backtop" aria-label="กลับขึ้นด้านบน">↑</button>
+<script>
+(function(){
+"use strict";
+var main = document.querySelector('main');
+var tocEl = document.getElementById('toc');
+var qEl = document.getElementById('q');
+var qclr = document.getElementById('qclr');
+var meta = document.getElementById('searchmeta');
+
+/* ---------- 1. build TOC ---------- */
+var links = [];
+(function buildToc(){
+  var kids = main.children, group = null;
+  for (var i=0;i<kids.length;i++){
+    var el = kids[i];
+    if (el.tagName === 'H2' && el.classList.contains('sec')){
+      group = document.createElement('div');
+      group.className = 'tocgroup';
+      var h = document.createElement('div');
+      h.className = 'sechead';
+      var pill = el.querySelector('.pill');
+      h.textContent = (pill ? pill.textContent + ' · ' : '') + el.textContent.replace(pill ? pill.textContent : '', '').trim();
+      group.appendChild(h);
+      tocEl.appendChild(group);
+    } else if (el.tagName === 'SECTION' && el.classList.contains('ch')){
+      if (!group){ group = document.createElement('div'); tocEl.appendChild(group); }
+      var h3 = el.querySelector('h3');
+      var n = el.getAttribute('data-ch') || '';
+      var title = h3 ? h3.textContent.replace(/^บทที่\s*\d+\s*[—-]\s*/,'').replace(/\s*(บทสำคัญที่สุดของส่วนนี้|ไม่เน้นสอบ|ขั้นตอน lab|⭐ เนียนที่สุด)\s*$/,'').trim()
+                     : 'ภาพรวมทั้งภาค';
+      var a = document.createElement('a');
+      a.href = '#' + el.id;
+      if (el.getAttribute('data-lite')) a.style.opacity = '.72';
+      a.innerHTML = '<span class="n">' + (n && n !== '0' ? n : '•') + '</span><span class="tt"></span>';
+      a.querySelector('.tt').textContent = title;
+      group.appendChild(a);
+      links.push({a:a, sec:el});
+    }
+  }
+})();
+
+/* ---------- 2. scroll spy ---------- */
+var byId = {};
+links.forEach(function(L){ byId[L.sec.id] = L.a; });
+var active = null;
+function spy(){
+  var best = null, bestTop = -1e9;
+  links.forEach(function(L){
+    var r = L.sec.getBoundingClientRect();
+    if (r.top <= 120 && r.top > bestTop){ bestTop = r.top; best = L; }
+  });
+  if (!best) best = links[0];
+  if (best && best.a !== active){
+    if (active) active.classList.remove('on');
+    active = best.a; active.classList.add('on');
+    var ar = active.getBoundingClientRect(), tr = tocEl.getBoundingClientRect();
+    if (ar.top < tr.top + 8 || ar.bottom > tr.bottom - 8){
+      tocEl.scrollTop += (ar.top - tr.top) - tocEl.clientHeight/2;
+    }
+  }
+}
+var spyTick = false;
+window.addEventListener('scroll', function(){
+  if (spyTick) return; spyTick = true;
+  requestAnimationFrame(function(){ spy(); spyTick = false; });
+}, {passive:true});
+
+/* ---------- 3. search ---------- */
+var textNodes = null, wraps = [];
+function collect(){
+  var w = document.createTreeWalker(main, NodeFilter.SHOW_TEXT, {
+    acceptNode: function(n){
+      if (!n.nodeValue || !n.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+      var p = n.parentElement;
+      if (!p) return NodeFilter.FILTER_REJECT;
+      var t = p.tagName;
+      if (t === 'SCRIPT' || t === 'STYLE' || t === 'MARK') return NodeFilter.FILTER_REJECT;
+      if (p.closest('svg')) return NodeFilter.FILTER_REJECT;
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+  var out = [], n;
+  while ((n = w.nextNode())) out.push(n);
+  return out;
+}
+function esc(s){ return s.replace(/[&<>"]/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); }
+function clearHl(){
+  wraps.forEach(function(o){
+    if (o.el.parentNode) o.el.parentNode.replaceChild(document.createTextNode(o.text), o.el);
+  });
+  wraps = []; textNodes = null;
+}
+function runSearch(raw){
+  clearHl();
+  var qs = raw.trim();
+  qclr.style.display = qs ? 'block' : 'none';
+  if (qs.length < 2){
+    links.forEach(function(L){ L.a.classList.remove('dim','hit'); });
+    document.querySelectorAll('.sechead').forEach(function(h){ h.style.display = ''; });
+    meta.textContent = '';
+    return;
+  }
+  var needle = qs.toLowerCase();
+  if (!textNodes) textNodes = collect();
+  var hitSecs = {}, total = 0;
+  textNodes.forEach(function(n){
+    var v = n.nodeValue, lv = v.toLowerCase();
+    if (lv.indexOf(needle) === -1) return;
+    var sec = n.parentElement.closest('section.ch');
+    if (sec) hitSecs[sec.id] = (hitSecs[sec.id]||0) + 1;
+    var html = '', i = 0, j;
+    while ((j = lv.indexOf(needle, i)) !== -1){
+      html += esc(v.slice(i, j)) + '<mark>' + esc(v.slice(j, j + needle.length)) + '</mark>';
+      i = j + needle.length; total++;
+    }
+    html += esc(v.slice(i));
+    var span = document.createElement('span');
+    span.innerHTML = html;
+    if (n.parentNode){
+      n.parentNode.replaceChild(span, n);
+      wraps.push({el:span, text:v});
+    }
+  });
+  var nSec = 0;
+  links.forEach(function(L){
+    var hit = !!hitSecs[L.sec.id];
+    L.a.classList.toggle('dim', !hit);
+    L.a.classList.toggle('hit', hit);
+    if (hit){
+      nSec++;
+      var d = L.sec.querySelector('details.chfold');
+      if (d) d.open = true;
+    }
+  });
+  document.querySelectorAll('.tocgroup').forEach(function(g){
+    var any = g.querySelector('a:not(.dim)');
+    var head = g.querySelector('.sechead');
+    if (head) head.style.display = any ? '' : 'none';
+  });
+  meta.textContent = total ? ('พบ ' + total + ' แห่ง ใน ' + nSec + ' บท') : 'ไม่พบคำนี้';
+}
+var tmr = null;
+qEl.addEventListener('input', function(){
+  clearTimeout(tmr);
+  var v = qEl.value;
+  tmr = setTimeout(function(){ runSearch(v); }, 170);
+});
+qclr.addEventListener('click', function(){ qEl.value=''; runSearch(''); qEl.focus(); });
+qEl.addEventListener('keydown', function(e){
+  if (e.key === 'Escape'){ qEl.value=''; runSearch(''); }
+  if (e.key === 'Enter'){
+    var first = tocEl.querySelector('a.hit');
+    if (first) { document.getElementById(first.getAttribute('href').slice(1)).scrollIntoView(); closeNav(); }
+  }
+});
+document.addEventListener('keydown', function(e){
+  if ((e.key === '/' || (e.key === 'k' && (e.metaKey || e.ctrlKey))) && document.activeElement !== qEl){
+    e.preventDefault(); openNav(); qEl.focus(); qEl.select();
+  }
+});
+
+/* ---------- 4. theme ---------- */
+var THEMES = [['auto','◐ ธีม: อัตโนมัติ'],['light','☀ ธีม: สว่าง'],['dark','☾ ธีม: มืด']];
+var tbtn = document.getElementById('themebtn');
+function store(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+function load(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+function setTheme(name){
+  document.documentElement.setAttribute('data-theme', name);
+  var row = THEMES.filter(function(t){ return t[0]===name; })[0] || THEMES[0];
+  tbtn.textContent = row[1];
+  store('ai4.theme', name);
+}
+setTheme(load('ai4.theme') || 'auto');
+tbtn.addEventListener('click', function(){
+  var cur = document.documentElement.getAttribute('data-theme');
+  var i = 0;
+  THEMES.forEach(function(t,k){ if (t[0]===cur) i = k; });
+  setTheme(THEMES[(i+1) % THEMES.length][0]);
+});
+
+/* ---------- 5. expand / collapse all ---------- */
+var exbtn = document.getElementById('expandbtn');
+exbtn.addEventListener('click', function(){
+  var ds = document.querySelectorAll('details.chfold');
+  var anyClosed = false;
+  ds.forEach(function(d){ if (!d.open) anyClosed = true; });
+  ds.forEach(function(d){ d.open = anyClosed; });
+  exbtn.textContent = anyClosed ? 'พับบทที่ไม่เน้น' : 'เปิดบททั้งหมด';
+  exbtn.setAttribute('aria-pressed', anyClosed ? 'true' : 'false');
+});
+
+/* ---------- 6. quiz reveal ---------- */
+document.querySelectorAll('.qreveal').forEach(function(b){
+  b.addEventListener('click', function(){
+    var qa = b.parentElement.querySelector('.qa');
+    var open = qa.hidden;
+    qa.hidden = !open;
+    b.textContent = open ? 'ซ่อนเฉลย' : 'ดูเฉลย';
+    b.classList.toggle('open', open);
+  });
+});
+var ansbtn = document.getElementById('allansbtn');
+ansbtn.addEventListener('click', function(){
+  var qas = document.querySelectorAll('.qa');
+  var anyHidden = false;
+  qas.forEach(function(q){ if (q.hidden) anyHidden = true; });
+  qas.forEach(function(q){ q.hidden = !anyHidden; });
+  document.querySelectorAll('.qreveal').forEach(function(b){
+    b.textContent = anyHidden ? 'ซ่อนเฉลย' : 'ดูเฉลย';
+    b.classList.toggle('open', anyHidden);
+  });
+  ansbtn.textContent = anyHidden ? 'ซ่อนเฉลยทั้งหมด' : 'เฉลยทั้งหมด';
+  ansbtn.setAttribute('aria-pressed', anyHidden ? 'true' : 'false');
+});
+
+
+/* ---------- 7a. windowing explorer ---------- */
+(function(){
+  var sl = document.getElementById('wl'), sw = document.getElementById('ww');
+  if (!sl || !sw) return;
+  var HU0 = -1100, HU1 = 1600, PX0 = 60, PX1 = 660;
+  function X(hu){ return PX0 + (Math.max(HU0, Math.min(HU1, hu)) - HU0) / (HU1 - HU0) * (PX1 - PX0); }
+  var TISSUE = [['อากาศ',-1000],['ปอด',-700],['ไขมัน',-100],['น้ำ',0],['เนื้อเยื่ออ่อน',40],['กระดูก',1000]];
+  var el = {
+    lo: document.getElementById('wLo'), mid: document.getElementById('wMid'), hi: document.getElementById('wHi'),
+    g: document.getElementById('ramp'),
+    l1: document.getElementById('wL1'), lc: document.getElementById('wLc'), l2: document.getElementById('wL2'),
+    t1: document.getElementById('wT1'), tc: document.getElementById('wTc'), t2: document.getElementById('wT2'),
+    v1: document.getElementById('wV1'), vc: document.getElementById('wVc'), v2: document.getElementById('wV2'),
+    olo: document.getElementById('wlo'), owo: document.getElementById('wwo'),
+    tb: document.querySelector('#wtab tbody')
+  };
+  function fmt(n){ return (n < 0 ? '−' : '') + Math.abs(Math.round(n)); }
+  function update(){
+    var L = +sl.value, W = +sw.value;
+    var a = L - W/2, b = L + W/2;
+    var xa = X(a), xb = X(b), xc = X(L);
+    el.lo.setAttribute('x', PX0); el.lo.setAttribute('width', Math.max(xa - PX0, 0));
+    el.mid.setAttribute('x', xa); el.mid.setAttribute('width', Math.max(xb - xa, 0.5));
+    el.hi.setAttribute('x', xb); el.hi.setAttribute('width', Math.max(PX1 - xb, 0));
+    el.g.setAttribute('x1', xa); el.g.setAttribute('x2', xb);
+    el.l1.setAttribute('x1', xa); el.l1.setAttribute('x2', xa);
+    el.lc.setAttribute('x1', xc); el.lc.setAttribute('x2', xc);
+    el.l2.setAttribute('x1', xb); el.l2.setAttribute('x2', xb);
+    var narrow = (xb - xa) < 82;
+    var a1 = narrow ? 'end' : 'middle', a2 = narrow ? 'start' : 'middle';
+    var px1 = narrow ? xa - 6 : xa, px2 = narrow ? xb + 6 : xb;
+    [el.t1, el.v1].forEach(function(n){ n.setAttribute('x', px1); n.setAttribute('text-anchor', a1); });
+    [el.t2, el.v2].forEach(function(n){ n.setAttribute('x', px2); n.setAttribute('text-anchor', a2); });
+    [el.tc, el.vc].forEach(function(n){ n.setAttribute('x', xc); n.style.opacity = narrow ? 0 : 1; });
+    el.v1.textContent = fmt(a); el.vc.textContent = fmt(L); el.v2.textContent = fmt(b);
+    el.olo.textContent = fmt(L) + ' HU';
+    el.owo.textContent = W + ' HU';
+    var rows = '';
+    TISSUE.forEach(function(t){
+      var d = Math.round(Math.max(0, Math.min(1, (t[1] - a) / W)) * 255);
+      var what = d === 0 ? 'ดำสนิท' : (d === 255 ? 'ขาวสนิท' : 'เทา');
+      rows += '<tr><td><b>' + t[0] + '</b></td><td class="num">' + fmt(t[1]) +
+              '</td><td class="num"><b>' + d + '</b></td><td><span class="swatch" style="background:rgb(' +
+              d + ',' + d + ',' + d + ')"></span> ' + what + '</td></tr>';
+    });
+    el.tb.innerHTML = rows;
+    document.querySelectorAll('.wbtn').forEach(function(btn){
+      var on = (+btn.getAttribute('data-l') === L && +btn.getAttribute('data-w') === W);
+      btn.classList.toggle('on', on);
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+  }
+  sl.addEventListener('input', update);
+  sw.addEventListener('input', update);
+  document.querySelectorAll('.wbtn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      sl.value = btn.getAttribute('data-l');
+      sw.value = btn.getAttribute('data-w');
+      update();
+    });
+  });
+  update();
+})();
+
+/* ---------- 7b. Dice / IoU explorer ---------- */
+(function(){
+  var sl = document.getElementById('dov');
+  if (!sl) return;
+  var AREA_A = 100, AREA_B = 80, S = 40;
+  var rA = Math.sqrt(AREA_A * S / Math.PI), rB = Math.sqrt(AREA_B * S / Math.PI);
+  var cA = document.getElementById('dcA'), cB = document.getElementById('dcB');
+  var out = document.getElementById('dovo'), ov = document.getElementById('dcOv');
+  var dD = document.getElementById('dDice'), dI = document.getElementById('dIoU'),
+      dU = document.getElementById('dUni'), dC = document.getElementById('dChk');
+  function lens(d){
+    if (d <= Math.abs(rA - rB)) return Math.PI * Math.min(rA, rB) * Math.min(rA, rB);
+    if (d >= rA + rB) return 0;
+    var t1 = rA*rA * Math.acos((d*d + rA*rA - rB*rB) / (2*d*rA));
+    var t2 = rB*rB * Math.acos((d*d + rB*rB - rA*rA) / (2*d*rB));
+    var t3 = 0.5 * Math.sqrt((-d+rA+rB)*(d+rA-rB)*(d-rA+rB)*(d+rA+rB));
+    return t1 + t2 - t3;
+  }
+  function solveD(target){
+    if (target <= 0) return rA + rB + 4;
+    var lo = Math.abs(rA - rB), hi = rA + rB;
+    for (var i = 0; i < 60; i++){
+      var m = (lo + hi) / 2;
+      if (lens(m) > target) lo = m; else hi = m;
+    }
+    return (lo + hi) / 2;
+  }
+  cA.setAttribute('r', rA.toFixed(1));
+  cB.setAttribute('r', rB.toFixed(1));
+  function update(){
+    var o = +sl.value;
+    var d = solveD(o * S);
+    var cx = 160, xA = cx - d/2, xB = cx + d/2;
+    cA.setAttribute('cx', xA.toFixed(1)); cB.setAttribute('cx', xB.toFixed(1));
+    document.getElementById('dcLA').setAttribute('x', xA.toFixed(1));
+    document.getElementById('dcLB').setAttribute('x', xB.toFixed(1));
+    out.textContent = o + ' พิกเซล';
+    ov.textContent = 'A∩B = ' + o;
+    ov.setAttribute('x', cx);
+    var uni = AREA_A + AREA_B - o;
+    var dice = 2 * o / (AREA_A + AREA_B);
+    var iou = o / uni;
+    dD.textContent = dice.toFixed(2);
+    dI.textContent = iou.toFixed(2);
+    dU.textContent = uni;
+    dC.textContent = (2 * iou / (1 + iou)).toFixed(2);
+  }
+  sl.addEventListener('input', update);
+  update();
+})();
+
+/* ---------- 8. nav + back to top ---------- */
+var menubtn = document.getElementById('menubtn'), scrim = document.getElementById('scrim');
+function openNav(){ if (window.innerWidth <= 880) document.body.classList.add('navopen'); }
+function closeNav(){ document.body.classList.remove('navopen'); }
+menubtn.addEventListener('click', function(){ document.body.classList.toggle('navopen'); });
+scrim.addEventListener('click', closeNav);
+tocEl.addEventListener('click', function(e){ if (e.target.closest('a')) closeNav(); });
+var bt = document.getElementById('backtop');
+bt.addEventListener('click', function(){ window.scrollTo({top:0, behavior:'smooth'}); });
+window.addEventListener('scroll', function(){
+  bt.style.display = window.scrollY > 700 ? 'block' : 'none';
+}, {passive:true});
+
+spy();
+})();
+</script>
+</body>
+</html>
